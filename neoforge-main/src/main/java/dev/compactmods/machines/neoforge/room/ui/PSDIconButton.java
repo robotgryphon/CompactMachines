@@ -7,7 +7,7 @@ import dev.compactmods.machines.neoforge.shrinking.Shrinking;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.client.gui.widget.ExtendedButton;
+import net.neoforged.client.gui.widget.ExtendedButton;
 import org.jetbrains.annotations.NotNull;
 
 public class PSDIconButton extends ExtendedButton {

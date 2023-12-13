@@ -1,9 +1,9 @@
 package dev.compactmods.machines.neoforge.wall;
 
 import dev.compactmods.machines.api.core.Constants;
-import net.minecraftforge.event.entity.player.PlayerInteractEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
+import net.neoforged.event.entity.player.PlayerInteractEvent;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.Mod;
 
 @Mod.EventBusSubscriber(modid = Constants.MOD_ID)
 public class ProtectedBlockHandler {

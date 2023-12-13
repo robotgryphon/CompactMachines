@@ -17,8 +17,8 @@ import mezz.jei.api.registration.IRecipeRegistration;
 import mezz.jei.api.registration.ISubtypeRegistration;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.registries.ForgeRegistries;
-import net.minecraftforge.server.ServerLifecycleHooks;
+import net.neoforged.registries.ForgeRegistries;
+import net.neoforged.server.ServerLifecycleHooks;
 
 import java.util.stream.Collectors;
 

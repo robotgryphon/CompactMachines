@@ -82,7 +82,7 @@ runs {
     create("data") {
         workingDirectory(file("run/data"))
 
-        programArguments("--mod", "compactcrafting")
+        programArguments("--mod", "compactmachines")
         programArguments("--all")
         programArguments("--output", file("src/generated/resources/").path)
         programArguments("--existing", file("src/main/resources").path)
@@ -140,7 +140,9 @@ dependencies {
     implementation("com.aventrix.jnanoid", "jnanoid", "2.0.0")
     jarJar("com.aventrix.jnanoid", "jnanoid", "[2.0.0]")
 
-        implementation("dev.compactmods.compactmachines:core-api:$coreVersion")
+    implementation("dev.compactmods.compactmachines:core-api:$coreVersion")
+    implementation("dev.compactmods.compactmachines:room-api:$coreVersion")
+    implementation("dev.compactmods.compactmachines:room-upgrade-api:$coreVersion")
     implementation("dev.compactmods.compactmachines:core:$coreVersion")
 //    implementation("dev.compactmods.compactmachines:tunnels-api:$tunnelsApiVersion")
 //
@@ -149,6 +151,14 @@ dependencies {
     }
 
     jarJar("dev.compactmods.compactmachines", "core-api", "[$coreVersion]") {
+        isTransitive = false
+    }
+
+    jarJar("dev.compactmods.compactmachines", "room-api", "[$coreVersion]") {
+        isTransitive = false
+    }
+
+    jarJar("dev.compactmods.compactmachines", "room-upgrade-api", "[$coreVersion]") {
         isTransitive = false
     }
 //

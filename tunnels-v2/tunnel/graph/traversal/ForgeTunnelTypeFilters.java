@@ -4,7 +4,7 @@ import dev.compactmods.machines.api.tunnels.capability.CapabilityTunnel;
 import dev.compactmods.machines.neoforge.tunnel.Tunnels;
 import dev.compactmods.machines.tunnel.graph.traversal.ITunnelFilter;
 import dev.compactmods.machines.tunnel.graph.traversal.TunnelTypeFilters;
-import net.minecraftforge.common.capabilities.Capability;
+import net.neoforged.common.capabilities.Capability;
 
 public class ForgeTunnelTypeFilters {
 

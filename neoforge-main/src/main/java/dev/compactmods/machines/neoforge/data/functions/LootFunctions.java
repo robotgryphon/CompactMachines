@@ -2,7 +2,7 @@ package dev.compactmods.machines.neoforge.data.functions;
 
 import dev.compactmods.machines.neoforge.Registries;
 import net.minecraft.world.level.storage.loot.functions.LootItemFunctionType;
-import net.minecraftforge.registries.RegistryObject;
+import net.neoforged.registries.RegistryObject;
 
 public class LootFunctions {
 

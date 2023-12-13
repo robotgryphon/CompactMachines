@@ -3,8 +3,8 @@ package dev.compactmods.machines.neoforge.compat.carryon;
 import dev.compactmods.machines.neoforge.machine.Machines;
 import dev.compactmods.machines.neoforge.machine.block.LegacySizedCompactMachineBlock;
 import dev.compactmods.machines.api.room.RoomSize;
-import net.minecraftforge.fml.InterModComms;
-import net.minecraftforge.registries.ForgeRegistries;
+import net.neoforged.fml.InterModComms;
+import net.neoforged.registries.ForgeRegistries;
 
 public class CarryOnCompat {
 

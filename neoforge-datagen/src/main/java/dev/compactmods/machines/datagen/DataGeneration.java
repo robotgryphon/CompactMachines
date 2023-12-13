@@ -8,7 +8,7 @@ import dev.compactmods.machines.datagen.tags.BlockTagGenerator;
 import dev.compactmods.machines.datagen.tags.ItemTagGenerator;
 import dev.compactmods.machines.datagen.tags.PointOfInterestTagGenerator;
 import net.neoforged.data.event.GatherDataEvent;
-import net.neoforged.eventbus.api.SubscribeEvent;
+import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.Mod;
 
 @Mod.EventBusSubscriber(modid = Constants.MOD_ID, bus = Mod.EventBusSubscriber.Bus.MOD)

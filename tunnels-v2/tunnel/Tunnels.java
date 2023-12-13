@@ -13,9 +13,9 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.material.Material;
 import net.minecraft.world.level.material.MaterialColor;
-import net.minecraftforge.registries.IForgeRegistry;
-import net.minecraftforge.registries.RegistryBuilder;
-import net.minecraftforge.registries.RegistryObject;
+import net.neoforged.registries.IForgeRegistry;
+import net.neoforged.registries.RegistryBuilder;
+import net.neoforged.registries.RegistryObject;
 
 import java.util.function.Supplier;
 
@@ -46,7 +46,7 @@ public class Tunnels {
     //   TUNNELS
     // ================================================================================================================
     public static final ResourceKey<TunnelDefinition> UNKNOWN_KEY = ResourceKey.create(TunnelDefinition.REGISTRY_KEY,
-            new ResourceLocation(MOD_ID, "unknown"));
+            new ResourceLocation(Constants.MOD_ID, "unknown"));
 
     public static final RegistryObject<TunnelDefinition> UNKNOWN = Registries.TUNNEL_DEFINITIONS
             .register("unknown", UnknownTunnel::new);
@@ -74,7 +74,7 @@ public class Tunnels {
 
     public static ResourceLocation getRegistryId(TunnelDefinition definition) {
         final var reg = TUNNEL_DEF_REGISTRY.get();
-        if (!reg.containsValue(definition)) return new ResourceLocation(MOD_ID, "unknown");
+        if (!reg.containsValue(definition)) return new ResourceLocation(Constants.MOD_ID, "unknown");
         return reg.getKey(definition);
     }
 

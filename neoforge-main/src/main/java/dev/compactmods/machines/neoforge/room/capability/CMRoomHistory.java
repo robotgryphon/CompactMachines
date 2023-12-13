@@ -1,7 +1,7 @@
 package dev.compactmods.machines.neoforge.room.capability;
 
 import com.mojang.serialization.DataResult;
-import dev.compactmods.machines.api.room.IRoomHistory;
+import dev.compactmods.compactmachines.api.room.history.IRoomHistory;
 import dev.compactmods.machines.codec.NbtListCollector;
 import dev.compactmods.machines.room.history.PlayerRoomHistoryItem;
 import net.minecraft.nbt.ListTag;

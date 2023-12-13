@@ -1,26 +1,15 @@
 package dev.compactmods.machines.neoforge.room.ui;
 
 import dev.compactmods.machines.neoforge.Registries;
-import net.minecraft.core.GlobalPos;
 import net.minecraft.world.inventory.MenuType;
-import net.minecraftforge.common.extensions.IForgeMenuType;
-import net.minecraftforge.registries.RegistryObject;
+import net.neoforged.neoforge.common.extensions.IMenuTypeExtension;
+import net.neoforged.neoforge.registries.DeferredHolder;
 
 public class RoomUserInterfaceRegistration {
 
-    public static final RegistryObject<MenuType<MachineRoomMenu>> MACHINE_MENU = Registries.CONTAINERS.register("machine", () -> IForgeMenuType.create(
-            ((windowId, inv, data) -> {
-                data.readBlockPos();
-                final var mach = data.readWithCodec(GlobalPos.CODEC);
-                final var room = data.readUtf();
-                final boolean hasName = data.readBoolean();
-                final var roomName = hasName ? data.readUtf() : "Room Preview";
-
-                return new MachineRoomMenu(windowId, room, mach, roomName);
-            })
-    ));
+    public static final DeferredHolder<MenuType<?>, MenuType<MachineRoomMenu>> MACHINE_MENU = Registries.CONTAINERS.register("machine",
+            () -> IMenuTypeExtension.create(MachineRoomMenu::createRoomMenu));
 
     public static void prepare() {
-
     }
 }

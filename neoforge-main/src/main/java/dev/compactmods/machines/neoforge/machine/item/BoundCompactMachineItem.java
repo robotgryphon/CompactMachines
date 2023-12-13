@@ -3,16 +3,16 @@ package dev.compactmods.machines.neoforge.machine.item;
 import dev.compactmods.machines.api.core.Constants;
 import dev.compactmods.machines.api.core.Tooltips;
 import dev.compactmods.machines.api.machine.MachineNbt;
-import dev.compactmods.machines.api.room.registration.IBasicRoomInfo;
-import dev.compactmods.machines.neoforge.machine.Machines;
 import dev.compactmods.machines.i18n.TranslationUtil;
 import dev.compactmods.machines.machine.item.ICompactMachineItem;
+import dev.compactmods.machines.neoforge.machine.Machines;
 import net.minecraft.Util;
 import net.minecraft.core.Vec3i;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
@@ -78,10 +78,17 @@ public class BoundCompactMachineItem extends BlockItem implements ICompactMachin
         tag.putString(ROOM_NBT, room);
     }
 
-    public static ItemStack createForRoom(IBasicRoomInfo room) {
+    public static ItemStack createForRoom(String roomCode) {
         ItemStack item = new ItemStack(Machines.BOUND_MACHINE_BLOCK_ITEM.get());
-        setRoom(item, room.code());
-        ICompactMachineItem.setColor(item, room.color());
+        setRoom(item, roomCode);
+        ICompactMachineItem.setColor(item, DyeColor.WHITE.getTextColor());
+        return item;
+    }
+
+    public static ItemStack createForRoom(String roomCode, int color) {
+        ItemStack item = new ItemStack(Machines.BOUND_MACHINE_BLOCK_ITEM.get());
+        setRoom(item, roomCode);
+        ICompactMachineItem.setColor(item, color);
         return item;
     }
 

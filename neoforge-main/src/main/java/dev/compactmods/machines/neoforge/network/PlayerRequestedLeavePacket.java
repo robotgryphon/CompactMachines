@@ -1,24 +1,12 @@
 package dev.compactmods.machines.neoforge.network;
 
 import dev.compactmods.machines.neoforge.room.RoomHelper;
-import net.minecraft.network.FriendlyByteBuf;
-import net.minecraftforge.network.NetworkEvent;
-
-import java.util.function.Supplier;
+import net.neoforged.neoforge.network.NetworkEvent;
 
 public record PlayerRequestedLeavePacket() {
-    public PlayerRequestedLeavePacket(FriendlyByteBuf friendlyByteBuf) {
-        this();
-    }
 
-    public void handle(Supplier<NetworkEvent.Context> context) {
-        final var ctx = context.get();
-        final var sender = ctx.getSender();
-
+    public void handle(NetworkEvent.Context context) {
+        final var sender = context.getSender();
         RoomHelper.teleportPlayerOutOfRoom(sender);
-    }
-
-    public void encode(FriendlyByteBuf buffer) {
-
     }
 }

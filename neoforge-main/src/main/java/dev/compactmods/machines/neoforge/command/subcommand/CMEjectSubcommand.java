@@ -5,8 +5,6 @@ import com.mojang.brigadier.builder.ArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import dev.compactmods.machines.neoforge.util.ForgePlayerUtil;
-import dev.compactmods.machines.neoforge.room.capability.RoomCapabilities;
-import dev.compactmods.machines.api.room.IRoomHistory;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.arguments.EntityArgument;

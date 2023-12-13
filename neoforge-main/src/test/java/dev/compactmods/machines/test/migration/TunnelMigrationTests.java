@@ -4,8 +4,8 @@ import dev.compactmods.machines.api.core.Constants;
 import dev.compactmods.machines.test.TestBatches;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
-import net.minecraftforge.gametest.GameTestHolder;
-import net.minecraftforge.gametest.PrefixGameTestTemplate;
+import net.neoforged.gametest.GameTestHolder;
+import net.neoforged.gametest.PrefixGameTestTemplate;
 
 @PrefixGameTestTemplate(false)
 @GameTestHolder(Constants.MOD_ID)

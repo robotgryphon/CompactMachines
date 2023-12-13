@@ -1,13 +1,11 @@
 package dev.compactmods.machines.neoforge.command.argument;
 
 import com.mojang.brigadier.context.CommandContext;
-import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.exceptions.DynamicCommandExceptionType;
 import dev.compactmods.machines.api.core.CMCommands;
-import dev.compactmods.machines.api.core.CMRegistryKeys;
-import dev.compactmods.machines.api.upgrade.RoomUpgrade;
-import dev.compactmods.machines.neoforge.upgrade.MachineRoomUpgrades;
+import dev.compactmods.machines.api.room.upgrade.RoomUpgrade;
 import dev.compactmods.machines.i18n.TranslationUtil;
+import dev.compactmods.machines.neoforge.upgrade.MachineRoomUpgrades;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.arguments.ResourceKeyArgument;
 import net.minecraft.resources.ResourceKey;
@@ -20,13 +18,13 @@ public class RoomUpgradeArgument extends ResourceKeyArgument<RoomUpgrade> {
             TranslationUtil.command(CMCommands.WRONG_DIMENSION));
 
     private RoomUpgradeArgument() {
-        super(CMRegistryKeys.ROOM_UPGRADES);
+        super(RoomUpgrade.REG_KEY);
     }
 
-    public static Optional<RoomUpgrade> getUpgrade(CommandContext<CommandSourceStack> stack, String argName) throws CommandSyntaxException {
-        final var UPGRADES = MachineRoomUpgrades.REGISTRY.get();
-        ResourceKey<RoomUpgrade> resourcekey = getRegistryType(stack, argName, CMRegistryKeys.ROOM_UPGRADES, ERROR_INVALID_UPGRADE);
-        return Optional.ofNullable(UPGRADES.getValue(resourcekey.location()));
+    public static Optional<RoomUpgrade> getUpgrade(CommandContext<CommandSourceStack> stack, String argName) {
+        final var argKey = (ResourceKey<?>) stack.getArgument(argName, ResourceKey.class);
+        return argKey.cast(RoomUpgrade.REG_KEY)
+                .map(MachineRoomUpgrades.REGISTRY::get);
     }
 
     public static RoomUpgradeArgument upgrade() {

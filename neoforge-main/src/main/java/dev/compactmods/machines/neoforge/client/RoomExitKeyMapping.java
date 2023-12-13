@@ -9,7 +9,7 @@ import net.minecraft.Util;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraftforge.client.settings.IKeyConflictContext;
+import net.neoforged.neoforge.client.settings.IKeyConflictContext;
 
 public class RoomExitKeyMapping {
 

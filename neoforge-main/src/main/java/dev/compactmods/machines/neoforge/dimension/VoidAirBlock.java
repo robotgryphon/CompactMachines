@@ -2,7 +2,6 @@ package dev.compactmods.machines.neoforge.dimension;
 
 import dev.compactmods.machines.api.room.IRoomHistory;
 import dev.compactmods.machines.neoforge.config.ServerConfig;
-import dev.compactmods.machines.neoforge.room.capability.RoomCapabilities;
 import dev.compactmods.machines.neoforge.util.ForgePlayerUtil;
 import dev.compactmods.machines.util.PlayerUtil;
 import net.minecraft.core.BlockPos;

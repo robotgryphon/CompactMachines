@@ -5,7 +5,7 @@ import dev.compactmods.machines.tunnel.client.ClientTunnelHandler;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceKey;
-import net.minecraftforge.network.NetworkEvent;
+import net.neoforged.network.NetworkEvent;
 
 import javax.annotation.Nonnull;
 import java.util.function.Supplier;

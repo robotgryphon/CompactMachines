@@ -7,8 +7,8 @@ import dev.compactmods.machines.test.util.FileHelper;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.world.level.storage.LevelStorageSource;
-import net.minecraftforge.gametest.GameTestHolder;
-import net.minecraftforge.gametest.PrefixGameTestTemplate;
+import net.neoforged.gametest.GameTestHolder;
+import net.neoforged.gametest.PrefixGameTestTemplate;
 
 @PrefixGameTestTemplate(false)
 @GameTestHolder(Constants.MOD_ID)

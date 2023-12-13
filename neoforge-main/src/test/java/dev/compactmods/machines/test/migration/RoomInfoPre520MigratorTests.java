@@ -10,8 +10,8 @@ import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.gametest.GameTestHolder;
-import net.minecraftforge.gametest.PrefixGameTestTemplate;
+import net.neoforged.gametest.GameTestHolder;
+import net.neoforged.gametest.PrefixGameTestTemplate;
 
 import java.io.IOException;
 import java.util.UUID;

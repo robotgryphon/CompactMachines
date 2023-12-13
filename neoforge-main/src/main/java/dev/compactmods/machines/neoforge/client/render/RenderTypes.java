@@ -4,7 +4,7 @@ import com.google.common.collect.ImmutableMap;
 import com.mojang.blaze3d.vertex.VertexFormat;
 import com.mojang.blaze3d.vertex.VertexFormatElement;
 import dev.compactmods.machines.api.core.Constants;
-import dev.compactmods.machines.neoforge.client.CM4Shaders;
+import dev.compactmods.machines.neoforge.client.CompactMachinesShaders;
 import net.minecraft.client.renderer.RenderStateShard;
 import net.minecraft.client.renderer.RenderType;
 
@@ -25,7 +25,7 @@ public class RenderTypes extends RenderStateShard {
 
 	protected static final RenderStateShard.LightmapStateShard LIGHTMAP_DISABLED = new RenderStateShard.LightmapStateShard(false);
 
-	protected static final RenderStateShard.ShaderStateShard WALL_BLOCKS = new RenderStateShard.ShaderStateShard(CM4Shaders::wall);
+	protected static final RenderStateShard.ShaderStateShard WALL_BLOCKS = new RenderStateShard.ShaderStateShard(CompactMachinesShaders::wall);
 
 	public static final RenderType WALLS = RenderType.create(
 			Constants.MOD_ID + ":wall",

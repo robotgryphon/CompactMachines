@@ -2,10 +2,9 @@ package dev.compactmods.machines.neoforge.network;
 
 import dev.compactmods.machines.neoforge.room.client.ClientRoomPacketHandler;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraftforge.network.NetworkEvent;
+import net.neoforged.neoforge.network.NetworkEvent;
 
 import java.util.UUID;
-import java.util.function.Supplier;
 
 public record SyncRoomMetadataPacket(String roomCode, UUID owner) {
     public SyncRoomMetadataPacket(FriendlyByteBuf buffer) {
@@ -17,8 +16,8 @@ public record SyncRoomMetadataPacket(String roomCode, UUID owner) {
         buffer.writeUUID(owner);
     }
 
-    public void handle(Supplier<NetworkEvent.Context> contextSupplier) {
+    public void handle(NetworkEvent.Context context) {
         ClientRoomPacketHandler.handleRoomSync(this.roomCode, this.owner);
-        contextSupplier.get().setPacketHandled(true);
+        context.setPacketHandled(true);
     }
 }

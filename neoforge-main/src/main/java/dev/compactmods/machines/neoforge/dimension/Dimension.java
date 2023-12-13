@@ -7,7 +7,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.dimension.DimensionType;
-import net.minecraftforge.registries.RegistryObject;
+import net.neoforged.registries.RegistryObject;
 
 import static dev.compactmods.machines.api.core.Constants.MOD_ID;
 

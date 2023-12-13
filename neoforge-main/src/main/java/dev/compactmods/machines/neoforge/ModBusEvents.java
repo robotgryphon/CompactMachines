@@ -5,9 +5,9 @@ import dev.compactmods.machines.advancement.AdvancementTriggers;
 import dev.compactmods.machines.api.core.Constants;
 import dev.compactmods.machines.neoforge.network.CompactMachinesNet;
 import dev.compactmods.machines.neoforge.network.RoomNetworkHandler;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.Mod;
+import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
 
 @Mod.EventBusSubscriber(modid = Constants.MOD_ID, bus = Mod.EventBusSubscriber.Bus.MOD)
 public class ModBusEvents {

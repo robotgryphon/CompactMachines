@@ -4,7 +4,7 @@ import dev.compactmods.machines.api.dimension.CompactDimension;
 import dev.compactmods.machines.api.dimension.MissingDimensionException;
 import dev.compactmods.machines.room.graph.CompactRoomProvider;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraftforge.server.ServerLifecycleHooks;
+import net.neoforged.server.ServerLifecycleHooks;
 import org.jetbrains.annotations.Nullable;
 
 import static dev.compactmods.machines.room.graph.CompactRoomProvider.DATA_NAME;

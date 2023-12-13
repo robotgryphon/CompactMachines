@@ -1,11 +1,11 @@
 package dev.compactmods.machines.neoforge.network;
 
-import dev.compactmods.machines.neoforge.util.VersionUtil;
 import dev.compactmods.machines.api.core.Constants;
+import dev.compactmods.machines.neoforge.util.VersionUtil;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraftforge.network.NetworkDirection;
-import net.minecraftforge.network.NetworkRegistry;
-import net.minecraftforge.network.simple.SimpleChannel;
+import net.neoforged.neoforge.network.NetworkRegistry;
+import net.neoforged.neoforge.network.PlayNetworkDirection;
+import net.neoforged.neoforge.network.simple.SimpleChannel;
 import org.apache.maven.artifact.versioning.ArtifactVersion;
 import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
 
@@ -21,13 +21,13 @@ public class RoomNetworkHandler {
     );
 
     public static void setupMessages() {
-        CHANNEL.messageBuilder(PlayerStartedRoomTrackingPacket.class, 1, NetworkDirection.PLAY_TO_SERVER)
+        CHANNEL.messageBuilder(PlayerStartedRoomTrackingPacket.class, 1, PlayNetworkDirection.PLAY_TO_SERVER)
                 .encoder(PlayerStartedRoomTrackingPacket::encode)
                 .decoder(PlayerStartedRoomTrackingPacket::new)
                 .consumerMainThread(PlayerStartedRoomTrackingPacket::handle)
                 .add();
 
-        CHANNEL.messageBuilder(InitialRoomBlockDataPacket.class, 2, NetworkDirection.PLAY_TO_CLIENT)
+        CHANNEL.messageBuilder(InitialRoomBlockDataPacket.class, 2, PlayNetworkDirection.PLAY_TO_CLIENT)
                 .encoder(InitialRoomBlockDataPacket::toNetwork)
                 .decoder(InitialRoomBlockDataPacket::fromNetwork)
                 .consumerMainThread(InitialRoomBlockDataPacket::handle)

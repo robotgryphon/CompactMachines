@@ -26,8 +26,8 @@ import net.minecraft.world.entity.decoration.ArmorStand;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructurePlaceSettings;
-import net.minecraftforge.client.model.data.ModelData;
-import net.minecraftforge.fml.ModList;
+import net.neoforged.client.model.data.ModelData;
+import net.neoforged.fml.ModList;
 
 public class MachineRoomScreen extends AbstractContainerScreen<MachineRoomMenu> {
 

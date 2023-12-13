@@ -4,10 +4,10 @@ import dev.compactmods.machines.api.core.Constants;
 import dev.compactmods.machines.neoforge.compat.carryon.CarryOnCompat;
 import dev.compactmods.machines.neoforge.compat.curios.CuriosCompat;
 import dev.compactmods.machines.neoforge.compat.theoneprobe.TheOneProbeCompat;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.ModList;
-import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.event.lifecycle.InterModEnqueueEvent;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.ModList;
+import net.neoforged.fml.common.Mod;
+import net.neoforged.fml.event.lifecycle.InterModEnqueueEvent;
 
 @Mod.EventBusSubscriber(modid = Constants.MOD_ID, bus = Mod.EventBusSubscriber.Bus.MOD)
 public class InterModCompat {

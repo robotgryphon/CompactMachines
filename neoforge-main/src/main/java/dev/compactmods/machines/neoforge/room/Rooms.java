@@ -12,8 +12,8 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.chunk.ChunkStatus;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate;
-import net.minecraftforge.registries.IForgeRegistry;
-import net.minecraftforge.registries.RegistryBuilder;
+import net.neoforged.registries.IForgeRegistry;
+import net.neoforged.registries.RegistryBuilder;
 
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;

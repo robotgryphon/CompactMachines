@@ -23,12 +23,13 @@ import dev.compactmods.machines.neoforge.villager.Villagers;
 import dev.compactmods.machines.neoforge.wall.Walls;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.common.capabilities.RegisterCapabilitiesEvent;
-import net.minecraftforge.fml.ModLoadingContext;
-import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.config.ModConfig;
-import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
-import net.minecraftforge.forgespi.language.ModFileScanData;
+import net.neoforged.common.capabilities.RegisterCapabilitiesEvent;
+import net.neoforged.fml.ModLoadingContext;
+import net.neoforged.fml.common.Mod;
+import net.neoforged.fml.config.ModConfig;
+import net.neoforged.fml.javafmlmod.FMLJavaModLoadingContext;
+import net.neoforged.forgespi.language.ModFileScanData;
+import net.neoforged.neoforgespi.language.ModFileScanData;
 import org.apache.logging.log4j.Marker;
 import org.apache.logging.log4j.MarkerManager;
 
@@ -38,12 +39,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 @Mod(Constants.MOD_ID)
-public class CompactMachines implements ICompactMachinesMod {
-    /**
-     * @deprecated Switch usages to use api {@link Constants#MOD_ID} in 1.20, eliminate it here
-     */
-    @Deprecated(forRemoval = true, since = "5.2.0")
-    public static final String MOD_ID = Constants.MOD_ID;
+public class CompactMachines {
 
     public static final Marker ADDON_LIFECYCLE = MarkerManager.getMarker("addons");
 
@@ -72,11 +68,6 @@ public class CompactMachines implements ICompactMachinesMod {
         bus.addListener(this::registerCapabilities);
     }
 
-    private void registerCapabilities(final RegisterCapabilitiesEvent caps) {
-        caps.register(IPlayerRoomMetadataProvider.class);
-        caps.register(IRoomHistory.class);
-    }
-
     /**
      * Sets up the deferred registration for usage in package/module setup.
      */
@@ -86,7 +77,6 @@ public class CompactMachines implements ICompactMachinesMod {
         Registries.BLOCKS.register(bus);
         Registries.ITEMS.register(bus);
         Registries.BLOCK_ENTITIES.register(bus);
-        Registries.TUNNEL_DEFINITIONS.register(bus);
         Registries.CONTAINERS.register(bus);
         Registries.ROOM_TEMPLATES.register(bus);
         Registries.UPGRADES.register(bus);
@@ -129,7 +119,6 @@ public class CompactMachines implements ICompactMachinesMod {
         // Package initialization here, this kickstarts the rest of the DR code (classloading)
         Machines.prepare();
         Walls.prepare();
-        Tunnels.prepare();
         Shrinking.prepare();
 
         RoomUserInterfaceRegistration.prepare();

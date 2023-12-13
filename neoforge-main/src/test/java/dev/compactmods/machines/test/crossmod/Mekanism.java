@@ -3,7 +3,7 @@ package dev.compactmods.machines.test.crossmod;
 import dev.compactmods.machines.neoforge.CompactMachines;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
-import net.minecraftforge.gametest.PrefixGameTestTemplate;
+import net.neoforged.gametest.PrefixGameTestTemplate;
 
 @PrefixGameTestTemplate(false)
 public class Mekanism {

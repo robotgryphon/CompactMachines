@@ -4,14 +4,14 @@ import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import dev.compactmods.compactmachines.api.room.Rooms;
+import dev.compactmods.machines.LoggingUtil;
+import dev.compactmods.machines.api.core.CMCommands;
+import dev.compactmods.machines.api.core.Messages;
+import dev.compactmods.machines.i18n.TranslationUtil;
 import dev.compactmods.machines.neoforge.command.argument.Suggestors;
 import dev.compactmods.machines.neoforge.config.ServerConfig;
 import dev.compactmods.machines.neoforge.machine.item.BoundCompactMachineItem;
-import dev.compactmods.machines.api.core.CMCommands;
-import dev.compactmods.machines.api.core.Messages;
-import dev.compactmods.machines.LoggingUtil;
-import dev.compactmods.machines.i18n.TranslationUtil;
-import dev.compactmods.machines.room.graph.CompactRoomProvider;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.arguments.EntityArgument;
@@ -39,13 +39,12 @@ public class CMGiveMachineSubcommand {
         final var player = EntityArgument.getPlayer(ctx, "player");
         final var roomCode = StringArgumentType.getString(ctx, "room");
 
-        var roomProvider = CompactRoomProvider.instance(src.getServer());
-        roomProvider.forRoom(roomCode).ifPresentOrElse(room -> {
-            ItemStack newItem = BoundCompactMachineItem.createForRoom(room);
+        Rooms.registrar().get(roomCode).ifPresentOrElse(room -> {
+            ItemStack newItem = BoundCompactMachineItem.createForRoom(roomCode);
             if (!player.addItem(newItem)) {
                 src.sendFailure(TranslationUtil.command(CMCommands.CANNOT_GIVE_MACHINE));
             } else {
-                src.sendSuccess(TranslationUtil.command(CMCommands.MACHINE_GIVEN, player.getDisplayName()), true);
+                src.sendSuccess(() -> TranslationUtil.command(CMCommands.MACHINE_GIVEN, player.getDisplayName()), true);
             }
         }, () -> {
             LOGGER.error("Error giving player a new machine block: room not found.");

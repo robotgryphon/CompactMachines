@@ -6,9 +6,9 @@ import dev.compactmods.machines.neoforge.data.migration.EarlyLevelDataFileReader
 import dev.compactmods.machines.neoforge.data.migration.Pre520RoomDataMigrator;
 import dev.compactmods.machines.room.graph.CompactRoomProvider;
 import net.minecraft.world.level.storage.LevelStorageSource;
-import net.minecraftforge.event.ModMismatchEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
+import net.neoforged.event.ModMismatchEvent;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.Mod;
 import org.apache.commons.io.file.PathUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;

@@ -6,11 +6,11 @@ import dev.compactmods.machines.api.room.IPlayerRoomMetadataProvider;
 import dev.compactmods.machines.client.PlayerFaceRenderer;
 import dev.compactmods.machines.util.PlayerUtil;
 import net.minecraft.client.Minecraft;
-import net.minecraftforge.client.gui.overlay.ForgeGui;
-import net.minecraftforge.client.gui.overlay.IGuiOverlay;
-import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.capabilities.CapabilityManager;
-import net.minecraftforge.common.capabilities.CapabilityToken;
+import net.neoforged.client.gui.overlay.ForgeGui;
+import net.neoforged.client.gui.overlay.IGuiOverlay;
+import net.neoforged.common.capabilities.Capability;
+import net.neoforged.common.capabilities.CapabilityManager;
+import net.neoforged.common.capabilities.CapabilityToken;
 
 public class RoomMetadataDebugOverlay implements IGuiOverlay {
     private static final Capability<IPlayerRoomMetadataProvider> CURRENT_ROOM_META = CapabilityManager.get(new CapabilityToken<>() {

@@ -2,7 +2,7 @@ package dev.compactmods.machines.neoforge.room;
 
 import dev.compactmods.machines.api.room.IPlayerRoomMetadata;
 import dev.compactmods.machines.api.room.IPlayerRoomMetadataProvider;
-import net.minecraftforge.common.util.LazyOptional;
+import net.neoforged.common.util.LazyOptional;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Optional;

@@ -3,7 +3,7 @@ package dev.compactmods.machines.neoforge.config;
 import com.electronwill.nightconfig.core.EnumGetMethod;
 import dev.compactmods.machines.machine.EnumMachinePlayersBreakHandling;
 import net.minecraft.commands.Commands;
-import net.minecraftforge.common.ForgeConfigSpec;
+import net.neoforged.common.ForgeConfigSpec;
 
 import java.util.Arrays;
 import java.util.List;

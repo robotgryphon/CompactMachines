@@ -16,9 +16,9 @@ import dev.compactmods.machines.neoforge.command.subcommand.CMUnbindSubcommand;
 import dev.compactmods.machines.neoforge.command.subcommand.SpawnSubcommand;
 import net.minecraft.commands.synchronization.ArgumentTypeInfos;
 import net.minecraft.commands.synchronization.SingletonArgumentInfo;
-import net.minecraftforge.event.RegisterCommandsEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.Mod;
+import net.neoforged.neoforge.event.RegisterCommandsEvent;
 
 @Mod.EventBusSubscriber(modid = Constants.MOD_ID)
 public class ForgeCommands {

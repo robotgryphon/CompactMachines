@@ -4,9 +4,7 @@ import dev.compactmods.machines.neoforge.room.client.ClientRoomPacketHandler;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate;
-import net.minecraftforge.network.NetworkEvent;
-
-import java.util.function.Supplier;
+import net.neoforged.neoforge.network.NetworkEvent;
 
 public record InitialRoomBlockDataPacket(StructureTemplate blocks) {
 
@@ -23,8 +21,8 @@ public record InitialRoomBlockDataPacket(StructureTemplate blocks) {
         buf.writeNbt(tag);
     }
 
-    public boolean handle(Supplier<NetworkEvent.Context> ctx) {
-        ctx.get().enqueueWork(() -> ClientRoomPacketHandler.handleBlockData(this.blocks));
+    public boolean handle(NetworkEvent.Context ctx) {
+        ctx.enqueueWork(() -> ClientRoomPacketHandler.handleBlockData(this.blocks));
         return true;
     }
 }

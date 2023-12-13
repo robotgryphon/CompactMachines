@@ -4,21 +4,15 @@ import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import dev.compactmods.compactmachines.api.room.Rooms;
+import dev.compactmods.machines.LoggingUtil;
 import dev.compactmods.machines.api.core.CMCommands;
-import dev.compactmods.machines.api.dimension.CompactDimension;
-import dev.compactmods.machines.api.dimension.MissingDimensionException;
-import dev.compactmods.machines.neoforge.CompactMachines;
+import dev.compactmods.machines.i18n.TranslationUtil;
 import dev.compactmods.machines.neoforge.config.ServerConfig;
 import dev.compactmods.machines.neoforge.machine.entity.BoundCompactMachineBlockEntity;
-import dev.compactmods.machines.i18n.TranslationUtil;
-import dev.compactmods.machines.room.graph.CompactRoomProvider;
-import dev.compactmods.machines.tunnel.graph.TunnelConnectionGraph;
-import dev.compactmods.machines.tunnel.graph.traversal.TunnelMachineFilters;
-import net.minecraft.commands.CommandRuntimeException;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.arguments.coordinates.BlockPosArgument;
-import net.minecraft.server.level.ServerLevel;
 
 public class CMRebindSubcommand {
 
@@ -34,39 +28,30 @@ public class CMRebindSubcommand {
     }
 
     private static int doRebind(CommandContext<CommandSourceStack> ctx) throws CommandSyntaxException {
-        final var server = ctx.getSource().getServer();
         final var level = ctx.getSource().getLevel();
-        final ServerLevel compactDim;
-        try {
-            compactDim = CompactDimension.forServer(server);
-        } catch (MissingDimensionException e) {
-            throw new CommandRuntimeException(TranslationUtil.command(CMCommands.LEVEL_NOT_FOUND));
-        }
+        final var source = ctx.getSource();
 
-        final var roomProvider = CompactRoomProvider.instance(compactDim);
+        final var LOGS = LoggingUtil.modLog();
+
+        final var roomProvider = Rooms.registrar();
         final var rebindingMachine = BlockPosArgument.getLoadedBlockPos(ctx, "pos");
         final var roomCode = StringArgumentType.getString(ctx, "bindTo");
-        roomProvider.forRoom(roomCode).ifPresentOrElse(targetRoom -> {
-            CompactMachines.LOGGER.debug("Binding machine at {} to room {}", rebindingMachine, targetRoom.code());
+        roomProvider.get(roomCode).ifPresentOrElse(targetRoom -> {
+            LOGS.debug("Binding machine at {} to room {}", rebindingMachine, roomCode);
 
             if (!(level.getBlockEntity(rebindingMachine) instanceof BoundCompactMachineBlockEntity machine)) {
-                CompactMachines.LOGGER.error("Refusing to rebind block at {}; block has invalid machine data.", rebindingMachine);
-                throw new CommandRuntimeException(TranslationUtil.command(CMCommands.NOT_A_MACHINE_BLOCK));
+                LOGS.error("Refusing to rebind block at {}; block has invalid machine data.", rebindingMachine);
+                source.sendFailure(TranslationUtil.command(CMCommands.NOT_A_MACHINE_BLOCK));
+                return;
             }
 
             machine.connectedRoom().ifPresentOrElse(currentRoom -> {
-                final var currentRoomTunnels = TunnelConnectionGraph.forRoom(compactDim, currentRoom);
-                currentRoomTunnels.positions(TunnelMachineFilters.all(machine.getLevelPosition()))
-                        .findFirst()
-                        .ifPresent(match -> {
-                            throw new CommandRuntimeException(TranslationUtil.command(CMCommands.NO_REBIND_TUNNEL_PRESENT, match));
-                        });
-
+                // TODO: Tunnel support check
                 // No tunnels - clear to rebind
                 machine.setConnectedRoom(roomCode);
             }, () -> machine.setConnectedRoom(roomCode));
         }, () -> {
-            CompactMachines.LOGGER.error("Cannot rebind to room {}; not registered.", roomCode);
+            LOGS.error("Cannot rebind to room {}; not registered.", roomCode);
         });
 
         return 0;

@@ -5,8 +5,9 @@ import dev.compactmods.machines.api.shrinking.PSDTags;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.client.event.TextureStitchEvent;
-import net.minecraftforge.fml.InterModComms;
+import net.neoforged.client.event.TextureStitchEvent;
+import net.neoforged.fml.InterModComms;
+import net.neoforged.neoforge.client.event.TextureAtlasStitchedEvent;
 import top.theillusivec4.curios.api.CuriosApi;
 import top.theillusivec4.curios.api.SlotTypeMessage;
 
@@ -26,10 +27,6 @@ public class CuriosCompat {
 
     private static boolean isPsd(ItemStack stack) {
         return stack.is(PSDTags.ITEM);
-    }
-
-    public static void addTextures(final TextureStitchEvent.Pre stitch) {
-        stitch.addSprite(CURIO_TEXTURE);
     }
 
     public static boolean hasPsdCurio(@Nonnull LivingEntity ent) {

@@ -2,11 +2,11 @@ package dev.compactmods.machines.neoforge.room;
 
 import dev.compactmods.machines.api.core.Constants;
 import dev.compactmods.machines.neoforge.room.ui.overlay.RoomMetadataDebugOverlay;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.client.event.RegisterGuiOverlaysEvent;
-import net.minecraftforge.client.gui.overlay.VanillaGuiOverlay;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.client.event.RegisterGuiOverlaysEvent;
+import net.neoforged.client.gui.overlay.VanillaGuiOverlay;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.Mod;
 
 @Mod.EventBusSubscriber(modid = Constants.MOD_ID, value = Dist.CLIENT, bus = Mod.EventBusSubscriber.Bus.MOD)
 public class RoomClientEventHandler {

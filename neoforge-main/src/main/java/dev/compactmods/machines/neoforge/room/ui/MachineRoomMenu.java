@@ -6,6 +6,7 @@ import dev.compactmods.machines.neoforge.CompactMachines;
 import dev.compactmods.machines.neoforge.room.Rooms;
 import dev.compactmods.machines.room.exceptions.NonexistentRoomException;
 import net.minecraft.core.GlobalPos;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.MenuProvider;
@@ -95,5 +96,15 @@ public class MachineRoomMenu extends AbstractContainerMenu {
 
     public String getRoomName() {
         return roomName;
+    }
+
+    public static MachineRoomMenu createRoomMenu(int windowId, Inventory inv, FriendlyByteBuf data) {
+        data.readBlockPos();
+        final var mach = data.readJsonWithCodec(GlobalPos.CODEC);
+        final var room = data.readUtf();
+        final boolean hasName = data.readBoolean();
+        final var roomName = hasName ? data.readUtf() : "Room Preview";
+
+        return new MachineRoomMenu(windowId, room, mach, roomName);
     }
 }

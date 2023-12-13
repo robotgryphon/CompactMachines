@@ -1,10 +1,10 @@
 package dev.compactmods.machines.test;
 
 import dev.compactmods.machines.api.core.Constants;
-import net.minecraftforge.event.RegisterGameTestsEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.ModList;
-import net.minecraftforge.fml.common.Mod;
+import net.neoforged.event.RegisterGameTestsEvent;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.ModList;
+import net.neoforged.fml.common.Mod;
 
 @Mod.EventBusSubscriber(modid = Constants.MOD_ID, bus = Mod.EventBusSubscriber.Bus.MOD)
 public class GameTestEventHandler {

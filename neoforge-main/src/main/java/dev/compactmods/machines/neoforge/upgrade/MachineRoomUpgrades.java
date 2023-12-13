@@ -1,41 +1,36 @@
 package dev.compactmods.machines.neoforge.upgrade;
 
-import dev.compactmods.machines.neoforge.CompactMachines;
+import dev.compactmods.machines.api.room.upgrade.RoomUpgrade;
 import dev.compactmods.machines.neoforge.Registries;
-import dev.compactmods.machines.api.upgrade.RoomUpgrade;
 import dev.compactmods.machines.neoforge.room.upgrade.RoomUpgradeWorkbench;
 import dev.compactmods.machines.neoforge.room.upgrade.RoomUpgradeWorkbenchEntity;
+import net.minecraft.core.Registry;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
-import net.minecraft.world.level.material.Material;
-import net.minecraftforge.registries.IForgeRegistry;
-import net.minecraftforge.registries.RegistryBuilder;
-import net.minecraftforge.registries.RegistryObject;
-
-import java.util.function.Supplier;
+import net.neoforged.neoforge.registries.DeferredHolder;
+import net.neoforged.neoforge.registries.RegistryBuilder;
 
 public class MachineRoomUpgrades {
 
-    public static final Supplier<IForgeRegistry<RoomUpgrade>> REGISTRY = Registries.UPGRADES.makeRegistry(RegistryBuilder::new);
+    public static final Registry<RoomUpgrade> REGISTRY = Registries.UPGRADES.makeRegistry(RegistryBuilder::create);
 
     // ================================================================================================================
 
-    public static final RegistryObject<Item> ROOM_UPGRADE = Registries.ITEMS.register("room_upgrade", () -> new RoomUpgradeItem(new Item.Properties()
-            .tab(CompactMachines.COMPACT_MACHINES_ITEMS)
+    public static final DeferredHolder<Item, RoomUpgradeItem> ROOM_UPGRADE = Registries.ITEMS.register("room_upgrade", () -> new RoomUpgradeItem(new Item.Properties()
             .stacksTo(1)));
 
-    public static final RegistryObject<Block> WORKBENCH_BLOCK = Registries.BLOCKS.register("workbench", () ->
-            new RoomUpgradeWorkbench(BlockBehaviour.Properties.of(Material.METAL)
+    public static final DeferredHolder<Block, RoomUpgradeWorkbench> WORKBENCH_BLOCK = Registries.BLOCKS.register("workbench", () ->
+            new RoomUpgradeWorkbench(BlockBehaviour.Properties.of()
                     .requiresCorrectToolForDrops()
                     .lightLevel(state -> 3)));
 
-    public static final RegistryObject<BlockItem> WORKBENCH_ITEM = Registries.ITEMS.register("workbench", () ->
-            new BlockItem(WORKBENCH_BLOCK.get(), new Item.Properties().tab(CompactMachines.COMPACT_MACHINES_ITEMS)));
+    public static final DeferredHolder<Item, BlockItem> WORKBENCH_ITEM = Registries.ITEMS.register("workbench", () ->
+            new BlockItem(WORKBENCH_BLOCK.get(), new Item.Properties()));
 
-    public static final RegistryObject<BlockEntityType<RoomUpgradeWorkbenchEntity>> ROOM_UPDATE_ENTITY = Registries.BLOCK_ENTITIES.register(
+    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<RoomUpgradeWorkbenchEntity>> ROOM_UPDATE_ENTITY = Registries.BLOCK_ENTITIES.register(
             "workbench", () -> BlockEntityType.Builder.of(RoomUpgradeWorkbenchEntity::new, WORKBENCH_BLOCK.get())
                     .build(null));
 
