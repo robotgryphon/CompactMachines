@@ -1,27 +1,28 @@
 pluginManagement {
+    plugins {
+        id("idea")
+        id("eclipse")
+        id("maven-publish")
+    }
+
     repositories {
-        mavenCentral()
         mavenLocal()
-        maven("https://maven.minecraftforge.net") {
-            name = "Minecraft Forge"
-        }
+        gradlePluginPortal()
 
         maven("https://maven.parchmentmc.org") {
             name = "ParchmentMC"
         }
-    }
 
-    resolutionStrategy {
-        eachPlugin {
-            if (requested.id.id == "net.minecraftforge.gradle") {
-                useModule("${requested.id}:ForgeGradle:${requested.version}")
-            }
+        maven("https://maven.neoforged.net/releases") {
+            name = "NeoForged"
         }
     }
 }
 
+plugins {
+    id("org.gradle.toolchains.foojay-resolver-convention") version("0.5.0")
+}
+
 rootProject.name = "Compact Machines"
-include("forge-tunnels-api")
-include("forge-main")
-include("forge-builtin")
-include("forge-datagen")
+include("neoforge-main")
+// include("neoforge-datagen")
