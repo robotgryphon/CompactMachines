@@ -6,7 +6,6 @@ import dev.compactmods.machines.datagen.lang.RussianLangGenerator;
 import dev.compactmods.machines.datagen.room.RoomTemplates;
 import dev.compactmods.machines.datagen.tags.BlockTagGenerator;
 import dev.compactmods.machines.datagen.tags.ItemTagGenerator;
-import dev.compactmods.machines.datagen.tags.PointOfInterestTagGenerator;
 import net.minecraft.data.DataProvider;
 import net.minecraft.data.loot.LootTableProvider;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;
@@ -42,7 +41,7 @@ public class DataGeneration {
         generator.addProvider(server, blocks);
         generator.addProvider(server, new ItemTagGenerator(packOut, blocks, holderLookup));
 
-        generator.addProvider(server, new PointOfInterestTagGenerator(packOut, holderLookup, helper));
+        // generator.addProvider(server, new PointOfInterestTagGenerator(packOut, holderLookup, helper));
 
         RoomTemplates.make(event);
 
