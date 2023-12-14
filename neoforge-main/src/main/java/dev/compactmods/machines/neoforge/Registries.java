@@ -28,7 +28,9 @@ public class Registries {
     public static final DeferredRegister<MenuType<?>> CONTAINERS = DeferredRegister.create(BuiltInRegistries.MENU, MOD_ID);
 
     // MachineRoomUpgrades
-    public static final DeferredRegister<RoomUpgrade> UPGRADES = DeferredRegister.create(RoomUpgrade.REG_KEY, MOD_ID);
+    public static final DeferredRegister<RoomUpgrade> UPGRADES_DR = DeferredRegister.create(RoomUpgrade.REG_KEY, MOD_ID);
+
+    public static final Registry<RoomUpgrade> UPGRADES = UPGRADES_DR.makeRegistry(b -> {});
 
     // Commands
     public static final DeferredRegister<ArgumentTypeInfo<?, ?>> COMMAND_ARGUMENT_TYPES = DeferredRegister.create(BuiltInRegistries.COMMAND_ARGUMENT_TYPE, MOD_ID);

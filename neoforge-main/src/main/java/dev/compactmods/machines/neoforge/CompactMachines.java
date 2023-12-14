@@ -58,7 +58,7 @@ public class CompactMachines {
         Registries.BLOCK_ENTITIES.register(bus);
         Registries.CONTAINERS.register(bus);
         Registries.ROOM_TEMPLATES_DR.register(bus);
-        Registries.UPGRADES.register(bus);
+        Registries.UPGRADES_DR.register(bus);
         Registries.COMMAND_ARGUMENT_TYPES.register(bus);
         Registries.LOOT_FUNCS.register(bus);
         Registries.VILLAGERS.register(bus);

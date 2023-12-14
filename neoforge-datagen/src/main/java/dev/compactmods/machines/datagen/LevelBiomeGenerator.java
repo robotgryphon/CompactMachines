@@ -4,34 +4,24 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.mojang.serialization.JsonOps;
-import dev.compactmods.machines.neoforge.CompactMachines;
 import dev.compactmods.machines.api.core.Constants;
 import dev.compactmods.machines.api.dimension.CompactDimension;
-import dev.compactmods.machines.neoforge.dimension.Dimension;
-import net.minecraft.core.Holder;
-import net.minecraft.core.Registry;
-import net.minecraft.core.RegistryAccess;
-import net.minecraft.data.*;
+import net.minecraft.data.CachedOutput;
+import net.minecraft.data.DataGenerator;
+import net.minecraft.data.DataProvider;
 import net.minecraft.data.worldgen.BiomeDefaultFeatures;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.BiomeGenerationSettings;
 import net.minecraft.world.level.biome.BiomeSpecialEffects;
 import net.minecraft.world.level.biome.MobSpawnSettings;
-import net.minecraft.world.level.chunk.ChunkGenerator;
 import net.minecraft.world.level.dimension.DimensionType;
 import net.minecraft.world.level.dimension.LevelStem;
-import net.minecraft.world.level.levelgen.FlatLevelSource;
-import net.minecraft.world.level.levelgen.flat.FlatLayerInfo;
-import net.minecraft.world.level.levelgen.flat.FlatLevelGeneratorSettings;
 
 import javax.annotation.Nonnull;
 import java.nio.file.Path;
 import java.util.HashMap;
-import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 import java.util.function.BiConsumer;
 
 public class LevelBiomeGenerator implements DataProvider {
@@ -45,65 +35,66 @@ public class LevelBiomeGenerator implements DataProvider {
     }
 
     @Override
-    public void run(@Nonnull CachedOutput cache) {
-        Path data = this.generator.getOutputFolder();
+    public CompletableFuture<?> run(@Nonnull CachedOutput cache) {
+        Path data = this.generator.getPackOutput().getOutputFolder();
 
         HashMap<ResourceLocation, Biome> biomes = Maps.newHashMap();
         HashMap<ResourceLocation, LevelStem> dims = Maps.newHashMap();
         HashMap<ResourceLocation, DimensionType> dimTypes = Maps.newHashMap();
 
         var biomeWriter = DataGenUtil.makeWriter(GSON, cache, data, ImmutableSet.of("worldgen", "biome"), Biome.DIRECT_CODEC, biomes);
+        writeBiomes(biomeWriter);
 
         var dimTypeWriter = DataGenUtil.makeWriter(GSON, cache, data, ImmutableSet.of("dimension_type"), DimensionType.DIRECT_CODEC, dimTypes);
-
-        var dimWriter = DataGenUtil.makeCustomWriter(GSON, cache, data, ImmutableSet.of("dimension"), this::writeFlatDimension, dims);
-
-        writeBiomes(biomeWriter);
         writeDimensionTypes(dimTypeWriter);
-        writeDimensions(biomes, dimTypes, dimWriter);
+
+        // var dimWriter = DataGenUtil.makeCustomWriter(GSON, cache, data, ImmutableSet.of("dimension"), this::writeFlatDimension, dims);
+        // writeDimensions(biomes, dimTypes, dimWriter);
+
+        return CompletableFuture.completedFuture(null);
     }
 
-    private JsonElement writeFlatDimension(LevelStem dimension) {
-        JsonObject d = new JsonObject();
-
-        final var regAccess = RegistryAccess.builtinCopy();
-        final var dimTypes = regAccess.registryOrThrow(Registry.DIMENSION_TYPE_REGISTRY);
-
-        d.add("type", ResourceLocation.CODEC.encodeStart(JsonOps.INSTANCE, CompactDimension.LEVEL_KEY.location())
-                .getOrThrow(false, CompactMachines.LOGGER::fatal));
-
-        var gen = ChunkGenerator.CODEC.encodeStart(JsonOps.INSTANCE, dimension.generator())
-                .getOrThrow(false, CompactMachines.LOGGER::error)
-                .getAsJsonObject();
-
-        // transform the chunk generator to add the type reference to the flat gen
-        var fls = Registry.CHUNK_GENERATOR.getResourceKey(FlatLevelSource.CODEC);
-        fls.ifPresent(genType -> gen.addProperty("type", genType.location().toString()));
-
-        // transform the full biome object into a reference
-        var settings = gen.get("settings").getAsJsonObject();
-        settings.remove("biome");
-        settings.addProperty("biome", this.COMPACT_BIOME.toString());
-
-        d.add("generator", gen);
-
-        return d;
-    }
-
-    private void writeDimensions(HashMap<ResourceLocation, Biome> biomes, HashMap<ResourceLocation, DimensionType> dimTypes, BiConsumer<LevelStem, ResourceLocation> consumer) {
-
-        RegistryAccess.Frozen reg = RegistryAccess.BUILTIN.get();
-        final var ssreg = reg.registryOrThrow(Registry.STRUCTURE_SET_REGISTRY);
-
-        var flatSettings = new FlatLevelGeneratorSettings(Optional.empty(), BuiltinRegistries.BIOME);
-
-        flatSettings.setBiome(Holder.direct(biomes.get(COMPACT_BIOME)));
-        flatSettings.getLayersInfo().add(new FlatLayerInfo(dimTypes.get(CompactDimension.LEVEL_KEY.location()).height(), Dimension.BLOCK_MACHINE_VOID_AIR.get()));
-        flatSettings.updateLayers();
-
-        var stem = new LevelStem(Holder.direct(dimTypes.get(CompactDimension.LEVEL_KEY.location())), new FlatLevelSource(ssreg, flatSettings));
-        consumer.accept(stem, CompactDimension.LEVEL_KEY.location());
-    }
+//    private JsonElement writeFlatDimension(LevelStem dimension) {
+//        JsonObject d = new JsonObject();
+//
+//        final var regAccess = RegistryAccess.builtinCopy();
+//        final var dimTypes = regAccess.registryOrThrow(Registry.DIMENSION_TYPE_REGISTRY);
+//
+//        d.add("type", ResourceLocation.CODEC.encodeStart(JsonOps.INSTANCE, CompactDimension.LEVEL_KEY.location())
+//                .getOrThrow(false, CompactMachines.LOGGER::fatal));
+//
+//        var gen = ChunkGenerator.CODEC.encodeStart(JsonOps.INSTANCE, dimension.generator())
+//                .getOrThrow(false, CompactMachines.LOGGER::error)
+//                .getAsJsonObject();
+//
+//        // transform the chunk generator to add the type reference to the flat gen
+//        var fls = Registry.CHUNK_GENERATOR.getResourceKey(FlatLevelSource.CODEC);
+//        fls.ifPresent(genType -> gen.addProperty("type", genType.location().toString()));
+//
+//        // transform the full biome object into a reference
+//        var settings = gen.get("settings").getAsJsonObject();
+//        settings.remove("biome");
+//        settings.addProperty("biome", this.COMPACT_BIOME.toString());
+//
+//        d.add("generator", gen);
+//
+//        return d;
+//    }
+//
+//    private void writeDimensions(HashMap<ResourceLocation, Biome> biomes, HashMap<ResourceLocation, DimensionType> dimTypes, BiConsumer<LevelStem, ResourceLocation> consumer) {
+//
+//        RegistryAccess.Frozen reg = RegistryAccess.BUILTIN.get();
+//        final var ssreg = reg.registryOrThrow(Registry.STRUCTURE_SET_REGISTRY);
+//
+//        var flatSettings = new FlatLevelGeneratorSettings(Optional.empty(), BuiltinRegistries.BIOME);
+//        flatSettings.withBiomeAndLayers(
+//                List.of(new FlatLayerInfo(dimTypes.get(CompactDimension.LEVEL_KEY.location()).height(), Dimension.BLOCK_MACHINE_VOID_AIR.get())),
+//                biomes.get(COMPACT_BIOME)
+//        );
+//
+//        var stem = new LevelStem(Holder.direct(dimTypes.get(CompactDimension.LEVEL_KEY.location())), new FlatLevelSource(ssreg, flatSettings));
+//        consumer.accept(stem, CompactDimension.LEVEL_KEY.location());
+//    }
 
     private void writeDimensionTypes(BiConsumer<DimensionType, ResourceLocation> consumer) {
         final DimensionType dim = new DimensionTypeBuilder()
@@ -127,7 +118,7 @@ public class LevelBiomeGenerator implements DataProvider {
                 .downfall(0)
                 .generationSettings(BiomeGenerationSettings.EMPTY)
                 .mobSpawnSettings(spawns)
-                .precipitation(Biome.Precipitation.NONE)
+                .hasPrecipitation(false)
                 .temperature(0.8f)
                 .temperatureAdjustment(Biome.TemperatureModifier.NONE)
                 .specialEffects(new BiomeSpecialEffects.Builder()

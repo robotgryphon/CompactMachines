@@ -1,24 +1,19 @@
 package dev.compactmods.machines.datagen;
 
 import dev.compactmods.machines.api.core.Constants;
-import dev.compactmods.machines.api.room.RoomSize;
 import dev.compactmods.machines.neoforge.machine.Machines;
-import dev.compactmods.machines.neoforge.upgrade.MachineRoomUpgrades;
-import net.minecraft.data.DataGenerator;
-import net.neoforged.client.model.generators.ItemModelProvider;
-import net.neoforged.common.data.ExistingFileHelper;
+import net.minecraft.data.PackOutput;
+import net.neoforged.neoforge.client.model.generators.ItemModelProvider;
+import net.neoforged.neoforge.common.data.ExistingFileHelper;
 
 public class ItemModelGenerator extends ItemModelProvider {
 
-    public ItemModelGenerator(DataGenerator generator, ExistingFileHelper existingFileHelper) {
-        super(generator, Constants.MOD_ID, existingFileHelper);
+    public ItemModelGenerator(PackOutput packOutput, ExistingFileHelper existingFileHelper) {
+        super(packOutput, Constants.MOD_ID, existingFileHelper);
     }
 
     @Override
     protected void registerModels() {
-        for (var size : RoomSize.values())
-            machine(size.getSerializedName());
-
         withExistingParent(Machines.BOUND_MACHINE_BLOCK_ITEM.getId().getPath(), modLoc("block/machine/machine"));
         withExistingParent(Machines.UNBOUND_MACHINE_BLOCK_ITEM.getId().getPath(), modLoc("block/machine/machine"));
         
@@ -31,13 +26,9 @@ public class ItemModelGenerator extends ItemModelProvider {
         withExistingParent("tunnel", mcLoc("item/generated"))
                 .texture("layer0", modLoc("item/tunnel"));
 
-        withExistingParent(MachineRoomUpgrades.ROOM_UPGRADE.getId().toString(), mcLoc("item/generated"))
-                .texture("layer0", modLoc("upgrades/chunkloader"));
-
-        withExistingParent(MachineRoomUpgrades.WORKBENCH_ITEM.getId().getPath(), modLoc("block/workbench"));
-    }
-
-    private void machine(String size) {
-        withExistingParent("machine_" + size, modLoc("block/machine/machine_" + size));
+//        withExistingParent(MachineRoomUpgrades.ROOM_UPGRADE.getId().toString(), mcLoc("item/generated"))
+//                .texture("layer0", modLoc("upgrades/chunkloader"));
+//
+//        withExistingParent(MachineRoomUpgrades.WORKBENCH_ITEM.getId().getPath(), modLoc("block/workbench"));
     }
 }

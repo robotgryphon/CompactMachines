@@ -1,23 +1,15 @@
 package dev.compactmods.machines.datagen.lang;
 
-import dev.compactmods.machines.neoforge.client.RoomExitKeyMapping;
-import dev.compactmods.machines.neoforge.dimension.VoidAirBlock;
-import dev.compactmods.machines.neoforge.tunnel.Tunnels;
-import dev.compactmods.machines.neoforge.upgrade.MachineRoomUpgrades;
-import dev.compactmods.machines.neoforge.wall.Walls;
 import dev.compactmods.machines.api.core.CMCommands;
 import dev.compactmods.machines.api.core.Constants;
 import dev.compactmods.machines.api.core.Messages;
 import dev.compactmods.machines.api.core.Tooltips;
-import dev.compactmods.machines.api.room.RoomSize;
+import dev.compactmods.machines.neoforge.client.RoomExitKeyMapping;
 import dev.compactmods.machines.neoforge.shrinking.Shrinking;
-import dev.compactmods.machines.forgebuiltin.tunnel.BuiltInTunnels;
-import dev.compactmods.machines.forgebuiltin.upgrade.BuiltInUpgrades;
+import dev.compactmods.machines.neoforge.wall.Walls;
 import net.minecraft.Util;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.resources.ResourceLocation;
-
-import static org.apache.commons.lang3.StringUtils.capitalize;
 
 public class EnglishLangGenerator extends BaseLangGenerator {
     public EnglishLangGenerator(DataGenerator gen) {
@@ -68,7 +60,7 @@ public class EnglishLangGenerator extends BaseLangGenerator {
 
         addBlock(Walls.BLOCK_BREAKABLE_WALL, "Compact Machine Wall");
         addBlock(Walls.BLOCK_SOLID_WALL, "Solid Compact Machine Wall");
-        addBlock(Tunnels.BLOCK_TUNNEL_WALL, "Solid Compact Machine Wall (with Tunnel)");
+        // addBlock(Tunnels.BLOCK_TUNNEL_WALL, "Solid Compact Machine Wall (with Tunnel)");
         add(Util.makeDescriptionId("block", new ResourceLocation(Constants.MOD_ID, "bound_machine_fallback")), "Bound Compact Machine");
 
         add(Shrinking.PERSONAL_SHRINKING_DEVICE.get(), "Personal Shrinking Device");
@@ -76,9 +68,9 @@ public class EnglishLangGenerator extends BaseLangGenerator {
         add(Constants.MOD_ID + ".direction.side", "Side: %s");
         add(Constants.MOD_ID + ".connected_block", "Connected: %s");
 
-        addTunnel(BuiltInTunnels.ITEM_TUNNEL_DEF, "Item Tunnel");
-        addTunnel(BuiltInTunnels.FLUID_TUNNEL_DEF, "Fluid Tunnel");
-        addTunnel(BuiltInTunnels.FORGE_ENERGY, "Energy Tunnel");
+//        addTunnel(BuiltInTunnels.ITEM_TUNNEL_DEF, "Item Tunnel");
+//        addTunnel(BuiltInTunnels.FLUID_TUNNEL_DEF, "Fluid Tunnel");
+//        addTunnel(BuiltInTunnels.FORGE_ENERGY, "Energy Tunnel");
         // addTunnel(Tunnels.REDSTONE_IN_DEF.get(), "Redstone Tunnel (In)");
         // addTunnel(Tunnels.REDSTONE_OUT_DEF.get(), "Redstone Tunnel (Out)");
 
@@ -102,7 +94,7 @@ public class EnglishLangGenerator extends BaseLangGenerator {
         addTooltip(Tooltips.NOT_YET_IMPLEMENTED, "Not Yet Implemented");
 
         //region Upgrades
-        add(BuiltInUpgrades.CHUNKLOAD, "Chunkloader Upgrade");
+        // add(BuiltInUpgrades.CHUNKLOAD, "Chunkloader Upgrade");
 
         addMessage(Messages.ALREADY_HAS_UPGRADE, "Upgrade has already been applied to room.");
         addMessage(Messages.UPGRADE_NOT_PRESENT, "Upgrade is not applied to the room.");
@@ -135,19 +127,14 @@ public class EnglishLangGenerator extends BaseLangGenerator {
         add("jei.compactmachines.machines", "Machines are used to make pocket dimensions. Craft a machine and place it in world, then use a Personal Shrinking Device to go inside.");
         add("jei.compactmachines.shrinking_device", "Use the Personal Shrinking Device (PSD) on a machine in order to enter a compact space. " +
                 "You can also right click it in the overworld for more info.");
-        add("death.attack." + VoidAirBlock.DAMAGE_SOURCE.msgId, "%1$s failed to enter the void");
+        // add("death.attack." + VoidAirBlock.DAMAGE_SOURCE.msgId, "%1$s failed to enter the void");
 
         add("curios.identifier.psd", "Personal Shrinking Device");
 
-        add(MachineRoomUpgrades.WORKBENCH_BLOCK.get(), "Workbench");
+        // add(MachineRoomUpgrades.WORKBENCH_BLOCK.get(), "Workbench");
         add("entity.minecraft.villager.compactmachines.tinkerer", "Tinkerer");
 
         add(RoomExitKeyMapping.CATEGORY, "Compact Machines");
         add(RoomExitKeyMapping.NAME, "Quick-Exit Compact Machine");
-    }
-
-    @Override
-    protected String getSizeTranslation(RoomSize size) {
-        return capitalize(size.getSerializedName());
     }
 }

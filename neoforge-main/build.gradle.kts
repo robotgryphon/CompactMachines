@@ -79,15 +79,6 @@ runs {
         environmentVariables("CM_TEST_RESOURCES", project.file("src/test/resources").path)
     }
 
-    create("data") {
-        workingDirectory(file("run/data"))
-
-        programArguments("--mod", "compactmachines")
-        programArguments("--all")
-        programArguments("--output", file("src/generated/resources/").path)
-        programArguments("--existing", file("src/main/resources").path)
-    }
-
     create("gameTestServer") {
         workingDirectory(file("run/gametest"))
         environmentVariable("CM_TEST_RESOURCES", file("src/test/resources").path)

@@ -9,10 +9,10 @@ import dev.compactmods.compactmachines.api.room.exceptions.NonexistentRoomExcept
 import dev.compactmods.machines.LoggingUtil;
 import dev.compactmods.machines.api.core.Messages;
 import dev.compactmods.machines.api.dimension.MissingDimensionException;
+import dev.compactmods.machines.i18n.TranslationUtil;
 import dev.compactmods.machines.neoforge.command.argument.Suggestors;
 import dev.compactmods.machines.neoforge.config.ServerConfig;
 import dev.compactmods.machines.neoforge.room.RoomHelper;
-import dev.compactmods.machines.i18n.TranslationUtil;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.arguments.EntityArgument;

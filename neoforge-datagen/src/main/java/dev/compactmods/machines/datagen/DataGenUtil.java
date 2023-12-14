@@ -5,14 +5,12 @@ import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.JsonOps;
-import dev.compactmods.machines.neoforge.CompactMachines;
 import dev.compactmods.machines.api.core.Constants;
 import net.minecraft.data.CachedOutput;
 import net.minecraft.data.DataProvider;
 import net.minecraft.resources.ResourceLocation;
 
 import javax.annotation.Nonnull;
-import java.io.IOException;
 import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.function.BiConsumer;
@@ -33,14 +31,10 @@ public class DataGenUtil {
 
                 fileLocation = fileLocation.resolve(path + ".json");
 
-                try {
-                    //noinspection OptionalGetWithoutIsPresent
-                    DataProvider.saveStable(cache, codec.encodeStart(JsonOps.INSTANCE, resource).result().get(), fileLocation);
+                //noinspection OptionalGetWithoutIsPresent
+                DataProvider.saveStable(cache, codec.encodeStart(JsonOps.INSTANCE, resource).result().get(), fileLocation);
 
-                    set.put(regName, resource);
-                } catch (IOException ioe) {
-                    CompactMachines.LOGGER.error("Couldn't save resource {}", fileLocation, ioe);
-                }
+                set.put(regName, resource);
             }
         };
     }
@@ -59,13 +53,9 @@ public class DataGenUtil {
 
                 fileLocation = fileLocation.resolve(path + ".json");
 
-                try {
-                    DataProvider.saveStable(cache, writer.apply(resource), fileLocation);
+                DataProvider.saveStable(cache, writer.apply(resource), fileLocation);
 
-                    set.put(regName, resource);
-                } catch (IOException ioe) {
-                    CompactMachines.LOGGER.error("Couldn't save resource {}", fileLocation, ioe);
-                }
+                set.put(regName, resource);
             }
         };
     }

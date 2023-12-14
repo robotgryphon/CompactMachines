@@ -1,12 +1,10 @@
 package dev.compactmods.machines.datagen.lang;
 
-import dev.compactmods.machines.neoforge.tunnel.Tunnels;
-import dev.compactmods.machines.neoforge.wall.Walls;
 import dev.compactmods.machines.api.core.Constants;
 import dev.compactmods.machines.api.core.Messages;
 import dev.compactmods.machines.api.core.Tooltips;
-import dev.compactmods.machines.api.room.RoomSize;
 import dev.compactmods.machines.neoforge.shrinking.Shrinking;
+import dev.compactmods.machines.neoforge.wall.Walls;
 import net.minecraft.core.Direction;
 import net.minecraft.data.DataGenerator;
 
@@ -18,18 +16,6 @@ public class RussianLangGenerator extends BaseLangGenerator {
     @Override
     protected String getMachineTranslation() {
         return "Компактный механизм";
-    }
-
-    @Override
-    protected String getSizeTranslation(RoomSize size) {
-        return switch(size) {
-            case TINY -> "Крошечный";
-            case SMALL -> "Маленький";
-            case NORMAL -> "Средний";
-            case LARGE -> "Большой";
-            case GIANT -> "Гигантский";
-            case MAXIMUM -> "Максимальный";
-        };
     }
 
     @Override
@@ -51,7 +37,7 @@ public class RussianLangGenerator extends BaseLangGenerator {
         // Walls (Solid, Breakable, Tunnel)
         add(Walls.BLOCK_SOLID_WALL.get(), "Прочная стена компактного механизма");
         add(Walls.BLOCK_BREAKABLE_WALL.get(), "Стена компактного механизма");
-        add(Tunnels.BLOCK_TUNNEL_WALL.get(), "Прочная стена компактного механизма (с Туннелем)");
+        // add(Tunnels.BLOCK_TUNNEL_WALL.get(), "Прочная стена компактного механизма (с Туннелем)");
 
         // Basics
         add(Constants.MOD_ID + ".connected_block", "Подключено: %s");
@@ -61,7 +47,7 @@ public class RussianLangGenerator extends BaseLangGenerator {
         add(Shrinking.PERSONAL_SHRINKING_DEVICE.get(), "Персональное сжимающее устройство");
 
         // Built-In Tunnels
-        add(Tunnels.ITEM_TUNNEL.get(), "Предметный туннель");
+        // add(Tunnels.ITEM_TUNNEL.get(), "Предметный туннель");
 
         // Creative Tabs
         add("itemGroup." + Constants.MOD_ID, "Компактные механизмы");

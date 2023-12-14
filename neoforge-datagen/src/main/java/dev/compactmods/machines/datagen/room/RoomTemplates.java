@@ -1,19 +1,20 @@
 package dev.compactmods.machines.datagen.room;
 
-import com.mojang.serialization.JsonOps;
+import dev.compactmods.compactmachines.api.room.RoomTemplate;
+import dev.compactmods.compactmachines.api.room.Rooms;
 import dev.compactmods.machines.api.core.Constants;
-import dev.compactmods.machines.api.room.RoomTemplate;
-import dev.compactmods.machines.api.room.Rooms;
 import dev.compactmods.machines.machine.LegacySizedTemplates;
-import net.minecraft.core.RegistryAccess;
+import net.minecraft.core.RegistrySetBuilder;
 import net.minecraft.core.Vec3i;
-import net.minecraft.resources.RegistryOps;
+import net.minecraft.data.DataProvider;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.FastColor;
-import net.neoforged.common.data.JsonCodecProvider;
-import net.neoforged.data.event.GatherDataEvent;
+import net.neoforged.neoforge.common.data.DatapackBuiltinEntriesProvider;
+import net.neoforged.neoforge.data.event.GatherDataEvent;
 
 import java.util.HashMap;
+import java.util.Set;
 
 public class RoomTemplates {
 
@@ -32,14 +33,16 @@ public class RoomTemplates {
                 FastColor.ARGB32.color(255, 0, 166, 88),
                 RoomTemplate.NO_TEMPLATE));
 
-        final var ops = RegistryOps.create(JsonOps.INSTANCE, RegistryAccess.builtinCopy());
-
         final var gen = event.getGenerator();
-        final var files = event.getExistingFileHelper();
-
-        final var provider = JsonCodecProvider.forDatapackRegistry(gen, files,
-                Constants.MOD_ID, ops, Rooms.TEMPLATE_REG_KEY, templates);
-
-        gen.addProvider(event.includeServer(), provider);
+        gen.addProvider(event.includeServer(), (DataProvider.Factory<DatapackBuiltinEntriesProvider>) output ->
+                new DatapackBuiltinEntriesProvider(output,
+                        event.getLookupProvider(),
+                        new RegistrySetBuilder()
+                                .add(Rooms.TEMPLATE_REG_KEY, ctx -> {
+                                    for (var template : templates.entrySet()) {
+                                        ctx.register(ResourceKey.create(Rooms.TEMPLATE_REG_KEY, template.getKey()), template.getValue());
+                                    }
+                                }),
+                        Set.of(Constants.MOD_ID)));
     }
 }

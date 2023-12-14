@@ -1,21 +1,16 @@
 package dev.compactmods.machines.datagen.lang;
 
-import dev.compactmods.machines.datagen.AdvancementLangBuilder;
-import dev.compactmods.machines.neoforge.machine.block.LegacySizedCompactMachineBlock;
-import dev.compactmods.machines.neoforge.tunnel.Tunnels;
-import dev.compactmods.machines.neoforge.upgrade.MachineRoomUpgrades;
 import dev.compactmods.machines.api.core.Advancements;
 import dev.compactmods.machines.api.core.Constants;
-import dev.compactmods.machines.api.room.RoomSize;
-import dev.compactmods.machines.api.upgrade.RoomUpgrade;
-import dev.compactmods.machines.api.tunnels.TunnelDefinition;
+import dev.compactmods.machines.api.room.upgrade.RoomUpgrade;
+import dev.compactmods.machines.datagen.AdvancementLangBuilder;
 import dev.compactmods.machines.i18n.TranslationUtil;
+import dev.compactmods.machines.neoforge.Registries;
 import net.minecraft.Util;
 import net.minecraft.core.Direction;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.resources.ResourceLocation;
-import net.neoforged.common.data.LanguageProvider;
-import net.neoforged.registries.IForgeRegistry;
+import net.neoforged.neoforge.common.data.LanguageProvider;
 
 import java.util.function.Supplier;
 
@@ -25,15 +20,10 @@ public abstract class BaseLangGenerator extends LanguageProvider {
 
     private final String locale;
 
-    private final IForgeRegistry<RoomUpgrade> ACTIONS_REG;
-
     public BaseLangGenerator(DataGenerator gen, String locale) {
-        super(gen, Constants.MOD_ID, locale);
+        super(gen.getPackOutput(), Constants.MOD_ID, locale);
         this.locale = locale;
-        ACTIONS_REG = MachineRoomUpgrades.REGISTRY.get();
     }
-
-    protected abstract String getSizeTranslation(RoomSize size);
 
     @SuppressWarnings("unused")
     protected String getDirectionTranslation(Direction dir) {
@@ -45,13 +35,9 @@ public abstract class BaseLangGenerator extends LanguageProvider {
     }
 
     @Override
-    @SuppressWarnings("removal")
     protected void addTranslations() {
         // Machine Block names
         final var machineTranslation = getMachineTranslation();
-        for(var size : RoomSize.values()) {
-            add(LegacySizedCompactMachineBlock.getBySize(size), "%s (%s)".formatted(machineTranslation, getSizeTranslation(size)));
-        }
 
         // Direction Names
         for (var dir : Direction.values()) {
@@ -63,15 +49,10 @@ public abstract class BaseLangGenerator extends LanguageProvider {
         add(TranslationUtil.tooltipId(id), translation);
     }
 
-    protected void addTunnel(Supplier<TunnelDefinition> tunnel, String name) {
-        add(TranslationUtil.tunnelId(Tunnels.getRegistryId(tunnel.get())), name);
-    }
-
-    void add(Supplier<RoomUpgrade> upgrade, String translation) {
+    protected void add(Supplier<RoomUpgrade> upgrade, String translation) {
         final var u = upgrade.get();
-        final var id = ACTIONS_REG.getKey(u);
-        if(u != null)
-            add(Util.makeDescriptionId("upgrade.action", id), translation);
+        final var id = Registries.UPGRADES.getKey(u);
+        add(Util.makeDescriptionId("upgrade.action", id), translation);
     }
 
     protected void addAdvancementTranslations() {

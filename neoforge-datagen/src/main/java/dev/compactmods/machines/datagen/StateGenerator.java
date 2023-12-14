@@ -1,24 +1,20 @@
 package dev.compactmods.machines.datagen;
 
 import dev.compactmods.machines.api.core.Constants;
-import dev.compactmods.machines.api.room.RoomSize;
 import dev.compactmods.machines.neoforge.machine.Machines;
-import dev.compactmods.machines.neoforge.machine.block.LegacySizedCompactMachineBlock;
-import dev.compactmods.machines.neoforge.upgrade.MachineRoomUpgrades;
 import dev.compactmods.machines.neoforge.wall.Walls;
-import net.minecraft.data.DataGenerator;
-import net.neoforged.client.model.generators.BlockModelProvider;
-import net.neoforged.client.model.generators.BlockStateProvider;
-import net.neoforged.client.model.generators.ConfiguredModel;
-import net.neoforged.common.data.ExistingFileHelper;
+import net.minecraft.data.PackOutput;
+import net.neoforged.neoforge.client.model.generators.BlockModelProvider;
+import net.neoforged.neoforge.client.model.generators.BlockStateProvider;
+import net.neoforged.neoforge.client.model.generators.ConfiguredModel;
+import net.neoforged.neoforge.common.data.ExistingFileHelper;
 
 public class StateGenerator extends BlockStateProvider {
-    public StateGenerator(DataGenerator gen, ExistingFileHelper exFileHelper) {
-        super(gen, Constants.MOD_ID, exFileHelper);
+    public StateGenerator(PackOutput packOutput, ExistingFileHelper exFileHelper) {
+        super(packOutput, Constants.MOD_ID, exFileHelper);
     }
 
     @Override
-    @SuppressWarnings("removal")
     protected void registerStatesAndModels() {
         // Wall block model
         BlockModelProvider models = models();
@@ -42,7 +38,7 @@ public class StateGenerator extends BlockStateProvider {
                 .end()
                 .element()
                 .allFaces((dir, face) -> face.texture("#tint")
-                        .emissivity(2)
+                        .emissivity(2, 0)
                         .uvs(0, 0, 16, 16)
                         .cullface(dir)
                         .tintindex(0)
@@ -64,15 +60,7 @@ public class StateGenerator extends BlockStateProvider {
                 .modelFile(m)
                 .build());
 
-        // Legacy-sized machines
-        for (RoomSize size : RoomSize.values()) {
-            String sizeName = size.getName();
-            simpleBlock(LegacySizedCompactMachineBlock.getBySize(size), ConfiguredModel.builder()
-                    .modelFile(models.cubeAll("block/machine/machine_" + sizeName, modLoc("block/machine/machine_" + sizeName)))
-                    .build());
-        }
-
-        this.simpleBlock(MachineRoomUpgrades.WORKBENCH_BLOCK.get(), models()
-                .cubeTop("block/workbench", modLoc("block/workbench/top"), modLoc("block/workbench/sides")));
+//        this.simpleBlock(MachineRoomUpgrades.WORKBENCH_BLOCK.get(), models()
+//                .cubeTop("block/workbench", modLoc("block/workbench/top"), modLoc("block/workbench/sides")));
     }
 }

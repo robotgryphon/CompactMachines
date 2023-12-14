@@ -25,4 +25,4 @@ plugins {
 
 rootProject.name = "Compact Machines"
 include("neoforge-main")
-// include("neoforge-datagen")
+include("neoforge-datagen")
