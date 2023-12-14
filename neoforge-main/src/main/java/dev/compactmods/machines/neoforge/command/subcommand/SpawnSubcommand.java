@@ -3,14 +3,11 @@ package dev.compactmods.machines.neoforge.command.subcommand;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.ArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
-import dev.compactmods.machines.neoforge.config.ServerConfig;
+import dev.compactmods.compactmachines.api.room.Rooms;
+import dev.compactmods.compactmachines.api.room.exceptions.NonexistentRoomException;
 import dev.compactmods.machines.api.core.CMCommands;
-import dev.compactmods.machines.api.core.Messages;
-import dev.compactmods.machines.api.dimension.CompactDimension;
-import dev.compactmods.machines.api.dimension.MissingDimensionException;
 import dev.compactmods.machines.i18n.TranslationUtil;
-import dev.compactmods.machines.room.exceptions.NonexistentRoomException;
-import dev.compactmods.machines.room.graph.CompactRoomProvider;
+import dev.compactmods.machines.neoforge.config.ServerConfig;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 
@@ -31,19 +28,14 @@ public class SpawnSubcommand {
 
     private static int resetRoomSpawn(CommandContext<CommandSourceStack> ctx) {
         final var src = ctx.getSource();
-        final var serv = src.getServer();
         final var roomCode = StringArgumentType.getString(ctx, "room");
 
         try {
-            final var compactDim = CompactDimension.forServer(serv);
-            final var roomProvider = CompactRoomProvider.instance(compactDim);
+            final var roomProvider = Rooms.spawnManager(roomCode);
 
-            roomProvider.resetSpawn(roomCode);
-            src.sendSuccess(TranslationUtil.command(CMCommands.SPAWN_CHANGED_SUCCESSFULLY, "%s".formatted(roomCode)), true);
+            // FIXME roomProvider.setDefaultSpawn();
+            src.sendSuccess(() -> TranslationUtil.command(CMCommands.SPAWN_CHANGED_SUCCESSFULLY, "%s".formatted(roomCode)), true);
             return 0;
-        } catch (MissingDimensionException e) {
-            src.sendFailure(TranslationUtil.command(Messages.UNREGISTERED_CM_DIM));
-            return -1;
         } catch (NonexistentRoomException e) {
             src.sendFailure(TranslationUtil.command(CMCommands.ROOM_NOT_FOUND, roomCode));
             return -1;

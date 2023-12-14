@@ -1,9 +1,9 @@
 package dev.compactmods.machines.neoforge.machine.entity;
 
-import dev.compactmods.machines.api.core.CMRegistryKeys;
+import dev.compactmods.compactmachines.api.room.RoomTemplate;
+import dev.compactmods.compactmachines.api.room.Rooms;
 import dev.compactmods.machines.api.machine.IMachineBlockEntity;
 import dev.compactmods.machines.api.machine.MachineNbt;
-import dev.compactmods.machines.api.room.RoomTemplate;
 import dev.compactmods.machines.neoforge.machine.Machines;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
@@ -60,7 +60,7 @@ public class UnboundCompactMachineEntity extends BlockEntity implements IMachine
     }
 
     public ResourceKey<RoomTemplate> templateId() {
-        return ResourceKey.create(CMRegistryKeys.ROOM_TEMPLATES, roomTemplateId);
+        return ResourceKey.create(Rooms.TEMPLATE_REG_KEY, roomTemplateId);
     }
 
     public void setTemplate(ResourceLocation template) {
@@ -71,7 +71,7 @@ public class UnboundCompactMachineEntity extends BlockEntity implements IMachine
     public Optional<RoomTemplate> template() {
         if (level != null) {
             return level.registryAccess()
-                    .registry(CMRegistryKeys.ROOM_TEMPLATES)
+                    .registry(Rooms.TEMPLATE_REG_KEY)
                     .map(reg -> reg.get(roomTemplateId));
         }
 

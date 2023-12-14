@@ -3,21 +3,18 @@ package dev.compactmods.machines.neoforge.command.subcommand;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import dev.compactmods.machines.neoforge.machine.entity.BoundCompactMachineBlockEntity;
+import dev.compactmods.compactmachines.api.room.Rooms;
 import dev.compactmods.machines.api.core.CMCommands;
 import dev.compactmods.machines.api.core.Messages;
 import dev.compactmods.machines.api.dimension.CompactDimension;
 import dev.compactmods.machines.api.machine.MachineTags;
 import dev.compactmods.machines.i18n.TranslationUtil;
-import dev.compactmods.machines.room.graph.CompactRoomProvider;
-import net.minecraft.commands.CommandRuntimeException;
+import dev.compactmods.machines.neoforge.machine.entity.BoundCompactMachineBlockEntity;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.arguments.EntityArgument;
 import net.minecraft.commands.arguments.coordinates.BlockPosArgument;
 import net.minecraft.network.chat.Component;
-
-import java.util.stream.Collectors;
 
 public class CMRoomsSubcommand {
 
@@ -46,17 +43,16 @@ public class CMRoomsSubcommand {
         final var block = BlockPosArgument.getLoadedBlockPos(ctx, "pos");
         final var level = ctx.getSource().getLevel();
 
-        if (!level.getBlockState(block).is(MachineTags.BLOCK))
-            throw new CommandRuntimeException(TranslationUtil.command(CMCommands.NOT_A_MACHINE_BLOCK));
+        if (!level.getBlockState(block).is(MachineTags.BLOCK)) {
+            ctx.getSource().sendFailure(TranslationUtil.command(CMCommands.NOT_A_MACHINE_BLOCK));
+            return -1;
+        }
 
         if (level.getBlockEntity(block) instanceof BoundCompactMachineBlockEntity be) {
-            be.connectedRoom().ifPresent(roomCode -> {
-                CompactRoomProvider.instance(ctx.getSource().getServer())
-                        .forRoom(roomCode)
-                        .ifPresent(roomInfo -> {
-                            final var m = TranslationUtil.message(Messages.MACHINE_ROOM_INFO, block, roomInfo.dimensions(), roomCode);
-                            ctx.getSource().sendSuccess(m, false);
-                        });
+            final var roomCode = be.connectedRoom();
+            Rooms.registrar().get(roomCode).ifPresent(roomInfo -> {
+                final var m = TranslationUtil.message(Messages.MACHINE_ROOM_INFO, block, roomInfo.area().dimensions(), roomCode);
+                ctx.getSource().sendSuccess(() -> m, false);
             });
         }
 
@@ -64,17 +60,20 @@ public class CMRoomsSubcommand {
     }
 
     private static int findByContainingPlayer(CommandContext<CommandSourceStack> ctx) throws CommandSyntaxException {
+        final var source = ctx.getSource();
+
         final var player = EntityArgument.getPlayer(ctx, "player");
 
         final var playerChunk = player.chunkPosition();
-        final var playerLevel = player.getLevel();
+        final var playerLevel = player.level();
 
         if (!playerLevel.dimension().equals(CompactDimension.LEVEL_KEY)) {
-            throw new CommandRuntimeException(TranslationUtil.command(CMCommands.WRONG_DIMENSION));
+            source.sendFailure(TranslationUtil.command(CMCommands.WRONG_DIMENSION));
+            return -1;
         }
 
         final var m = TranslationUtil.message(Messages.PLAYER_ROOM_INFO, player.getDisplayName(), playerChunk.toString());
-        ctx.getSource().sendSuccess(m, false);
+        source.sendSuccess(() -> m, false);
 
         return 0;
     }
@@ -82,14 +81,14 @@ public class CMRoomsSubcommand {
     public static int findByOwner(CommandContext<CommandSourceStack> ctx) throws CommandSyntaxException {
         final var owner = EntityArgument.getPlayer(ctx, "owner");
         final var source = ctx.getSource();
-        final var graph = CompactRoomProvider.instance(source.getServer());
+
+        final var owned = Rooms.owners().findByOwner(owner.getUUID()).toList();
 
         // TODO Localization
-        final var owned = graph.findByOwner(owner.getUUID()).collect(Collectors.toSet());
         if (owned.isEmpty()) {
-            source.sendSuccess(Component.literal("No rooms found."), false);
+            source.sendSuccess(() -> Component.literal("No rooms found."), false);
         } else {
-            owned.forEach(roomInfo -> source.sendSuccess(Component.literal("Room: " + roomInfo.code()), false));
+            owned.forEach(roomInfo -> source.sendSuccess(() -> Component.literal("Room: " + roomInfo.code()), false));
         }
 
 

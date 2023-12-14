@@ -1,12 +1,11 @@
 package dev.compactmods.machines.neoforge.machine.item;
 
+import dev.compactmods.compactmachines.api.room.RoomTemplate;
 import dev.compactmods.machines.api.core.Tooltips;
 import dev.compactmods.machines.api.machine.MachineEntityNbt;
-import dev.compactmods.machines.api.machine.MachineIds;
-import dev.compactmods.machines.api.room.RoomTemplate;
-import dev.compactmods.machines.neoforge.machine.Machines;
 import dev.compactmods.machines.i18n.TranslationUtil;
 import dev.compactmods.machines.machine.item.ICompactMachineItem;
+import dev.compactmods.machines.neoforge.machine.Machines;
 import net.minecraft.ChatFormatting;
 import net.minecraft.Util;
 import net.minecraft.client.gui.screens.Screen;
@@ -16,9 +15,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
-import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.Level;
-import net.neoforged.registries.ForgeRegistries;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -66,19 +63,15 @@ public class UnboundCompactMachineItem extends BlockItem implements ICompactMach
         }
     }
 
-    private static ItemLike fromRegistry() {
-        return ForgeRegistries.ITEMS.getValue(MachineIds.UNBOUND_MACHINE_ITEM_ID);
-    }
-
     public static ItemStack unbound() {
-        final var stack = new ItemStack(fromRegistry(), 1);
+        final var stack = new ItemStack(Machines.UNBOUND_MACHINE_BLOCK_ITEM.get(), 1);
         MachineItemUtil.setTemplate(stack, RoomTemplate.NO_TEMPLATE);
         ICompactMachineItem.setColor(stack, 0xFFFFFFFF);
         return stack;
     }
 
     public static ItemStack forTemplate(ResourceLocation templateId, RoomTemplate template) {
-        final var stack = new ItemStack(fromRegistry(), 1);
+        final var stack = new ItemStack(Machines.UNBOUND_MACHINE_BLOCK_ITEM.get(), 1);
         MachineItemUtil.setTemplate(stack, templateId);
         ICompactMachineItem.setColor(stack, template.color());
 

@@ -1,7 +1,6 @@
 package dev.compactmods.machines.neoforge;
 
 import dev.compactmods.machines.LoggingUtil;
-import dev.compactmods.machines.advancement.AdvancementTriggers;
 import dev.compactmods.machines.api.core.Constants;
 import dev.compactmods.machines.neoforge.network.CompactMachinesNet;
 import dev.compactmods.machines.neoforge.network.RoomNetworkHandler;
@@ -19,8 +18,5 @@ public class ModBusEvents {
         logger.trace("Initializing network handler.");
         CompactMachinesNet.setupMessages();
         RoomNetworkHandler.setupMessages();
-
-        logger.trace("Registering advancement triggers.");
-        AdvancementTriggers.init();
     }
 }

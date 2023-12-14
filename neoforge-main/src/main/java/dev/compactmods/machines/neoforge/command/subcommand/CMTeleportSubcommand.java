@@ -4,6 +4,8 @@ import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import dev.compactmods.compactmachines.api.room.Rooms;
+import dev.compactmods.compactmachines.api.room.exceptions.NonexistentRoomException;
 import dev.compactmods.machines.LoggingUtil;
 import dev.compactmods.machines.api.core.Messages;
 import dev.compactmods.machines.api.dimension.MissingDimensionException;
@@ -11,8 +13,6 @@ import dev.compactmods.machines.neoforge.command.argument.Suggestors;
 import dev.compactmods.machines.neoforge.config.ServerConfig;
 import dev.compactmods.machines.neoforge.room.RoomHelper;
 import dev.compactmods.machines.i18n.TranslationUtil;
-import dev.compactmods.machines.room.exceptions.NonexistentRoomException;
-import dev.compactmods.machines.room.graph.CompactRoomProvider;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.arguments.EntityArgument;
@@ -41,12 +41,11 @@ public class CMTeleportSubcommand {
     }
 
     private static void teleportToRoom(CommandSourceStack src, MinecraftServer server, ServerPlayer player, String roomCode) {
-        var roomProvider = CompactRoomProvider.instance(src.getServer());
-        roomProvider.forRoom(roomCode).ifPresentOrElse(room -> {
+        Rooms.registrar().get(roomCode).ifPresentOrElse(room -> {
             try {
                 RoomHelper.teleportPlayerIntoRoom(server, player, room);
             } catch (MissingDimensionException | NonexistentRoomException e) {
-                throw new RuntimeException(e);
+                // TODO LOGS
             }
         }, () -> {
             LOGGER.error("Error teleporting player into room: room not found.");

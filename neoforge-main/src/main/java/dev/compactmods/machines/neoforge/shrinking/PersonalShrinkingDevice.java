@@ -1,14 +1,10 @@
 package dev.compactmods.machines.neoforge.shrinking;
 
-import dev.compactmods.machines.neoforge.room.RoomHelper;
 import dev.compactmods.machines.api.core.Messages;
 import dev.compactmods.machines.api.core.Tooltips;
 import dev.compactmods.machines.api.dimension.CompactDimension;
-import dev.compactmods.machines.api.room.registration.IMutableRoomRegistration;
-import dev.compactmods.machines.client.gui.PersonalShrinkingDeviceScreen;
 import dev.compactmods.machines.i18n.TranslationUtil;
-import dev.compactmods.machines.room.graph.CompactRoomProvider;
-import dev.compactmods.machines.util.PlayerUtil;
+import dev.compactmods.machines.neoforge.room.RoomHelper;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
@@ -44,7 +40,6 @@ public class PersonalShrinkingDevice extends Item {
                     .withStyle(ChatFormatting.DARK_GRAY)
                     .withStyle(ChatFormatting.ITALIC));
         }
-
     }
 
     @Override
@@ -57,22 +52,23 @@ public class PersonalShrinkingDevice extends Item {
         // If we aren't in the compact dimension, allow PSD guide usage
         // Prevents misfiring if a player is trying to leave a machine or set their spawn
         if (world.isClientSide && !world.dimension().equals(CompactDimension.LEVEL_KEY)) {
-            PersonalShrinkingDeviceScreen.show();
+            // fixme PersonalShrinkingDeviceScreen.show();
             return InteractionResultHolder.success(stack);
         }
 
         if (world instanceof ServerLevel && player instanceof ServerPlayer serverPlayer) {
-            ServerLevel playerDim = serverPlayer.getLevel();
+            ServerLevel playerDim = serverPlayer.serverLevel();
             if (playerDim.dimension().equals(CompactDimension.LEVEL_KEY)) {
                 if (player.isShiftKeyDown()) {
 
-                    final var roomInfo = CompactRoomProvider.instance(playerDim);
-                    roomInfo.findByChunk(player.chunkPosition()).ifPresent(room -> {
-                        if(room instanceof IMutableRoomRegistration mutableRoom) {
-                            mutableRoom.setSpawnPosition(player.position());
-                            mutableRoom.setSpawnRotation(PlayerUtil.getLookDirection(player));
-                        }
-                    });
+                    // FIXME Change Spawnpoint
+//                    final var roomInfo = CompactRoomProvider.instance(playerDim);
+//                    roomInfo.findByChunk(player.chunkPosition()).ifPresent(room -> {
+//                        if(room instanceof IMutableRoomRegistration mutableRoom) {
+//                            mutableRoom.setSpawnPosition(player.position());
+//                            mutableRoom.setSpawnRotation(PlayerUtil.getLookDirection(player));
+//                        }
+//                    });
 
                     MutableComponent tc = TranslationUtil.message(Messages.ROOM_SPAWNPOINT_SET)
                             .withStyle(ChatFormatting.GREEN);

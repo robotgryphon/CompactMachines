@@ -1,10 +1,9 @@
 package dev.compactmods.machines.neoforge.room.ui;
 
+import dev.compactmods.machines.LoggingUtil;
 import dev.compactmods.machines.api.core.Constants;
 import dev.compactmods.machines.api.dimension.MissingDimensionException;
-import dev.compactmods.machines.neoforge.CompactMachines;
-import dev.compactmods.machines.neoforge.room.Rooms;
-import dev.compactmods.machines.room.exceptions.NonexistentRoomException;
+import dev.compactmods.machines.neoforge.room.RoomBlocks;
 import net.minecraft.core.GlobalPos;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
@@ -57,14 +56,12 @@ public class MachineRoomMenu extends AbstractContainerMenu {
             @Override
             public AbstractContainerMenu createMenu(int winId, Inventory inv, Player player2) {
                 try {
-                    final var title = Rooms.getRoomName(server, roomCode);
-
-                    var menu = new MachineRoomMenu(winId, roomCode, machinePos, title.orElse("Room Preview"));
-                    menu.roomBlocks = Rooms.getInternalBlocks(server, roomCode).get(5, TimeUnit.SECONDS);
+                    var menu = new MachineRoomMenu(winId, roomCode, machinePos, "Room Preview");
+                    menu.roomBlocks = RoomBlocks.getInternalBlocks(server, roomCode).get(5, TimeUnit.SECONDS);
                     return menu;
 
-                } catch (NonexistentRoomException | MissingDimensionException e) {
-                    CompactMachines.LOGGER.fatal("Error creating machine preview for {}.", machinePos, e);
+                } catch (MissingDimensionException e) {
+                    LoggingUtil.modLog().fatal("Error creating machine preview for {}.", machinePos, e);
                     return null;
                 } catch (ExecutionException | InterruptedException | TimeoutException e) {
                     throw new RuntimeException(e);

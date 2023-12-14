@@ -1,26 +1,17 @@
 package dev.compactmods.machines.neoforge.machine.block;
 
 import dev.compactmods.machines.api.core.Messages;
-import dev.compactmods.machines.api.dimension.CompactDimension;
-import dev.compactmods.machines.api.dimension.MissingDimensionException;
+import dev.compactmods.machines.i18n.TranslationUtil;
+import dev.compactmods.machines.machine.EnumMachinePlayersBreakHandling;
 import dev.compactmods.machines.neoforge.config.ServerConfig;
 import dev.compactmods.machines.neoforge.machine.entity.BoundCompactMachineBlockEntity;
 import dev.compactmods.machines.neoforge.room.RoomHelper;
-import dev.compactmods.machines.neoforge.room.Rooms;
 import dev.compactmods.machines.neoforge.room.ui.MachineRoomMenu;
-import dev.compactmods.machines.neoforge.wall.Walls;
-import dev.compactmods.machines.i18n.TranslationUtil;
-import dev.compactmods.machines.machine.EnumMachinePlayersBreakHandling;
-import dev.compactmods.machines.machine.graph.DimensionMachineGraph;
-import dev.compactmods.machines.room.exceptions.NonexistentRoomException;
-import dev.compactmods.machines.tunnel.graph.TunnelConnectionGraph;
-import dev.compactmods.machines.tunnel.graph.traversal.TunnelMachineFilters;
 import dev.compactmods.machines.util.PlayerUtil;
 import net.minecraft.commands.Commands;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.GlobalPos;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
@@ -28,58 +19,22 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.NameTagItem;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
-import net.neoforged.common.ForgeHooks;
-import net.neoforged.network.NetworkHooks;
+import net.neoforged.neoforge.common.CommonHooks;
+import net.neoforged.neoforge.network.NetworkHooks;
 import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.Nonnull;
 import java.util.Optional;
 import java.util.UUID;
 
-@SuppressWarnings("removal")
 public class MachineBlockUtil {
 
-    static void cleanupTunnelsPostMachineRemove(Level level, BlockPos pos) {
-        if (level instanceof ServerLevel sl) {
-            final var serv = sl.getServer();
-            final var compactDim = serv.getLevel(CompactDimension.LEVEL_KEY);
-
-            if (level.getBlockEntity(pos) instanceof BoundCompactMachineBlockEntity entity) {
-                entity.connectedRoom().ifPresent(roomCode -> {
-                    final var dimGraph = DimensionMachineGraph.forDimension(sl);
-                    dimGraph.unregisterMachine(pos);
-
-                    if (compactDim == null)
-                        return;
-
-                    final var tunnels = TunnelConnectionGraph.forRoom(compactDim, roomCode);
-                    tunnels.positions(TunnelMachineFilters.all(entity.getLevelPosition()))
-                            .forEach(pos1 -> {
-                                tunnels.unregister(pos1);
-                                compactDim.setBlock(pos1, Walls.BLOCK_SOLID_WALL.get().defaultBlockState(), Block.UPDATE_ALL);
-                            });
-                });
-            }
-        }
-    }
-
     @Nonnull
-    static InteractionResult tryRoomTeleport(Level level, BlockPos pos, ServerPlayer player, MinecraftServer server) {
+    static InteractionResult tryRoomTeleport(Level level, BlockPos pos, ServerPlayer player) {
         // Try teleport to compact machine dimension
         if (level.getBlockEntity(pos) instanceof BoundCompactMachineBlockEntity tile) {
-            tile.connectedRoom().ifPresentOrElse(roomCode -> {
-                try {
-                    RoomHelper.teleportPlayerIntoMachine(level, player, tile.getLevelPosition(), roomCode);
-                } catch (MissingDimensionException e) {
-                    e.printStackTrace();
-                }
-            }, () -> {
-
-                // AdvancementTriggers.getTriggerForMachineClaim(size).trigger(sp);
-            });
-
+            RoomHelper.teleportPlayerIntoMachine(level, player, tile.getLevelPosition(), tile.connectedRoom());
             return InteractionResult.SUCCESS;
         }
 
@@ -96,8 +51,8 @@ public class MachineBlockUtil {
      * @return
      */
     public static float destroyProgressUnchecked(BlockState state, Player player, BlockGetter worldIn, BlockPos pos) {
-        int baseSpeedForge = ForgeHooks.isCorrectToolForDrops(state, player) ? 30 : 100;
-        return player.getDigSpeed(state, pos) / (float) baseSpeedForge;
+        int baseSpeedForge = CommonHooks.isCorrectToolForDrops(state, player) ? 30 : 100;
+        return player.getDigSpeed(state, pos) / baseSpeedForge;
     }
 
     public static float destroyProgress(BlockState state, Player player, BlockGetter worldIn, BlockPos pos) {
@@ -132,24 +87,21 @@ public class MachineBlockUtil {
     }
 
     public static void roomPreviewScreen(BlockPos pos, ServerPlayer player, MinecraftServer server, BoundCompactMachineBlockEntity machine) {
-        machine.connectedRoom().ifPresent(roomCode -> {
-            try {
-                final var roomName = Rooms.getRoomName(server, roomCode);
-                NetworkHooks.openScreen(player, MachineRoomMenu.makeProvider(server, roomCode, machine.getLevelPosition()), (buf) -> {
-                    buf.writeBlockPos(pos);
-                    buf.writeWithCodec(GlobalPos.CODEC, machine.getLevelPosition());
-                    buf.writeUtf(roomCode);
-                    roomName.ifPresentOrElse(name -> {
-                        buf.writeBoolean(true);
-                        buf.writeUtf(name);
-                    }, () -> {
-                        buf.writeBoolean(false);
-                        buf.writeUtf("");
-                    });
-                });
-            } catch (NonexistentRoomException e) {
-                e.printStackTrace();
-            }
+        final var roomCode = machine.connectedRoom();
+
+        NetworkHooks.openScreen(player, MachineRoomMenu.makeProvider(server, roomCode, machine.getLevelPosition()), (buf) -> {
+            buf.writeBlockPos(pos);
+            buf.writeJsonWithCodec(GlobalPos.CODEC, machine.getLevelPosition());
+            buf.writeUtf(roomCode);
+
+            // FIXME Renamable rooms
+//            roomName.ifPresentOrElse(name -> {
+//                buf.writeBoolean(true);
+//                buf.writeUtf(name);
+//            }, () -> {
+                buf.writeBoolean(false);
+                buf.writeUtf("");
+//            });
         });
     }
 
@@ -175,14 +127,8 @@ public class MachineBlockUtil {
                     });
                 }
 
-                tile.connectedRoom().ifPresent(roomCode -> {
-                    try {
-                        final var newName = mainItem.getHoverName().getString(120);
-                        Rooms.updateName(level.getServer(), roomCode, newName);
-                    } catch (NonexistentRoomException e) {
-                        throw new RuntimeException(e);
-                    }
-                });
+                final var newName = mainItem.getHoverName().getString(120);
+                // FIXME Renamable rooms Rooms.updateName(level.getServer(), tile.connectedRoom(), newName);
             }
         }
         return null;

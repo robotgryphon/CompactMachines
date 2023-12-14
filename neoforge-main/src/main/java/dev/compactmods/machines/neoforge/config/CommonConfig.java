@@ -1,18 +1,12 @@
 package dev.compactmods.machines.neoforge.config;
 
-import dev.compactmods.machines.neoforge.CompactMachines;
-import dev.compactmods.machines.api.core.Constants;
-import net.neoforged.common.ForgeConfigSpec;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.Mod;
-import net.neoforged.fml.event.config.ModConfigEvent;
+import net.neoforged.neoforge.common.ModConfigSpec;
 
-@Mod.EventBusSubscriber(modid = Constants.MOD_ID, bus = Mod.EventBusSubscriber.Bus.MOD)
 public class CommonConfig {
 
-    public static ForgeConfigSpec CONFIG;
+    public static ModConfigSpec CONFIG;
 
-    public static ForgeConfigSpec.BooleanValue ENABLE_VANILLA_RECIPES;
+    public static ModConfigSpec.BooleanValue ENABLE_VANILLA_RECIPES;
 
 
 
@@ -21,7 +15,7 @@ public class CommonConfig {
     }
 
     private static void generateConfig() {
-        ForgeConfigSpec.Builder builder = new ForgeConfigSpec.Builder();
+        ModConfigSpec.Builder builder = new ModConfigSpec.Builder();
 
         builder
                 .comment("Recipes and Integrations")
@@ -34,10 +28,5 @@ public class CommonConfig {
         builder.pop();
 
         CONFIG = builder.build();
-    }
-
-    @SubscribeEvent
-    public static void onLoaded(ModConfigEvent.Loading loading) {
-        CompactMachines.LOGGER.debug("Loading common configuration...");
     }
 }

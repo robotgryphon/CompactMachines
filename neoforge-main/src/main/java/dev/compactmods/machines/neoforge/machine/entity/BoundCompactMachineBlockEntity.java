@@ -1,36 +1,25 @@
 package dev.compactmods.machines.neoforge.machine.entity;
 
-import dev.compactmods.machines.api.dimension.CompactDimension;
-import dev.compactmods.machines.api.dimension.MissingDimensionException;
 import dev.compactmods.machines.api.machine.IMachineBlockEntity;
 import dev.compactmods.machines.api.machine.MachineEntityNbt;
 import dev.compactmods.machines.api.machine.MachineNbt;
-import dev.compactmods.machines.neoforge.CompactMachines;
-import dev.compactmods.machines.neoforge.machine.Machines;
-import dev.compactmods.machines.neoforge.tunnel.TunnelWallEntity;
-import dev.compactmods.machines.neoforge.tunnel.graph.traversal.ForgeTunnelTypeFilters;
 import dev.compactmods.machines.machine.graph.DimensionMachineGraph;
-import dev.compactmods.machines.room.graph.CompactRoomProvider;
-import dev.compactmods.machines.tunnel.graph.TunnelConnectionGraph;
-import dev.compactmods.machines.tunnel.graph.traversal.TunnelMachineFilters;
+import dev.compactmods.machines.neoforge.machine.Machines;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
 import net.minecraft.core.GlobalPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import net.neoforged.common.capabilities.Capability;
-import net.neoforged.common.util.LazyOptional;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Optional;
 import java.util.UUID;
 
-@SuppressWarnings("removal")
 public class BoundCompactMachineBlockEntity extends BlockEntity implements IMachineBlockEntity {
 
     protected UUID owner;
@@ -45,40 +34,6 @@ public class BoundCompactMachineBlockEntity extends BlockEntity implements IMach
 
     public BoundCompactMachineBlockEntity(BlockPos pos, BlockState state) {
         super(Machines.MACHINE_ENTITY.get(), pos, state);
-    }
-
-    @NotNull
-    @Override
-    public <T> LazyOptional<T> getCapability(@NotNull Capability<T> cap, @Nullable Direction side) {
-        if (level instanceof ServerLevel sl) {
-            return getConnectedRoom().map(roomId -> {
-                try {
-                    final var serv = sl.getServer();
-                    final var compactDim = CompactDimension.forServer(serv);
-
-                    final var graph = TunnelConnectionGraph.forRoom(compactDim, roomId);
-
-                    final var firstSupported = graph.positions(
-                            TunnelMachineFilters.sided(getLevelPosition(), side),
-                            ForgeTunnelTypeFilters.capability(cap)
-                    ).findFirst();
-
-                    if (firstSupported.isEmpty())
-                        return super.getCapability(cap, side);
-
-                    if (compactDim.getBlockEntity(firstSupported.get()) instanceof TunnelWallEntity tunnel) {
-                        return tunnel.getTunnelCapability(cap, side);
-                    } else {
-                        return super.getCapability(cap, side);
-                    }
-                } catch (MissingDimensionException e) {
-                    CompactMachines.LOGGER.fatal(e);
-                    return super.getCapability(cap, side);
-                }
-            }).orElse(super.getCapability(cap, side));
-        }
-
-        return super.getCapability(cap, side);
     }
 
     @Override
@@ -141,21 +96,6 @@ public class BoundCompactMachineBlockEntity extends BlockEntity implements IMach
         return data;
     }
 
-    private Optional<String> getConnectedRoom() {
-        if (level instanceof ServerLevel sl) {
-            if (roomCode != null)
-                return Optional.of(roomCode);
-
-            final var graph = DimensionMachineGraph.forDimension(sl);
-
-            var chunk = graph.connectedRoom(worldPosition);
-            chunk.ifPresent(c -> this.roomCode = c);
-            return chunk;
-        }
-
-        return Optional.ofNullable(roomCode);
-    }
-
     @Override
     public void handleUpdateTag(CompoundTag tag) {
         super.handleUpdateTag(tag);
@@ -211,9 +151,11 @@ public class BoundCompactMachineBlockEntity extends BlockEntity implements IMach
             this.roomCode = roomCode;
 
             // FIXME - Rooms do not have colors on first creation; this should be pulled from the template!
-            CompactRoomProvider.instance(sl.getServer()).forRoom(roomCode).ifPresent(roomInfo -> {
-                this.roomColor = roomInfo.color();
-            });
+//            Rooms.registrar().get(roomCode).ifPresentOrElse(inst -> {
+//                this.roomColor = inst.registration().defaultMachineColor();
+//            }, () -> {
+                this.roomColor = DyeColor.WHITE.getTextColor();
+//            });
 
             this.setChanged();
         }
@@ -224,25 +166,8 @@ public class BoundCompactMachineBlockEntity extends BlockEntity implements IMach
             final var dimMachines = DimensionMachineGraph.forDimension(sl);
             dimMachines.unregisterMachine(worldPosition);
 
-            this.roomCode = null;
-            setChanged();
+            sl.setBlock(worldPosition, Machines.UNBOUND_MACHINE_BLOCK.get().defaultBlockState(), Block.UPDATE_ALL);
         }
-    }
-
-    public Optional<TunnelConnectionGraph> getTunnelGraph() {
-        if (level == null || roomCode == null) return Optional.empty();
-
-        if (level instanceof ServerLevel sl) {
-            try {
-                final var compactDim = CompactDimension.forServer(sl.getServer());
-                final var tunnelGraph = TunnelConnectionGraph.forRoom(compactDim, roomCode);
-                return Optional.of(tunnelGraph);
-            } catch (MissingDimensionException e) {
-                return Optional.empty();
-            }
-        }
-
-        return Optional.empty();
     }
 
     public int getColor() {
@@ -254,8 +179,9 @@ public class BoundCompactMachineBlockEntity extends BlockEntity implements IMach
         this.hasMachineColorOverride = true;
     }
 
-    public Optional<String> connectedRoom() {
-        return Optional.ofNullable(roomCode);
+    @NotNull
+    public String connectedRoom() {
+        return roomCode;
     }
 
     public Optional<Component> getCustomName() {

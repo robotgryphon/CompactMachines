@@ -3,31 +3,31 @@ package dev.compactmods.machines.neoforge.config;
 import com.electronwill.nightconfig.core.EnumGetMethod;
 import dev.compactmods.machines.machine.EnumMachinePlayersBreakHandling;
 import net.minecraft.commands.Commands;
-import net.neoforged.common.ForgeConfigSpec;
+import net.neoforged.neoforge.common.ModConfigSpec;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
 public class ServerConfig {
-    public static ForgeConfigSpec CONFIG;
+    public static ModConfigSpec CONFIG;
 
-    public static ForgeConfigSpec.EnumValue<EnumMachinePlayersBreakHandling> MACHINE_PLAYER_BREAK_HANDLING;
+    public static ModConfigSpec.EnumValue<EnumMachinePlayersBreakHandling> MACHINE_PLAYER_BREAK_HANDLING;
 
-    private static ForgeConfigSpec.IntValue REBIND_LEVEL;
-    private static ForgeConfigSpec.IntValue GIVE_MACHINE;
-    private static ForgeConfigSpec.IntValue CHANGE_SPAWN_LEVEL;
+    private static ModConfigSpec.IntValue REBIND_LEVEL;
+    private static ModConfigSpec.IntValue GIVE_MACHINE;
+    private static ModConfigSpec.IntValue CHANGE_SPAWN_LEVEL;
 
-    private static ForgeConfigSpec.IntValue CHANGE_ROOM_UPGRADES;
+    private static ModConfigSpec.IntValue CHANGE_ROOM_UPGRADES;
 
-    private static ForgeConfigSpec.BooleanValue ALLOWED_OUTSIDE_MACHINE;
+    private static ModConfigSpec.BooleanValue ALLOWED_OUTSIDE_MACHINE;
 
     static {
         generateConfig();
     }
 
     private static void generateConfig() {
-        ForgeConfigSpec.Builder builder = new ForgeConfigSpec.Builder();
+        ModConfigSpec.Builder builder = new ModConfigSpec.Builder();
 
         builder
                 .comment("Machines")

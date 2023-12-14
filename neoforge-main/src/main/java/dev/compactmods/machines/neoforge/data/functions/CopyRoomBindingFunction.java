@@ -1,39 +1,29 @@
 package dev.compactmods.machines.neoforge.data.functions;
 
-import com.google.gson.JsonDeserializationContext;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonSerializationContext;
-import dev.compactmods.machines.neoforge.machine.entity.BoundCompactMachineBlockEntity;
-import dev.compactmods.machines.neoforge.machine.item.BoundCompactMachineItem;
+import com.mojang.serialization.Codec;
 import dev.compactmods.machines.api.core.CMTags;
 import dev.compactmods.machines.machine.item.ICompactMachineItem;
+import dev.compactmods.machines.neoforge.machine.entity.BoundCompactMachineBlockEntity;
+import dev.compactmods.machines.neoforge.machine.item.BoundCompactMachineItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.storage.loot.LootContext;
-import net.minecraft.world.level.storage.loot.functions.LootItemConditionalFunction;
+import net.minecraft.world.level.storage.loot.functions.LootItemFunction;
 import net.minecraft.world.level.storage.loot.functions.LootItemFunctionType;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
-import net.minecraft.world.level.storage.loot.predicates.LootItemCondition;
+import org.jetbrains.annotations.NotNull;
 
-public class CopyRoomBindingFunction extends LootItemConditionalFunction {
+public class CopyRoomBindingFunction implements LootItemFunction {
 
-    protected CopyRoomBindingFunction(LootItemCondition[] conditions) {
-        super(conditions);
-    }
-
-    public static Builder<?> binding() {
-        return simpleBuilder(CopyRoomBindingFunction::new);
-    }
+    public static final Codec<CopyRoomBindingFunction> CODEC = Codec.unit(new CopyRoomBindingFunction());
 
     @Override
-    protected ItemStack run(ItemStack stack, LootContext ctx) {
+    public ItemStack apply(ItemStack stack, LootContext ctx) {
         var state = ctx.getParam(LootContextParams.BLOCK_STATE);
         if(state.is(CMTags.MACHINE_BLOCK)) {
             var data = ctx.getParam(LootContextParams.BLOCK_ENTITY);
             if (data instanceof BoundCompactMachineBlockEntity machine) {
-                machine.connectedRoom().ifPresent(roomCode -> {
-                    ICompactMachineItem.setColor(stack, machine.getColor());
-                    BoundCompactMachineItem.setRoom(stack, roomCode);
-                });
+                ICompactMachineItem.setColor(stack, machine.getColor());
+                BoundCompactMachineItem.setRoom(stack, machine.connectedRoom());
             }
         }
 
@@ -41,17 +31,7 @@ public class CopyRoomBindingFunction extends LootItemConditionalFunction {
     }
 
     @Override
-    public LootItemFunctionType getType() {
-        return LootFunctions.COPY_ROOM_BINDING.get();
-    }
-
-    public static class Serializer extends LootItemConditionalFunction.Serializer<CopyRoomBindingFunction> {
-        public void serialize(JsonObject json, CopyRoomBindingFunction func, JsonSerializationContext ctx) {
-            super.serialize(json, func, ctx);
-        }
-
-        public CopyRoomBindingFunction deserialize(JsonObject json, JsonDeserializationContext ctx, LootItemCondition[] conditions) {
-            return new CopyRoomBindingFunction(conditions);
-        }
+    public @NotNull LootItemFunctionType getType() {
+        return LootFunctions.COPY_ROOM_BINDING.value();
     }
 }

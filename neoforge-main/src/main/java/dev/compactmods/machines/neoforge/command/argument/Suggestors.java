@@ -3,14 +3,14 @@ package dev.compactmods.machines.neoforge.command.argument;
 import com.mojang.brigadier.suggestion.SuggestionProvider;
 import dev.compactmods.compactmachines.api.room.Rooms;
 import dev.compactmods.compactmachines.api.room.registration.IRoomRegistration;
-import dev.compactmods.machines.neoforge.upgrade.MachineRoomUpgrades;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.SharedSuggestionProvider;
 
 public class Suggestors {
 
-    public static final SuggestionProvider<CommandSourceStack> ROOM_UPGRADES = (ctx, builder) ->
-            SharedSuggestionProvider.suggestResource(MachineRoomUpgrades.REGISTRY.keySet(), builder);
+    // FIXME
+//    public static final SuggestionProvider<CommandSourceStack> ROOM_UPGRADES = (ctx, builder) ->
+//            SharedSuggestionProvider.suggestResource(MachineRoomUpgrades.REGISTRY.keySet(), builder);
 
     public static final SuggestionProvider<CommandSourceStack> OWNED_ROOM_CODES = (ctx, builder) -> {
         final var owner = ctx.getSource().getPlayerOrException();

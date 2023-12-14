@@ -45,11 +45,8 @@ public class CMRebindSubcommand {
                 return;
             }
 
-            machine.connectedRoom().ifPresentOrElse(currentRoom -> {
-                // TODO: Tunnel support check
-                // No tunnels - clear to rebind
-                machine.setConnectedRoom(roomCode);
-            }, () -> machine.setConnectedRoom(roomCode));
+            // No tunnels - clear to rebind
+            machine.setConnectedRoom(roomCode);
         }, () -> {
             LOGS.error("Cannot rebind to room {}; not registered.", roomCode);
         });

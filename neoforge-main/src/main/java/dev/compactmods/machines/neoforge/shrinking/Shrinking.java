@@ -1,25 +1,13 @@
 package dev.compactmods.machines.neoforge.shrinking;
 
-import dev.compactmods.machines.neoforge.CompactMachines;
 import dev.compactmods.machines.neoforge.Registries;
-import dev.compactmods.machines.api.core.Constants;
-import net.minecraft.core.Holder;
-import net.minecraft.core.Registry;
-import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
-import net.neoforged.registries.RegistryObject;
+import net.neoforged.neoforge.registries.DeferredItem;
 
 public class Shrinking {
 
-    public static final Holder<Item> psd = Holder.Reference.createStandAlone(Registry.ITEM, ResourceKey.create(
-            Registry.ITEM_REGISTRY, new ResourceLocation(Constants.MOD_ID, "personal_shrinking_device")
-    ));
-
-    public static final RegistryObject<PersonalShrinkingDevice> PERSONAL_SHRINKING_DEVICE = Registries.ITEMS.register("personal_shrinking_device",
-            () -> new PersonalShrinkingDevice(new Item.Properties()
-                    .tab(CompactMachines.COMPACT_MACHINES_ITEMS)
-                    .stacksTo(1)));
+    public static final DeferredItem<PersonalShrinkingDevice> PERSONAL_SHRINKING_DEVICE = Registries.ITEMS.register("personal_shrinking_device",
+            () -> new PersonalShrinkingDevice(new Item.Properties().stacksTo(1)));
 
     public static void prepare() {
 

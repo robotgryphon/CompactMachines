@@ -1,8 +1,8 @@
 package dev.compactmods.machines.neoforge.machine.item;
 
+import dev.compactmods.compactmachines.api.room.RoomTemplate;
 import dev.compactmods.machines.api.machine.MachineNbt;
-import dev.compactmods.machines.api.room.RoomTemplate;
-import dev.compactmods.machines.neoforge.room.RoomHelper;
+import dev.compactmods.machines.neoforge.Registries;
 import net.minecraft.nbt.Tag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
@@ -35,7 +35,7 @@ public class MachineItemUtil {
     public static Optional<RoomTemplate> getTemplate(ItemStack stack) {
         var template = getTemplateId(stack);
         if (!template.equals(RoomTemplate.NO_TEMPLATE)) {
-            final var actualTemplate = RoomHelper.getTemplates().get(template);
+            final var actualTemplate = Registries.ROOM_TEMPLATES.get(template);
             return Optional.ofNullable(actualTemplate);
         }
 

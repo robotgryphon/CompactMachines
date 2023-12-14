@@ -32,7 +32,7 @@ public class CompactMachineBlock extends Block {
         MinecraftServer server = level.getServer();
         ItemStack mainItem = player.getMainHandItem();
         if (mainItem.is(PSDTags.ITEM) && player instanceof ServerPlayer sp) {
-            return MachineBlockUtil.tryRoomTeleport(level, pos, sp, server);
+            return MachineBlockUtil.tryRoomTeleport(level, pos, sp);
         }
 
         return InteractionResult.sidedSuccess(level.isClientSide);

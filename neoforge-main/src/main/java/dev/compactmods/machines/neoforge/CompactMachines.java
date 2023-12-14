@@ -1,11 +1,9 @@
 package dev.compactmods.machines.neoforge;
 
-import dev.compactmods.machines.ICompactMachinesMod;
+import dev.compactmods.machines.LoggingUtil;
 import dev.compactmods.machines.api.CompactMachinesAddon;
 import dev.compactmods.machines.api.ICompactMachinesAddon;
 import dev.compactmods.machines.api.core.Constants;
-import dev.compactmods.machines.api.room.IPlayerRoomMetadataProvider;
-import dev.compactmods.machines.api.room.IRoomHistory;
 import dev.compactmods.machines.command.Commands;
 import dev.compactmods.machines.neoforge.client.ClientConfig;
 import dev.compactmods.machines.neoforge.config.CommonConfig;
@@ -13,27 +11,19 @@ import dev.compactmods.machines.neoforge.config.ServerConfig;
 import dev.compactmods.machines.neoforge.data.functions.LootFunctions;
 import dev.compactmods.machines.neoforge.dimension.Dimension;
 import dev.compactmods.machines.neoforge.machine.Machines;
-import dev.compactmods.machines.neoforge.room.Rooms;
 import dev.compactmods.machines.neoforge.room.ui.RoomUserInterfaceRegistration;
 import dev.compactmods.machines.neoforge.shrinking.Shrinking;
-import dev.compactmods.machines.neoforge.tunnel.Tunnels;
-import dev.compactmods.machines.neoforge.upgrade.MachineRoomUpgrades;
 import dev.compactmods.machines.neoforge.util.AnnotationScanner;
 import dev.compactmods.machines.neoforge.villager.Villagers;
 import dev.compactmods.machines.neoforge.wall.Walls;
-import net.minecraft.world.item.CreativeModeTab;
-import net.minecraft.world.item.ItemStack;
-import net.neoforged.common.capabilities.RegisterCapabilitiesEvent;
 import net.neoforged.fml.ModLoadingContext;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.config.ModConfig;
 import net.neoforged.fml.javafmlmod.FMLJavaModLoadingContext;
-import net.neoforged.forgespi.language.ModFileScanData;
 import net.neoforged.neoforgespi.language.ModFileScanData;
 import org.apache.logging.log4j.Marker;
 import org.apache.logging.log4j.MarkerManager;
 
-import javax.annotation.Nonnull;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -42,14 +32,6 @@ import java.util.stream.Collectors;
 public class CompactMachines {
 
     public static final Marker ADDON_LIFECYCLE = MarkerManager.getMarker("addons");
-
-    public static final CreativeModeTab COMPACT_MACHINES_ITEMS = new CreativeModeTab(Constants.MOD_ID) {
-        @Override
-        public @Nonnull
-        ItemStack makeIcon() {
-            return new ItemStack(Machines.MACHINE_BLOCK_ITEM_NORMAL.get());
-        }
-    };
 
     private static Set<ICompactMachinesAddon> loadedAddons;
 
@@ -63,9 +45,6 @@ public class CompactMachines {
         mlCtx.registerConfig(ModConfig.Type.CLIENT, ClientConfig.CONFIG);
         mlCtx.registerConfig(ModConfig.Type.COMMON, CommonConfig.CONFIG);
         mlCtx.registerConfig(ModConfig.Type.SERVER, ServerConfig.CONFIG);
-
-        final var bus = FMLJavaModLoadingContext.get().getModEventBus();
-        bus.addListener(this::registerCapabilities);
     }
 
     /**
@@ -78,7 +57,7 @@ public class CompactMachines {
         Registries.ITEMS.register(bus);
         Registries.BLOCK_ENTITIES.register(bus);
         Registries.CONTAINERS.register(bus);
-        Registries.ROOM_TEMPLATES.register(bus);
+        Registries.ROOM_TEMPLATES_DR.register(bus);
         Registries.UPGRADES.register(bus);
         Registries.COMMAND_ARGUMENT_TYPES.register(bus);
         Registries.LOOT_FUNCS.register(bus);
@@ -110,7 +89,7 @@ public class CompactMachines {
                 .collect(Collectors.toSet());
 
         CompactMachines.loadedAddons.forEach(addon -> {
-            LOGGER.debug(ADDON_LIFECYCLE, "Sending registration hook to addon: {}", addon.getClass().getName());
+            LoggingUtil.modLog().debug(ADDON_LIFECYCLE, "Sending registration hook to addon: {}", addon.getClass().getName());
             addon.afterRegistration();
         });
     }
@@ -123,8 +102,7 @@ public class CompactMachines {
 
         RoomUserInterfaceRegistration.prepare();
         Dimension.prepare();
-        Rooms.prepare();
-        MachineRoomUpgrades.prepare();
+//  fixme      MachineRoomUpgrades.prepare();
         Commands.prepare();
         LootFunctions.prepare();
 

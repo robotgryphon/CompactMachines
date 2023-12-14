@@ -1,7 +1,7 @@
 package dev.compactmods.machines.neoforge.network;
 
 import dev.compactmods.machines.api.dimension.MissingDimensionException;
-import dev.compactmods.machines.neoforge.room.Rooms;
+import dev.compactmods.machines.neoforge.room.RoomBlocks;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate;
 import net.neoforged.neoforge.network.NetworkEvent;
@@ -26,7 +26,7 @@ public record PlayerStartedRoomTrackingPacket(String room) {
         ctx.enqueueWork(() -> {
             StructureTemplate blocks;
             try {
-                blocks = Rooms.getInternalBlocks(sender.server, room).get(5, TimeUnit.SECONDS);
+                blocks = RoomBlocks.getInternalBlocks(sender.server, room).get(5, TimeUnit.SECONDS);
             } catch (InterruptedException | ExecutionException | TimeoutException | MissingDimensionException e) {
                 throw new RuntimeException(e);
             }

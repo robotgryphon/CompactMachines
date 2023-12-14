@@ -1,14 +1,11 @@
 package dev.compactmods.machines.neoforge.room.ui;
 
-import com.mojang.blaze3d.vertex.PoseStack;
 import dev.compactmods.machines.neoforge.network.CompactMachinesNet;
 import dev.compactmods.machines.neoforge.network.PlayerRequestedTeleportPacket;
-import dev.compactmods.machines.neoforge.shrinking.Shrinking;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.network.chat.Component;
-import net.minecraft.world.item.ItemStack;
-import net.neoforged.client.gui.widget.ExtendedButton;
-import org.jetbrains.annotations.NotNull;
+import net.neoforged.neoforge.client.gui.widget.ExtendedButton;
 
 public class PSDIconButton extends ExtendedButton {
     private final MachineRoomScreen parent;
@@ -20,13 +17,18 @@ public class PSDIconButton extends ExtendedButton {
     }
 
     @Override
-    public void render(@NotNull PoseStack pose, int mouseX, int mouseY, float partialTicks) {
-        super.render(pose, mouseX, mouseY, partialTicks);
-
-        this.parent.getMinecraft().getItemRenderer().renderAndDecorateItem(
-                new ItemStack(Shrinking.PERSONAL_SHRINKING_DEVICE.get()),
-                x + 2, y + 2, 40);
+    public void renderWidget(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
+        super.renderWidget(guiGraphics, mouseX, mouseY, partialTick);
     }
+
+    //    @Override
+//    public void render(@NotNull PoseStack pose, int mouseX, int mouseY, float partialTicks) {
+//        super.render(pose, mouseX, mouseY, partialTicks);
+//
+////        this.parent.getMinecraft().getItemRenderer().renderStatic(
+////                new ItemStack(Shrinking.PERSONAL_SHRINKING_DEVICE.get()),
+////                x + 2, y + 2, 40);
+//    }
 
     private static void onClicked(Button button) {
         if (button instanceof PSDIconButton psd && button.active) {

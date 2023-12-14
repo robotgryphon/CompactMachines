@@ -2,23 +2,23 @@ package dev.compactmods.machines.neoforge.villager;
 
 import com.google.common.collect.ImmutableSet;
 import dev.compactmods.machines.neoforge.Registries;
-import dev.compactmods.machines.neoforge.upgrade.MachineRoomUpgrades;
 import dev.compactmods.machines.api.core.Constants;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.entity.ai.village.poi.PoiType;
 import net.minecraft.world.entity.npc.VillagerProfession;
-import net.neoforged.registries.ForgeRegistries;
-import net.neoforged.registries.RegistryObject;
+
+import java.util.function.Supplier;
 
 public class Villagers {
     public static final ResourceLocation TINKERER_ID = new ResourceLocation(Constants.MOD_ID, "tinkerer");
 
     public static final ResourceKey<PoiType> TINKERER_WORKBENCH_KEY = ResourceKey
-            .create(ForgeRegistries.POI_TYPES.getRegistryKey(), TINKERER_ID);
+            .create(BuiltInRegistries.POINT_OF_INTEREST_TYPE.key(), TINKERER_ID);
 
-    public static final RegistryObject<VillagerProfession> TINKERER = Registries.VILLAGERS.register("tinkerer",
+    public static final Supplier<VillagerProfession> TINKERER = Registries.VILLAGERS.register("tinkerer",
             () -> new VillagerProfession(
                     TINKERER_ID.toString(),
                     holder -> holder.is(TINKERER_WORKBENCH_KEY), //jobSite
@@ -40,9 +40,9 @@ public class Villagers {
 //            () -> new BasicItemListing(1, new ItemStack(Machines.MACHINE_BLOCK_ITEM_TINY.get()), 5, 100));
 
     static {
-        Registries.POINTS_OF_INTEREST.register("tinkerer", () -> new PoiType(
-                ImmutableSet.of(MachineRoomUpgrades.WORKBENCH_BLOCK.get().defaultBlockState()), 1, 1)
-        );
+//        Registries.POINTS_OF_INTEREST.register("tinkerer", () -> new PoiType(
+//                ImmutableSet.of(MachineRoomUpgrades.WORKBENCH_BLOCK.get().defaultBlockState()), 1, 1)
+//        );
     }
 
     public static void prepare() {
