@@ -46,7 +46,11 @@ jarJar.enable()
 //    }
 //}
 
-minecraft.accessTransformers.file(project.file("src/main/resources/META-INF/accesstransformer.cfg"))
+minecraft {
+    modIdentifier.set(mod_id)
+    accessTransformers.file(project.file("src/main/resources/META-INF/accesstransformer.cfg"))
+}
+
 
 runs {
     // applies to all the run configs below
