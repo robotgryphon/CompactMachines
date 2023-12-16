@@ -44,6 +44,7 @@ public class DataGeneration {
         // generator.addProvider(server, new PointOfInterestTagGenerator(packOut, holderLookup, helper));
 
         generator.addProvider(event.includeServer(), new RoomTemplatesGenerator(packOut, holderLookup));
+        // generator.addProvider(event.includeServer(), new PackMetaGenerator(packOut));
 
         // Client
         boolean client = event.includeClient();
