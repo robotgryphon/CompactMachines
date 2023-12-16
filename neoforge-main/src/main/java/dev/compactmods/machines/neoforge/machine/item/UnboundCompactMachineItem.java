@@ -44,8 +44,8 @@ public class UnboundCompactMachineItem extends BlockItem implements ICompactMach
         // We need NBT data for the rest of this
         boolean sneaking = Screen.hasShiftDown();
 
-        if (sneaking) {
-            MachineItemUtil.getTemplate(stack).ifPresent(actualTemplate -> {
+        if (sneaking && worldIn != null) {
+            MachineItemUtil.getTemplate(worldIn.registryAccess(), stack).ifPresent(actualTemplate -> {
                 final var roomDimensions = actualTemplate.dimensions();
                 tooltip.add(Component.literal("Size: " + roomDimensions.toShortString()).withStyle(ChatFormatting.YELLOW));
 
