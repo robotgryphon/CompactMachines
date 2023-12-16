@@ -5,14 +5,12 @@ import dev.compactmods.machines.api.core.Tooltips;
 import dev.compactmods.machines.api.machine.MachineEntityNbt;
 import dev.compactmods.machines.i18n.TranslationUtil;
 import dev.compactmods.machines.machine.item.ICompactMachineItem;
-import dev.compactmods.machines.neoforge.Registries;
 import dev.compactmods.machines.neoforge.machine.Machines;
 import net.minecraft.ChatFormatting;
 import net.minecraft.Util;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
@@ -80,20 +78,5 @@ public class UnboundCompactMachineItem extends BlockItem implements ICompactMach
         final var tag = stack.getOrCreateTag();
         tag.putString(MachineEntityNbt.NBT_TEMPLATE_ID, templateId.toString());
         return stack;
-    }
-
-    public static ItemStack forTemplate(ResourceKey<RoomTemplate> key) {
-        final var template = Registries.ROOM_TEMPLATES.get(key);
-        if(template != null) {
-            final var stack = new ItemStack(Machines.UNBOUND_MACHINE_BLOCK_ITEM.get(), 1);
-            MachineItemUtil.setTemplate(stack, key.location());
-            ICompactMachineItem.setColor(stack, template.color());
-
-            final var tag = stack.getOrCreateTag();
-            tag.putString(MachineEntityNbt.NBT_TEMPLATE_ID, key.location().toString());
-            return stack;
-        } else {
-            return unbound();
-        }
     }
 }

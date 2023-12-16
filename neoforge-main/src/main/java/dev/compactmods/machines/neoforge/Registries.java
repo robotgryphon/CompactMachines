@@ -64,7 +64,7 @@ public class Registries {
         TABS.register(modBus);
 
         modBus.addListener((DataPackRegistryEvent.NewRegistry newRegistries) -> {
-            newRegistries.dataPackRegistry(Rooms.TEMPLATE_REG_KEY, RoomTemplate.CODEC);
+            newRegistries.dataPackRegistry(Rooms.TEMPLATE_REG_KEY, RoomTemplate.CODEC, RoomTemplate.CODEC);
         });
 
         modBus.addListener((BuildCreativeModeTabContentsEvent addToTabs) -> {

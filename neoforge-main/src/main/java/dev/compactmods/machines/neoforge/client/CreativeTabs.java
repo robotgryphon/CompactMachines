@@ -28,15 +28,12 @@ public interface CreativeTabs {
         output.accept(Shrinking.PERSONAL_SHRINKING_DEVICE.get(), CreativeModeTab.TabVisibility.PARENT_AND_SEARCH_TABS);
         output.accept(Walls.ITEM_BREAKABLE_WALL.get(), CreativeModeTab.TabVisibility.PARENT_AND_SEARCH_TABS);
 
-        // FIXME No machines, sad face :<
-        final var templateLookup = params.holders().lookup(Rooms.TEMPLATE_REG_KEY);
-        templateLookup.ifPresent(lookup -> {
-            final var machines = lookup.listElementIds()
-                    .map(UnboundCompactMachineItem::forTemplate)
-                    .toList();
+        final var lookup = params.holders().lookupOrThrow(Rooms.TEMPLATE_REG_KEY);
+        final var machines = lookup.listElements()
+                .map(k -> UnboundCompactMachineItem.forTemplate(k.key().location(), k.value()))
+                .toList();
 
-            output.acceptAll(machines, CreativeModeTab.TabVisibility.PARENT_AND_SEARCH_TABS);
-        });
+        output.acceptAll(machines, CreativeModeTab.TabVisibility.PARENT_AND_SEARCH_TABS);
     }
 
     static void prepare() {}
