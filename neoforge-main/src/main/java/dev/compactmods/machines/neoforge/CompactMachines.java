@@ -5,6 +5,7 @@ import dev.compactmods.machines.api.ICompactMachinesAddon;
 import dev.compactmods.machines.api.core.Constants;
 import dev.compactmods.machines.command.Commands;
 import dev.compactmods.machines.neoforge.client.ClientConfig;
+import dev.compactmods.machines.neoforge.client.CreativeTabs;
 import dev.compactmods.machines.neoforge.config.CommonConfig;
 import dev.compactmods.machines.neoforge.config.ServerConfig;
 import dev.compactmods.machines.neoforge.data.functions.LootFunctions;
@@ -14,6 +15,7 @@ import dev.compactmods.machines.neoforge.room.Rooms;
 import dev.compactmods.machines.neoforge.shrinking.Shrinking;
 import dev.compactmods.machines.neoforge.villager.Villagers;
 import dev.compactmods.machines.neoforge.wall.Walls;
+import net.minecraft.util.FastColor;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModLoadingContext;
 import net.neoforged.fml.common.Mod;
@@ -27,6 +29,8 @@ import java.util.Set;
 public class CompactMachines {
 
     public static final Marker ADDON_LIFECYCLE = MarkerManager.getMarker("addons");
+
+    public static final int BRAND_MACHINE_COLOR = FastColor.ARGB32.color(255, 248, 246, 76);
 
     private static Set<ICompactMachinesAddon> loadedAddons = ImmutableSet.of();
 
@@ -43,6 +47,7 @@ public class CompactMachines {
         LootFunctions.prepare();
 
         Villagers.prepare();
+        CreativeTabs.prepare();
 
         Registries.setup(modBus);
 
