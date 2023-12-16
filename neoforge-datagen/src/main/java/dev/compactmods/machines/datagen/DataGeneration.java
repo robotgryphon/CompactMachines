@@ -3,7 +3,7 @@ package dev.compactmods.machines.datagen;
 import dev.compactmods.machines.api.core.Constants;
 import dev.compactmods.machines.datagen.lang.EnglishLangGenerator;
 import dev.compactmods.machines.datagen.lang.RussianLangGenerator;
-import dev.compactmods.machines.datagen.room.RoomTemplates;
+import dev.compactmods.machines.datagen.room.RoomTemplatesGenerator;
 import dev.compactmods.machines.datagen.tags.BlockTagGenerator;
 import dev.compactmods.machines.datagen.tags.ItemTagGenerator;
 import net.minecraft.data.DataProvider;
@@ -43,7 +43,7 @@ public class DataGeneration {
 
         // generator.addProvider(server, new PointOfInterestTagGenerator(packOut, holderLookup, helper));
 
-        RoomTemplates.make(event);
+        generator.addProvider(event.includeServer(), new RoomTemplatesGenerator(packOut, holderLookup));
 
         // Client
         boolean client = event.includeClient();

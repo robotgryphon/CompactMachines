@@ -12,6 +12,8 @@ import net.minecraft.world.entity.npc.VillagerProfession;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.storage.loot.functions.LootItemFunctionType;
+import net.neoforged.bus.api.IEventBus;
+import net.neoforged.neoforge.registries.DataPackRegistryEvent;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
 import static dev.compactmods.machines.api.core.Constants.MOD_ID;
@@ -28,9 +30,7 @@ public class Registries {
     public static final DeferredRegister<MenuType<?>> CONTAINERS = DeferredRegister.create(BuiltInRegistries.MENU, MOD_ID);
 
     // MachineRoomUpgrades
-    public static final DeferredRegister<RoomUpgrade> UPGRADES_DR = DeferredRegister.create(RoomUpgrade.REG_KEY, MOD_ID);
-
-    public static final Registry<RoomUpgrade> UPGRADES = UPGRADES_DR.makeRegistry(b -> {});
+    public static Registry<RoomUpgrade> UPGRADES;
 
     // Commands
     public static final DeferredRegister<ArgumentTypeInfo<?, ?>> COMMAND_ARGUMENT_TYPES = DeferredRegister.create(BuiltInRegistries.COMMAND_ARGUMENT_TYPE, MOD_ID);
@@ -38,16 +38,26 @@ public class Registries {
     // LootFunctions
     public static final DeferredRegister<LootItemFunctionType> LOOT_FUNCS = DeferredRegister.create(BuiltInRegistries.LOOT_FUNCTION_TYPE, MOD_ID);
 
-    public static final DeferredRegister<RoomTemplate> ROOM_TEMPLATES_DR = DeferredRegister.create(Rooms.TEMPLATE_REG_KEY, Constants.MOD_ID);
-
-    public static final Registry<RoomTemplate> ROOM_TEMPLATES = ROOM_TEMPLATES_DR.makeRegistry(b -> {});
+    public static Registry<RoomTemplate> ROOM_TEMPLATES;
 
     // Villagers
     public static final DeferredRegister<VillagerProfession> VILLAGERS = DeferredRegister.create(BuiltInRegistries.VILLAGER_PROFESSION, Constants.MOD_ID);
 
     public static final DeferredRegister<PoiType> POINTS_OF_INTEREST = DeferredRegister.create(BuiltInRegistries.POINT_OF_INTEREST_TYPE, Constants.MOD_ID);
 
-    public static void setup() {
+    public static void setup(IEventBus modBus) {
+        BLOCKS.register(modBus);
+        ITEMS.register(modBus);
+        BLOCK_ENTITIES.register(modBus);
+        CONTAINERS.register(modBus);
+        COMMAND_ARGUMENT_TYPES.register(modBus);
+        LOOT_FUNCS.register(modBus);
+        VILLAGERS.register(modBus);
+        // Villagers.TRADES.register(bus);
+        POINTS_OF_INTEREST.register(modBus);
 
+        modBus.addListener((DataPackRegistryEvent.NewRegistry newRegistries) -> {
+            newRegistries.dataPackRegistry(Rooms.TEMPLATE_REG_KEY, RoomTemplate.CODEC);
+        });
     }
 }

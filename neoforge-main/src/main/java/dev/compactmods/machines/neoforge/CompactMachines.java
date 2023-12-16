@@ -35,8 +35,8 @@ public class CompactMachines {
 
     private static Set<ICompactMachinesAddon> loadedAddons;
 
-    public CompactMachines() {
-        Registries.setup();
+    public CompactMachines(IEventBus modBus) {
+        Registries.setup(modBus);
         preparePackages();
         doRegistration();
 
