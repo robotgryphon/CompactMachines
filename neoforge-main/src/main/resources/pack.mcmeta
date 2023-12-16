@@ -1,8 +1,6 @@
 {
-    "pack": {
-        "description": {
-            "text": "CompactMachines Resources"
-        },
-        "pack_format": 18
-    }
+  "pack": {
+    "description": "CompactMachines resources",
+    "pack_format": 18
+  }
 }

@@ -5,7 +5,7 @@ import dev.compactmods.machines.machine.client.MachineColors;
 import dev.compactmods.machines.neoforge.machine.Machines;
 import dev.compactmods.machines.neoforge.machine.entity.UnboundCompactMachineEntity;
 import dev.compactmods.machines.neoforge.room.ui.MachineRoomScreen;
-import dev.compactmods.machines.neoforge.room.ui.RoomUserInterfaceRegistration;
+import dev.compactmods.machines.neoforge.room.Rooms;
 import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.BlockAndTintGetter;
@@ -46,6 +46,6 @@ public class ClientModBusEventHandler {
 
     @SubscribeEvent
     public static void onClientSetup(final FMLClientSetupEvent client) {
-        MenuScreens.register(RoomUserInterfaceRegistration.MACHINE_MENU.get(), MachineRoomScreen::new);
+        MenuScreens.register(Rooms.MACHINE_MENU.get(), MachineRoomScreen::new);
     }
 }

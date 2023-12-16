@@ -47,8 +47,8 @@ runs {
 
         programArguments("--mod", "compactmachines")
         programArguments("--all")
-        programArguments("--output", project(":neoforge-main").file("src/generated/resources").absolutePath)
-        programArguments("--existing", project(":neoforge-main").file("src/main/resources").absolutePath)
+        programArguments("--output", mainProject.file("src/generated/resources").absolutePath)
+        programArguments("--existing", mainProject.file("src/main/resources").absolutePath)
     }
 }
 

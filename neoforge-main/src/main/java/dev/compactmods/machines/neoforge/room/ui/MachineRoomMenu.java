@@ -4,6 +4,7 @@ import dev.compactmods.machines.LoggingUtil;
 import dev.compactmods.machines.api.core.Constants;
 import dev.compactmods.machines.api.dimension.MissingDimensionException;
 import dev.compactmods.machines.neoforge.room.RoomBlocks;
+import dev.compactmods.machines.neoforge.room.Rooms;
 import net.minecraft.core.GlobalPos;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
@@ -29,7 +30,7 @@ public class MachineRoomMenu extends AbstractContainerMenu {
     public boolean loadingBlocks;
 
     public MachineRoomMenu(int win, String room, GlobalPos machine, String roomName) {
-        super(RoomUserInterfaceRegistration.MACHINE_MENU.get(), win);
+        super(Rooms.MACHINE_MENU.get(), win);
         this.room = room;
         this.roomName = roomName;
         this.roomBlocks = new StructureTemplate();

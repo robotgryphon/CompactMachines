@@ -1,3 +1,5 @@
+@file:Suppress("SpellCheckingInspection")
+
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -13,14 +15,14 @@ var envVersion: String = System.getenv("VERSION") ?: "9.9.9"
 if (envVersion.startsWith("v"))
     envVersion = envVersion.trimStart('v');
 
-val mod_id: String by extra
+val modId: String = property("mod_id") as String
 val isRelease: Boolean = (System.getenv("RELEASE") ?: "false").equals("true", true)
 
-val neoforge_version: String by extra
+val neoforgeVersion: String = property("neoforge_version") as String
 val coreVersion: String = property("core_version") as String
 
 base {
-    archivesName.set(mod_id)
+    archivesName.set(modId)
     group = "dev.compactmods"
     version = envVersion
 }
@@ -31,26 +33,21 @@ java {
 
 jarJar.enable()
 
-//sourceSets.named("main") {
-//    java.srcDir("src/main/java")
-//    resources {
-//        srcDir("src/main/resources")
-//        srcDir("src/generated/resources")
-//    }
-//}
-//
-//sourceSets.named("test") {
-//    java.srcDir("src/test/java")
-//    resources {
-//        srcDir("src/test/resources")
-//    }
-//}
+sourceSets.main {
+    java {
+        srcDir("src/main/java")
+    }
 
-minecraft {
-    modIdentifier.set(mod_id)
-    accessTransformers.file(project.file("src/main/resources/META-INF/accesstransformer.cfg"))
+    resources {
+        srcDir("src/main/resources")
+        srcDir("src/generated/resources")
+    }
 }
 
+minecraft {
+    modIdentifier.set(modId)
+    accessTransformers.file(project.file("src/main/resources/META-INF/accesstransformer.cfg"))
+}
 
 runs {
     // applies to all the run configs below
@@ -71,7 +68,7 @@ runs {
 
     create("client") {
         // Comma-separated list of namespaces to load gametests from. Empty = all namespaces.
-        systemProperty("forge.enabledGameTestNamespaces", mod_id)
+        systemProperty("forge.enabledGameTestNamespaces", modId)
 
         programArguments("--username", "Nano")
         programArguments("--width", "1920")
@@ -91,8 +88,7 @@ runs {
 
 repositories {
     mavenLocal()
-
-    mavenCentral() {
+    mavenCentral {
         name = "Central"
         content {
             includeGroup("com.aventrix.jnanoid")
@@ -130,7 +126,7 @@ repositories {
 }
 
 dependencies {
-    implementation("net.neoforged:neoforge:${neoforge_version}")
+    implementation("net.neoforged:neoforge:${neoforgeVersion}")
 
     implementation("com.aventrix.jnanoid", "jnanoid", "2.0.0")
     jarJar("com.aventrix.jnanoid", "jnanoid", "[2.0.0]")
@@ -139,6 +135,7 @@ dependencies {
     implementation("dev.compactmods.compactmachines:room-api:$coreVersion")
     implementation("dev.compactmods.compactmachines:room-upgrade-api:$coreVersion")
     implementation("dev.compactmods.compactmachines:core:$coreVersion")
+
 //    implementation("dev.compactmods.compactmachines:tunnels-api:$tunnelsApiVersion")
 //
     jarJar("dev.compactmods.compactmachines", "core", "[$coreVersion]") {
