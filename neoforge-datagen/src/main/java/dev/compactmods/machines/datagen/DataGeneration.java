@@ -3,7 +3,6 @@ package dev.compactmods.machines.datagen;
 import dev.compactmods.machines.api.core.Constants;
 import dev.compactmods.machines.datagen.lang.EnglishLangGenerator;
 import dev.compactmods.machines.datagen.lang.RussianLangGenerator;
-import dev.compactmods.machines.datagen.room.RoomTemplatesGenerator;
 import dev.compactmods.machines.datagen.tags.BlockTagGenerator;
 import dev.compactmods.machines.datagen.tags.ItemTagGenerator;
 import net.minecraft.data.DataProvider;
@@ -29,7 +28,7 @@ public class DataGeneration {
 
         // Server
         boolean server = event.includeServer();
-        generator.addProvider(server, new LevelBiomeGenerator(generator));
+        generator.addProvider(server, new DatapackRegisteredStuff(packOut, holderLookup));
         generator.addProvider(server, (DataProvider.Factory<LootTableProvider>) output -> new LootTableProvider(output,
                 Collections.emptySet(),
                 List.of(new LootTableProvider.SubProviderEntry(BlockLootGenerator::new, LootContextParamSets.BLOCK))
@@ -42,8 +41,6 @@ public class DataGeneration {
         generator.addProvider(server, new ItemTagGenerator(packOut, blocks, holderLookup));
 
         // generator.addProvider(server, new PointOfInterestTagGenerator(packOut, holderLookup, helper));
-
-        generator.addProvider(event.includeServer(), new RoomTemplatesGenerator(packOut, holderLookup));
         // generator.addProvider(event.includeServer(), new PackMetaGenerator(packOut));
 
         // Client
