@@ -1,4 +1,4 @@
-package dev.compactmods.machines.datagen;
+package dev.compactmods.machines.datagen.util;
 
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.BlockTags;

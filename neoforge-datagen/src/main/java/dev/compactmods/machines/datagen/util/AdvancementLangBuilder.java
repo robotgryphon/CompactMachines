@@ -1,4 +1,4 @@
-package dev.compactmods.machines.datagen;
+package dev.compactmods.machines.datagen.util;
 
 import dev.compactmods.machines.datagen.lang.BaseLangGenerator;
 import dev.compactmods.machines.i18n.TranslationUtil;

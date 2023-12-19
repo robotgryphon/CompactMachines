@@ -4,6 +4,7 @@ import dev.compactmods.compactmachines.api.room.RoomTemplate;
 import dev.compactmods.compactmachines.api.room.Rooms;
 import dev.compactmods.machines.api.core.Constants;
 import dev.compactmods.machines.api.dimension.CompactDimension;
+import dev.compactmods.machines.datagen.util.DimensionTypeBuilder;
 import dev.compactmods.machines.machine.LegacySizedTemplates;
 import dev.compactmods.machines.neoforge.dimension.Dimension;
 import net.minecraft.core.HolderLookup;

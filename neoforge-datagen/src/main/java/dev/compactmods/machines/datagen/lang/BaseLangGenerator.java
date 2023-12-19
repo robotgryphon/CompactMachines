@@ -3,7 +3,7 @@ package dev.compactmods.machines.datagen.lang;
 import dev.compactmods.machines.api.core.Advancements;
 import dev.compactmods.machines.api.core.Constants;
 import dev.compactmods.machines.api.room.upgrade.RoomUpgrade;
-import dev.compactmods.machines.datagen.AdvancementLangBuilder;
+import dev.compactmods.machines.datagen.util.AdvancementLangBuilder;
 import dev.compactmods.machines.i18n.TranslationUtil;
 import dev.compactmods.machines.neoforge.Registries;
 import net.minecraft.Util;
