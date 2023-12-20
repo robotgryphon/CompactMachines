@@ -42,7 +42,7 @@ public class CompactMachines {
         Shrinking.prepare();
         Rooms.prepare();
         Dimension.prepare();
-//  fixme      MachineRoomUpgrades.prepare();
+//  todo upgrade system      MachineRoomUpgrades.prepare();
         Commands.prepare();
         LootFunctions.prepare();
 

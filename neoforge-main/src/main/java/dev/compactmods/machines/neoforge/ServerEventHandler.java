@@ -1,7 +1,13 @@
 package dev.compactmods.machines.neoforge;
 
+import dev.compactmods.compactmachines.api.room.IRoomRegistrar;
+import dev.compactmods.compactmachines.api.room.RoomApi;
+import dev.compactmods.compactmachines.api.room.owner.IRoomOwners;
+import dev.compactmods.compactmachines.api.room.spatial.IRoomChunkManager;
+import dev.compactmods.compactmachines.api.room.spawn.IRoomSpawnManagers;
 import dev.compactmods.machines.LoggingUtil;
 import dev.compactmods.machines.api.dimension.CompactDimension;
+import dev.compactmods.machines.room.RoomApiInstance;
 import net.minecraft.server.level.ServerLevel;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.neoforge.event.level.LevelEvent;
@@ -13,6 +19,16 @@ public class ServerEventHandler {
     @SubscribeEvent
     public static void onServerAboutToStart(final ServerAboutToStartEvent server) {
         final var modLog = LoggingUtil.modLog();
+
+        modLog.debug("Setting up room API instances.");
+        final IRoomRegistrar registrar = null;
+        final IRoomOwners owners = null;
+        final IRoomSpawnManagers spawnManager = null;
+        final IRoomChunkManager chunkManager = null;
+
+        //noinspection UnstableApiUsage
+        RoomApi.INSTANCE = new RoomApiInstance(registrar, owners, spawnManager, chunkManager);
+        modLog.debug("Completed setting up room API instances.");
 
         modLog.debug("Starting addon scan and injection for server startup.");
 //        CompactMachines.getAddons().forEach(addon -> {
