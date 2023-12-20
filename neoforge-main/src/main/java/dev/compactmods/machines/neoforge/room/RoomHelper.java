@@ -1,7 +1,7 @@
 package dev.compactmods.machines.neoforge.room;
 
-import dev.compactmods.compactmachines.api.room.IRoomInstance;
-import dev.compactmods.compactmachines.api.room.Rooms;
+import dev.compactmods.compactmachines.api.room.RoomApi;
+import dev.compactmods.compactmachines.api.room.RoomInstance;
 import dev.compactmods.compactmachines.api.room.exceptions.NonexistentRoomException;
 import dev.compactmods.machines.LoggingUtil;
 import dev.compactmods.machines.api.dimension.CompactDimension;
@@ -25,10 +25,10 @@ public abstract class RoomHelper {
     public static void teleportPlayerIntoMachine(Level machineLevel, ServerPlayer player, GlobalPos machinePos, String roomCode) {
         MinecraftServer serv = machineLevel.getServer();
 
-        Rooms.registrar().get(roomCode).ifPresent(roomInfo -> {
+        RoomApi.registrar().get(roomCode).ifPresent(roomInfo -> {
             // Recursion check. Player tried to enter the room they're already in.
             if (player.level().dimension().equals(CompactDimension.LEVEL_KEY)) {
-                final boolean recursion = roomInfo.chunks().hasChunk(player.chunkPosition());
+                final boolean recursion = roomInfo.chunks().get().hasChunk(player.chunkPosition());
                 if (recursion) {
                     // TODO: Secret Advancement
                     // AdvancementTriggers.RECURSIVE_ROOMS.trigger(player);
@@ -52,7 +52,7 @@ public abstract class RoomHelper {
         });
     }
 
-    public static void setCurrentRoom(MinecraftServer server, ServerPlayer player, IRoomInstance room) {
+    public static void setCurrentRoom(MinecraftServer server, ServerPlayer player, RoomInstance room) {
         // Mark current room, invalidates any listeners + debug screen
         // FIXME - Data attachment/packet sync current room to client
 //        final var roomProvider = CompactRoomProvider.instance(server);
@@ -65,15 +65,16 @@ public abstract class RoomHelper {
 //        CompactMachinesNet.CHANNEL.send(PacketDistributor.PLAYER.with(() -> player), sync);
     }
 
-    public static void teleportPlayerIntoRoom(MinecraftServer serv, ServerPlayer player, IRoomInstance room) throws MissingDimensionException, NonexistentRoomException {
+    public static void teleportPlayerIntoRoom(MinecraftServer serv, ServerPlayer player, RoomInstance room) throws MissingDimensionException, NonexistentRoomException {
         teleportPlayerIntoRoom(serv, player, room, null);
     }
 
-    public static void teleportPlayerIntoRoom(MinecraftServer serv, ServerPlayer player, IRoomInstance room, @Nullable GlobalPos from)
-            throws MissingDimensionException, NonexistentRoomException {
+    public static void teleportPlayerIntoRoom(MinecraftServer serv, ServerPlayer player, RoomInstance room, @Nullable GlobalPos from)
+            throws MissingDimensionException {
         final var compactDim = CompactDimension.forServer(serv);
         serv.submitAsync(() -> {
-            final var spawn = room.spawns().forPlayer(player.getUUID()).orElse(room.spawns().defaultSpawn());
+            final var spawns = room.spawns().get();
+            final var spawn = spawns.forPlayer(player.getUUID()).orElse(spawns.defaultSpawn());
             player.changeDimension(compactDim, SimpleTeleporter.to(spawn.position(), spawn.rotation()));
         });
 

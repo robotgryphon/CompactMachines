@@ -1,5 +1,6 @@
 package dev.compactmods.machines.neoforge.room;
 
+import dev.compactmods.compactmachines.api.room.RoomApi;
 import dev.compactmods.machines.api.dimension.CompactDimension;
 import dev.compactmods.machines.api.dimension.MissingDimensionException;
 import net.minecraft.core.BlockPos;
@@ -18,8 +19,8 @@ public class RoomBlocks {
 
         final var compactDim = server.getLevel(CompactDimension.LEVEL_KEY);
         final var chunkSource = compactDim.getChunkSource();
-        return dev.compactmods.compactmachines.api.room.Rooms.registrar().get(room).map(instance -> {
-            final var chunkLoading = instance.chunks()
+        return RoomApi.room(room).map(instance -> {
+            final var chunkLoading = instance.chunks().get()
                     .stream()
                     .map(cp -> chunkSource.getChunkFuture(cp.x, cp.z, ChunkStatus.FULL, true))
                     .toList();
@@ -27,7 +28,7 @@ public class RoomBlocks {
             final var awaitAllChunks = CompletableFuture.allOf(chunkLoading.toArray(new CompletableFuture[chunkLoading.size()]));
 
             return awaitAllChunks.thenApply(ignored -> {
-                final var bounds = instance.area().outerBounds();
+                final var bounds = instance.area().get().outerBounds();
                 tem.fillFromWorld(compactDim,
                         BlockPos.containing(bounds.minX, bounds.minY - 1, bounds.minZ),
                         new Vec3i((int) bounds.getXsize(), (int) bounds.getYsize() + 1, (int) bounds.getZsize()),

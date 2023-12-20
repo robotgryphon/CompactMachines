@@ -2,7 +2,7 @@ package dev.compactmods.machines.neoforge.command.subcommand;
 
 import com.mojang.brigadier.builder.ArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
-import dev.compactmods.compactmachines.api.room.Rooms;
+import dev.compactmods.compactmachines.api.room.RoomApi;
 import dev.compactmods.machines.api.core.CMCommands;
 import dev.compactmods.machines.i18n.TranslationUtil;
 import dev.compactmods.machines.machine.graph.DimensionMachineGraph;
@@ -38,7 +38,7 @@ public class CMSummarySubcommand {
         long grandTotal = ls.build().sum();
         src.sendSuccess(() -> TranslationUtil.command(CMCommands.MACHINE_REG_TOTAL, grandTotal).withStyle(ChatFormatting.GOLD), false);
 
-        final var roomCount = Rooms.registrar().count();
+        final var roomCount = RoomApi.registrar().count();
         src.sendSuccess(() -> TranslationUtil.command(CMCommands.ROOM_REG_COUNT, roomCount), false);
 
         return 0;

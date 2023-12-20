@@ -4,7 +4,7 @@ import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import dev.compactmods.compactmachines.api.room.Rooms;
+import dev.compactmods.compactmachines.api.room.RoomApi;
 import dev.compactmods.compactmachines.api.room.exceptions.NonexistentRoomException;
 import dev.compactmods.machines.LoggingUtil;
 import dev.compactmods.machines.api.core.Messages;
@@ -41,7 +41,7 @@ public class CMTeleportSubcommand {
     }
 
     private static void teleportToRoom(CommandSourceStack src, MinecraftServer server, ServerPlayer player, String roomCode) {
-        Rooms.registrar().get(roomCode).ifPresentOrElse(room -> {
+        RoomApi.registrar().get(roomCode).ifPresentOrElse(room -> {
             try {
                 RoomHelper.teleportPlayerIntoRoom(server, player, room);
             } catch (MissingDimensionException | NonexistentRoomException e) {

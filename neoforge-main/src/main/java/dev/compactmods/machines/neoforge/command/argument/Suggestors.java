@@ -2,8 +2,8 @@ package dev.compactmods.machines.neoforge.command.argument;
 
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.suggestion.SuggestionProvider;
-import dev.compactmods.compactmachines.api.room.Rooms;
-import dev.compactmods.compactmachines.api.room.registration.IRoomRegistration;
+import dev.compactmods.compactmachines.api.room.RoomApi;
+import dev.compactmods.compactmachines.api.room.RoomTemplate;
 import dev.compactmods.machines.api.room.upgrade.RoomUpgrade;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.SharedSuggestionProvider;
@@ -15,25 +15,25 @@ import java.util.Set;
 
 public class Suggestors {
     public static final SuggestionProvider<CommandSourceStack> ROOM_TEMPLATES = (ctx, builder) ->
-            SharedSuggestionProvider.suggestResource(getRegistryValues(ctx, Rooms.TEMPLATE_REG_KEY), builder);
+            SharedSuggestionProvider.suggestResource(getRegistryValues(ctx, RoomTemplate.REGISTRY_KEY), builder);
 
     public static final SuggestionProvider<CommandSourceStack> ROOM_UPGRADES = (ctx, builder) ->
-            SharedSuggestionProvider.suggestResource(getRegistryValues(ctx, RoomUpgrade.REG_KEY), builder);
+            SharedSuggestionProvider.suggestResource(getRegistryValues(ctx, RoomUpgrade.REGISTRY_KEY), builder);
 
     public static final SuggestionProvider<CommandSourceStack> OWNED_ROOM_CODES = (ctx, builder) -> {
         final var owner = ctx.getSource().getPlayerOrException();
 
-        final var codes = Rooms.owners()
+        final var codes = RoomApi.owners()
                 .findByOwner(owner.getUUID())
-                .map(IRoomRegistration::code);
+                .toList();
 
         return SharedSuggestionProvider.suggest(codes, builder);
     };
 
     public static final SuggestionProvider<CommandSourceStack> ROOM_CODES = (ctx, builder) -> {
-        final var codes = Rooms.registrar()
-                .allRooms()
-                .map(IRoomRegistration::code);
+        final var codes = RoomApi.registrar()
+                .allRoomCodes()
+                .toList();
 
         return SharedSuggestionProvider.suggest(codes, builder);
     };

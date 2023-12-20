@@ -1,7 +1,6 @@
 package dev.compactmods.machines.neoforge;
 
 import dev.compactmods.compactmachines.api.room.RoomTemplate;
-import dev.compactmods.compactmachines.api.room.Rooms;
 import dev.compactmods.machines.api.core.Constants;
 import dev.compactmods.machines.api.room.upgrade.RoomUpgrade;
 import dev.compactmods.machines.neoforge.shrinking.Shrinking;
@@ -64,7 +63,7 @@ public class Registries {
         TABS.register(modBus);
 
         modBus.addListener((DataPackRegistryEvent.NewRegistry newRegistries) -> {
-            newRegistries.dataPackRegistry(Rooms.TEMPLATE_REG_KEY, RoomTemplate.CODEC, RoomTemplate.CODEC);
+            newRegistries.dataPackRegistry(RoomTemplate.REGISTRY_KEY, RoomTemplate.CODEC, RoomTemplate.CODEC);
         });
 
         modBus.addListener((BuildCreativeModeTabContentsEvent addToTabs) -> {

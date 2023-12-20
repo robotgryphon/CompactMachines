@@ -3,7 +3,7 @@ package dev.compactmods.machines.neoforge.command.subcommand;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.ArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
-import dev.compactmods.compactmachines.api.room.Rooms;
+import dev.compactmods.compactmachines.api.room.RoomApi;
 import dev.compactmods.compactmachines.api.room.exceptions.NonexistentRoomException;
 import dev.compactmods.machines.api.core.CMCommands;
 import dev.compactmods.machines.i18n.TranslationUtil;
@@ -31,7 +31,7 @@ public class SpawnSubcommand {
         final var roomCode = StringArgumentType.getString(ctx, "room");
 
         try {
-            final var roomProvider = Rooms.spawnManager(roomCode);
+            final var spawnManager = RoomApi.spawnManager(roomCode);
 
             // FIXME roomProvider.setDefaultSpawn();
             src.sendSuccess(() -> TranslationUtil.command(CMCommands.SPAWN_CHANGED_SUCCESSFULLY, "%s".formatted(roomCode)), true);

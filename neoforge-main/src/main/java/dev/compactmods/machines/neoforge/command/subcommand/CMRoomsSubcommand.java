@@ -3,7 +3,7 @@ package dev.compactmods.machines.neoforge.command.subcommand;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import dev.compactmods.compactmachines.api.room.Rooms;
+import dev.compactmods.compactmachines.api.room.RoomApi;
 import dev.compactmods.machines.api.core.CMCommands;
 import dev.compactmods.machines.api.core.Messages;
 import dev.compactmods.machines.api.dimension.CompactDimension;
@@ -50,8 +50,8 @@ public class CMRoomsSubcommand {
 
         if (level.getBlockEntity(block) instanceof BoundCompactMachineBlockEntity be) {
             final var roomCode = be.connectedRoom();
-            Rooms.registrar().get(roomCode).ifPresent(roomInfo -> {
-                final var m = TranslationUtil.message(Messages.MACHINE_ROOM_INFO, block, roomInfo.area().dimensions(), roomCode);
+            RoomApi.registrar().get(roomCode).ifPresent(roomInfo -> {
+                final var m = TranslationUtil.message(Messages.MACHINE_ROOM_INFO, block, roomInfo.area().get().dimensions(), roomCode);
                 ctx.getSource().sendSuccess(() -> m, false);
             });
         }
@@ -82,13 +82,13 @@ public class CMRoomsSubcommand {
         final var owner = EntityArgument.getPlayer(ctx, "owner");
         final var source = ctx.getSource();
 
-        final var owned = Rooms.owners().findByOwner(owner.getUUID()).toList();
+        final var owned = RoomApi.owners().findByOwner(owner.getUUID()).toList();
 
         // TODO Localization
         if (owned.isEmpty()) {
             source.sendSuccess(() -> Component.literal("No rooms found."), false);
         } else {
-            owned.forEach(roomInfo -> source.sendSuccess(() -> Component.literal("Room: " + roomInfo.code()), false));
+            owned.forEach(roomCode -> source.sendSuccess(() -> Component.literal("Room: " + roomCode), false));
         }
 
 

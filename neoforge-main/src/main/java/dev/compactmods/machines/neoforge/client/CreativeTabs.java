@@ -1,6 +1,6 @@
 package dev.compactmods.machines.neoforge.client;
 
-import dev.compactmods.compactmachines.api.room.Rooms;
+import dev.compactmods.compactmachines.api.room.RoomTemplate;
 import dev.compactmods.machines.machine.item.ICompactMachineItem;
 import dev.compactmods.machines.neoforge.CompactMachines;
 import dev.compactmods.machines.neoforge.machine.item.UnboundCompactMachineItem;
@@ -28,7 +28,7 @@ public interface CreativeTabs {
         output.accept(Shrinking.PERSONAL_SHRINKING_DEVICE.get(), CreativeModeTab.TabVisibility.PARENT_AND_SEARCH_TABS);
         output.accept(Walls.ITEM_BREAKABLE_WALL.get(), CreativeModeTab.TabVisibility.PARENT_AND_SEARCH_TABS);
 
-        final var lookup = params.holders().lookupOrThrow(Rooms.TEMPLATE_REG_KEY);
+        final var lookup = params.holders().lookupOrThrow(RoomTemplate.REGISTRY_KEY);
         final var machines = lookup.listElements()
                 .map(k -> UnboundCompactMachineItem.forTemplate(k.key().location(), k.value()))
                 .toList();

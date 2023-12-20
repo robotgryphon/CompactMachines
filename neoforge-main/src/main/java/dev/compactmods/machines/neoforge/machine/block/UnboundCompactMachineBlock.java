@@ -36,7 +36,8 @@ public class UnboundCompactMachineBlock extends CompactMachineBlock implements E
     @Override
     public ItemStack getCloneItemStack(BlockState state, HitResult target, LevelReader level, BlockPos pos, Player player) {
         if (level.getBlockEntity(pos) instanceof UnboundCompactMachineEntity be) {
-            return UnboundCompactMachineItem.forTemplate(be.templateId().location(), be.template().get());
+            final var temp = be.template().orElseThrow();
+            return UnboundCompactMachineItem.forTemplate(be.templateId(), temp);
         }
 
         return UnboundCompactMachineItem.unbound();
