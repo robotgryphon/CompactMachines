@@ -1,7 +1,6 @@
 package dev.compactmods.machines.datagen;
 
 import dev.compactmods.compactmachines.api.room.RoomTemplate;
-import dev.compactmods.compactmachines.api.room.Rooms;
 import dev.compactmods.machines.api.core.Constants;
 import dev.compactmods.machines.api.dimension.CompactDimension;
 import dev.compactmods.machines.datagen.util.DimensionTypeBuilder;
@@ -41,8 +40,7 @@ public class DatapackRegisteredStuff extends DatapackBuiltinEntriesProvider {
             .add(Registries.BIOME, DatapackRegisteredStuff::generateBiomes)
             .add(Registries.DIMENSION_TYPE, DatapackRegisteredStuff::generateDimensionTypes)
             .add(Registries.LEVEL_STEM, DatapackRegisteredStuff::generateDimensions)
-            .add(Rooms.TEMPLATE_REG_KEY, DatapackRegisteredStuff::addRoomTemplates);
-
+            .add(RoomTemplate.REGISTRY_KEY, DatapackRegisteredStuff::addRoomTemplates);
 
     DatapackRegisteredStuff(PackOutput packOutput, CompletableFuture<HolderLookup.Provider> registries) {
         super(packOutput, registries, BUILDER, Set.of(Constants.MOD_ID));
@@ -101,13 +99,13 @@ public class DatapackRegisteredStuff extends DatapackBuiltinEntriesProvider {
 
     @SuppressWarnings("removal")
     private static void addRoomTemplates(BootstapContext<RoomTemplate> ctx) {
-        ctx.register(ResourceKey.create(Rooms.TEMPLATE_REG_KEY, LegacySizedTemplates.EMPTY_TINY.id()), LegacySizedTemplates.EMPTY_TINY.template());
-        ctx.register(ResourceKey.create(Rooms.TEMPLATE_REG_KEY, new ResourceLocation(Constants.MOD_ID, "small")), LegacySizedTemplates.EMPTY_SMALL.template());
-        ctx.register(ResourceKey.create(Rooms.TEMPLATE_REG_KEY, new ResourceLocation(Constants.MOD_ID, "normal")), LegacySizedTemplates.EMPTY_NORMAL.template());
-        ctx.register(ResourceKey.create(Rooms.TEMPLATE_REG_KEY, new ResourceLocation(Constants.MOD_ID, "large")), LegacySizedTemplates.EMPTY_LARGE.template());
-        ctx.register(ResourceKey.create(Rooms.TEMPLATE_REG_KEY, new ResourceLocation(Constants.MOD_ID, "giant")), LegacySizedTemplates.EMPTY_GIANT.template());
-        ctx.register(ResourceKey.create(Rooms.TEMPLATE_REG_KEY, new ResourceLocation(Constants.MOD_ID, "colossal")), LegacySizedTemplates.EMPTY_COLOSSAL.template());
-        ctx.register(ResourceKey.create(Rooms.TEMPLATE_REG_KEY, new ResourceLocation(Constants.MOD_ID, "absurd")), new RoomTemplate(new Vec3i(25, 25, 25),
+        ctx.register(ResourceKey.create(RoomTemplate.REGISTRY_KEY, LegacySizedTemplates.EMPTY_TINY.id()), LegacySizedTemplates.EMPTY_TINY.template());
+        ctx.register(ResourceKey.create(RoomTemplate.REGISTRY_KEY, new ResourceLocation(Constants.MOD_ID, "small")), LegacySizedTemplates.EMPTY_SMALL.template());
+        ctx.register(ResourceKey.create(RoomTemplate.REGISTRY_KEY, new ResourceLocation(Constants.MOD_ID, "normal")), LegacySizedTemplates.EMPTY_NORMAL.template());
+        ctx.register(ResourceKey.create(RoomTemplate.REGISTRY_KEY, new ResourceLocation(Constants.MOD_ID, "large")), LegacySizedTemplates.EMPTY_LARGE.template());
+        ctx.register(ResourceKey.create(RoomTemplate.REGISTRY_KEY, new ResourceLocation(Constants.MOD_ID, "giant")), LegacySizedTemplates.EMPTY_GIANT.template());
+        ctx.register(ResourceKey.create(RoomTemplate.REGISTRY_KEY, new ResourceLocation(Constants.MOD_ID, "colossal")), LegacySizedTemplates.EMPTY_COLOSSAL.template());
+        ctx.register(ResourceKey.create(RoomTemplate.REGISTRY_KEY, new ResourceLocation(Constants.MOD_ID, "absurd")), new RoomTemplate(new Vec3i(25, 25, 25),
                 FastColor.ARGB32.color(255, 0, 166, 88),
                 RoomTemplate.NO_TEMPLATE));
     }
