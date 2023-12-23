@@ -1,27 +1,44 @@
-package dev.compactmods.machines.neoforge.client;
+package dev.compactmods.machines.neoforge.client.creative;
 
 import dev.compactmods.compactmachines.api.room.RoomTemplate;
+import dev.compactmods.machines.api.core.Constants;
 import dev.compactmods.machines.machine.item.ICompactMachineItem;
 import dev.compactmods.machines.neoforge.CompactMachines;
 import dev.compactmods.machines.neoforge.machine.item.UnboundCompactMachineItem;
 import dev.compactmods.machines.neoforge.room.Rooms;
 import dev.compactmods.machines.neoforge.shrinking.Shrinking;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.CreativeModeTab;
+import net.minecraft.world.item.DyeColor;
 import net.neoforged.neoforge.registries.DeferredHolder;
 
 import static dev.compactmods.machines.neoforge.Registries.TABS;
 
 public interface CreativeTabs {
 
-    DeferredHolder<CreativeModeTab, CreativeModeTab> TAB = TABS.register("main", () -> CreativeModeTab.builder()
+    ResourceLocation MAIN_RL = new ResourceLocation(Constants.MOD_ID, "main");
+    ResourceLocation LINKED_MACHINES_RL = new ResourceLocation(Constants.MOD_ID, "linked_machines");
+
+    DeferredHolder<CreativeModeTab, CreativeModeTab> NEW_MACHINES = TABS.register(MAIN_RL.getPath(), () -> CreativeModeTab.builder()
+            .icon(() -> {
+                final var ub = UnboundCompactMachineItem.unbound();
+                ICompactMachineItem.setColor(ub, DyeColor.WHITE.getTextColor());
+                return ub;
+            })
+            .title(Component.translatable("itemGroup.compactmachines.main"))
+            .displayItems(CreativeTabs::fillItems)
+            .build());
+
+    DeferredHolder<CreativeModeTab, CreativeModeTab> EXISTING_MACHINES = TABS.register(LINKED_MACHINES_RL.getPath(), () -> CreativeModeTab.builder()
             .icon(() -> {
                 final var ub = UnboundCompactMachineItem.unbound();
                 ICompactMachineItem.setColor(ub, CompactMachines.BRAND_MACHINE_COLOR);
                 return ub;
             })
-            .title(Component.translatable("itemGroup.compactmachines"))
-            .displayItems(CreativeTabs::fillItems)
+            .title(Component.translatable("itemGroup.compactmachines.linked_machines"))
+            .withTabsBefore(MAIN_RL)
+            .withSearchBar()
             .build());
 
     static void fillItems(CreativeModeTab.ItemDisplayParameters params, CreativeModeTab.Output output) {

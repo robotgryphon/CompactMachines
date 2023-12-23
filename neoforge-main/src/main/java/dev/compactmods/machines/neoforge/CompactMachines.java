@@ -5,7 +5,7 @@ import dev.compactmods.machines.api.ICompactMachinesAddon;
 import dev.compactmods.machines.api.core.Constants;
 import dev.compactmods.machines.command.Commands;
 import dev.compactmods.machines.neoforge.client.ClientConfig;
-import dev.compactmods.machines.neoforge.client.CreativeTabs;
+import dev.compactmods.machines.neoforge.client.creative.CreativeTabs;
 import dev.compactmods.machines.neoforge.config.CommonConfig;
 import dev.compactmods.machines.neoforge.config.ServerConfig;
 import dev.compactmods.machines.neoforge.data.functions.LootFunctions;
