@@ -25,7 +25,7 @@ public abstract class RoomHelper {
     public static void teleportPlayerIntoMachine(Level machineLevel, ServerPlayer player, GlobalPos machinePos, String roomCode) {
         MinecraftServer serv = machineLevel.getServer();
 
-        RoomApi.registrar().get(roomCode).ifPresent(roomInfo -> {
+        RoomApi.room(roomCode).ifPresent(roomInfo -> {
             // Recursion check. Player tried to enter the room they're already in.
             if (player.level().dimension().equals(CompactDimension.LEVEL_KEY)) {
                 final boolean recursion = roomInfo.chunks().get().hasChunk(player.chunkPosition());
@@ -73,6 +73,7 @@ public abstract class RoomHelper {
             throws MissingDimensionException {
         final var compactDim = CompactDimension.forServer(serv);
         serv.submitAsync(() -> {
+            // FIXME SPAWN MANAGEMENT
             final var spawns = room.spawns().get().spawns();
             final var spawn = spawns.forPlayer(player.getUUID()).orElse(spawns.defaultSpawn());
             player.changeDimension(compactDim, SimpleTeleporter.to(spawn.position(), spawn.rotation()));
