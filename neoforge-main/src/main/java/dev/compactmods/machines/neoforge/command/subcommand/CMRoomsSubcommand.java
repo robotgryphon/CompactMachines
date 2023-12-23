@@ -51,7 +51,7 @@ public class CMRoomsSubcommand {
         if (level.getBlockEntity(block) instanceof BoundCompactMachineBlockEntity be) {
             final var roomCode = be.connectedRoom();
             RoomApi.registrar().get(roomCode).ifPresent(roomInfo -> {
-                final var m = TranslationUtil.message(Messages.MACHINE_ROOM_INFO, block, roomInfo.area().get().dimensions(), roomCode);
+                final var m = TranslationUtil.message(Messages.MACHINE_ROOM_INFO, block, roomInfo.boundaries().dimensions(), roomCode);
                 ctx.getSource().sendSuccess(() -> m, false);
             });
         }

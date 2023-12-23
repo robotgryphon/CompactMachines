@@ -28,7 +28,7 @@ public class RoomBlocks {
             final var awaitAllChunks = CompletableFuture.allOf(chunkLoading.toArray(new CompletableFuture[chunkLoading.size()]));
 
             return awaitAllChunks.thenApply(ignored -> {
-                final var bounds = instance.area().get().outerBounds();
+                final var bounds = instance.boundaries().outerBounds();
                 tem.fillFromWorld(compactDim,
                         BlockPos.containing(bounds.minX, bounds.minY - 1, bounds.minZ),
                         new Vec3i((int) bounds.getXsize(), (int) bounds.getYsize() + 1, (int) bounds.getZsize()),

@@ -4,7 +4,6 @@ import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.ArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import dev.compactmods.compactmachines.api.room.RoomApi;
-import dev.compactmods.compactmachines.api.room.exceptions.NonexistentRoomException;
 import dev.compactmods.machines.api.core.CMCommands;
 import dev.compactmods.machines.i18n.TranslationUtil;
 import dev.compactmods.machines.neoforge.config.ServerConfig;
@@ -30,15 +29,10 @@ public class SpawnSubcommand {
         final var src = ctx.getSource();
         final var roomCode = StringArgumentType.getString(ctx, "room");
 
-        try {
-            final var spawnManager = RoomApi.spawnManager(roomCode);
+        final var spawnManager = RoomApi.spawnManager(roomCode);
 
-            // FIXME roomProvider.setDefaultSpawn();
-            src.sendSuccess(() -> TranslationUtil.command(CMCommands.SPAWN_CHANGED_SUCCESSFULLY, "%s".formatted(roomCode)), true);
-            return 0;
-        } catch (NonexistentRoomException e) {
-            src.sendFailure(TranslationUtil.command(CMCommands.ROOM_NOT_FOUND, roomCode));
-            return -1;
-        }
+        // FIXME roomProvider.setDefaultSpawn();
+        src.sendSuccess(() -> TranslationUtil.command(CMCommands.SPAWN_CHANGED_SUCCESSFULLY, "%s".formatted(roomCode)), true);
+        return 0;
     }
 }

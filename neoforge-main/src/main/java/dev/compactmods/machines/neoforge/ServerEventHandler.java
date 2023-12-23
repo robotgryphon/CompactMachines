@@ -6,14 +6,17 @@ import dev.compactmods.compactmachines.api.room.owner.IRoomOwners;
 import dev.compactmods.compactmachines.api.room.spatial.IRoomChunkManager;
 import dev.compactmods.compactmachines.api.room.spawn.IRoomSpawnManagers;
 import dev.compactmods.machines.LoggingUtil;
+import dev.compactmods.machines.api.core.Constants;
 import dev.compactmods.machines.api.dimension.CompactDimension;
 import dev.compactmods.machines.room.RoomApiInstance;
+import dev.compactmods.machines.room.RoomRegistration;
 import net.minecraft.server.level.ServerLevel;
 import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.Mod;
 import net.neoforged.neoforge.event.level.LevelEvent;
 import net.neoforged.neoforge.event.server.ServerAboutToStartEvent;
 
-// @Mod.EventBusSubscriber(modid = Constants.MOD_ID)
+@Mod.EventBusSubscriber(modid = Constants.MOD_ID)
 public class ServerEventHandler {
 
     @SubscribeEvent
@@ -21,10 +24,10 @@ public class ServerEventHandler {
         final var modLog = LoggingUtil.modLog();
 
         modLog.debug("Setting up room API instances.");
-        final IRoomRegistrar registrar = null;
+        final IRoomRegistrar registrar = new RoomRegistration();
         final IRoomOwners owners = null;
         final IRoomSpawnManagers spawnManager = null;
-        final IRoomChunkManager chunkManager = null;
+        final IRoomChunkManager chunkManager = null; // new GraphChunkManager();
 
         //noinspection UnstableApiUsage
         RoomApi.INSTANCE = new RoomApiInstance(registrar, owners, spawnManager, chunkManager);

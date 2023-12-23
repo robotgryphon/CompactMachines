@@ -73,7 +73,7 @@ public abstract class RoomHelper {
             throws MissingDimensionException {
         final var compactDim = CompactDimension.forServer(serv);
         serv.submitAsync(() -> {
-            final var spawns = room.spawns().get();
+            final var spawns = room.spawns().get().spawns();
             final var spawn = spawns.forPlayer(player.getUUID()).orElse(spawns.defaultSpawn());
             player.changeDimension(compactDim, SimpleTeleporter.to(spawn.position(), spawn.rotation()));
         });

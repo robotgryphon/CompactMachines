@@ -2,10 +2,8 @@ package dev.compactmods.machines.neoforge;
 
 import dev.compactmods.compactmachines.api.room.RoomTemplate;
 import dev.compactmods.machines.api.core.Constants;
-import dev.compactmods.machines.api.room.upgrade.RoomUpgrade;
 import dev.compactmods.machines.neoforge.shrinking.Shrinking;
 import net.minecraft.commands.synchronization.ArgumentTypeInfo;
-import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.entity.ai.village.poi.PoiType;
 import net.minecraft.world.entity.npc.VillagerProfession;
@@ -34,16 +32,11 @@ public class Registries {
     // UIRegistration
     public static final DeferredRegister<MenuType<?>> CONTAINERS = DeferredRegister.create(BuiltInRegistries.MENU, MOD_ID);
 
-    // MachineRoomUpgrades
-    public static Registry<RoomUpgrade> UPGRADES;
-
     // Commands
     public static final DeferredRegister<ArgumentTypeInfo<?, ?>> COMMAND_ARGUMENT_TYPES = DeferredRegister.create(BuiltInRegistries.COMMAND_ARGUMENT_TYPE, MOD_ID);
 
     // LootFunctions
     public static final DeferredRegister<LootItemFunctionType> LOOT_FUNCS = DeferredRegister.create(BuiltInRegistries.LOOT_FUNCTION_TYPE, MOD_ID);
-
-    public static Registry<RoomTemplate> ROOM_TEMPLATES;
 
     // Villagers
     public static final DeferredRegister<VillagerProfession> VILLAGERS = DeferredRegister.create(BuiltInRegistries.VILLAGER_PROFESSION, Constants.MOD_ID);

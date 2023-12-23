@@ -20,7 +20,7 @@ val isRelease: Boolean = (System.getenv("RELEASE") ?: "false").equals("true", tr
 
 val neoforgeVersion: String = property("neoforge_version") as String
 val coreVersion: String = property("core_version") as String
-
+val featherVersion: String = property("feather_version") as String
 base {
     archivesName.set(modId)
     group = "dev.compactmods"
@@ -59,6 +59,7 @@ runs {
         systemProperty("forge.logging.console.level", "debug")
 
         dependencies {
+            runtime("dev.compactmods:feather:$featherVersion")
             runtime("com.aventrix.jnanoid:jnanoid:2.0.0")
         }
 
