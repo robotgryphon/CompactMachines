@@ -5,8 +5,8 @@ import dev.compactmods.machines.api.core.Constants;
 import dev.compactmods.machines.api.core.Messages;
 import dev.compactmods.machines.api.core.Tooltips;
 import dev.compactmods.machines.neoforge.client.RoomExitKeyMapping;
+import dev.compactmods.machines.neoforge.room.Rooms;
 import dev.compactmods.machines.neoforge.shrinking.Shrinking;
-import dev.compactmods.machines.neoforge.wall.Walls;
 import net.minecraft.Util;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.resources.ResourceLocation;
@@ -58,8 +58,8 @@ public class EnglishLangGenerator extends BaseLangGenerator {
 
         addAdvancementTranslations();
 
-        addBlock(Walls.BLOCK_BREAKABLE_WALL, "Compact Machine Wall");
-        addBlock(Walls.BLOCK_SOLID_WALL, "Solid Compact Machine Wall");
+        addBlock(Rooms.BLOCK_BREAKABLE_WALL, "Compact Machine Wall");
+        addBlock(Rooms.BLOCK_SOLID_WALL, "Solid Compact Machine Wall");
         // addBlock(Tunnels.BLOCK_TUNNEL_WALL, "Solid Compact Machine Wall (with Tunnel)");
         add(Util.makeDescriptionId("block", new ResourceLocation(Constants.MOD_ID, "bound_machine_fallback")), "Bound Compact Machine");
 

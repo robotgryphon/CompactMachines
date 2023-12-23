@@ -1,4 +1,4 @@
-package dev.compactmods.machines.neoforge.machine.entity;
+package dev.compactmods.machines.neoforge.machine.block;
 
 import dev.compactmods.machines.api.machine.IMachineBlockEntity;
 import dev.compactmods.machines.api.machine.MachineEntityNbt;

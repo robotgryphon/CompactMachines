@@ -1,4 +1,4 @@
-package dev.compactmods.machines.neoforge.wall;
+package dev.compactmods.machines.neoforge.room.block;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.Entity;

@@ -14,7 +14,6 @@ import dev.compactmods.machines.neoforge.machine.Machines;
 import dev.compactmods.machines.neoforge.room.Rooms;
 import dev.compactmods.machines.neoforge.shrinking.Shrinking;
 import dev.compactmods.machines.neoforge.villager.Villagers;
-import dev.compactmods.machines.neoforge.wall.Walls;
 import net.minecraft.util.FastColor;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModLoadingContext;
@@ -38,7 +37,6 @@ public class CompactMachines {
     public CompactMachines(IEventBus modBus) {
         // Package initialization here, this kick-starts the rest of the DR code (classloading)
         Machines.prepare();
-        Walls.prepare();
         Shrinking.prepare();
         Rooms.prepare();
         Dimension.prepare();

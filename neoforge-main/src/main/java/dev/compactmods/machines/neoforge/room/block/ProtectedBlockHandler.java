@@ -1,4 +1,4 @@
-package dev.compactmods.machines.neoforge.wall;
+package dev.compactmods.machines.neoforge.room.block;
 
 import dev.compactmods.machines.api.core.Constants;
 import net.neoforged.bus.api.SubscribeEvent;

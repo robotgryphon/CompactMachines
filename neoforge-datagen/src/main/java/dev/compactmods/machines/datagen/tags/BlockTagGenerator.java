@@ -3,7 +3,7 @@ package dev.compactmods.machines.datagen.tags;
 import dev.compactmods.machines.api.core.CMTags;
 import dev.compactmods.machines.api.core.Constants;
 import dev.compactmods.machines.neoforge.machine.Machines;
-import dev.compactmods.machines.neoforge.wall.Walls;
+import dev.compactmods.machines.neoforge.room.Rooms;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.data.PackOutput;
 import net.minecraft.tags.BlockTags;
@@ -24,7 +24,7 @@ public class BlockTagGenerator extends BlockTagsProvider {
         var pickaxe = tag(BlockTags.MINEABLE_WITH_PICKAXE);
         var ironTool = tag(BlockTags.NEEDS_IRON_TOOL);
 
-        var breakableWall = Walls.BLOCK_BREAKABLE_WALL.get();
+        var breakableWall = Rooms.BLOCK_BREAKABLE_WALL.get();
         pickaxe.add(breakableWall);
         ironTool.add(breakableWall);
 

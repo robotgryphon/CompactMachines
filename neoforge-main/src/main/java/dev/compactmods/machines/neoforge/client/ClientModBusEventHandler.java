@@ -3,7 +3,7 @@ package dev.compactmods.machines.neoforge.client;
 import dev.compactmods.machines.api.core.Constants;
 import dev.compactmods.machines.machine.client.MachineColors;
 import dev.compactmods.machines.neoforge.machine.Machines;
-import dev.compactmods.machines.neoforge.machine.entity.UnboundCompactMachineEntity;
+import dev.compactmods.machines.neoforge.machine.block.UnboundCompactMachineEntity;
 import dev.compactmods.machines.neoforge.room.ui.MachineRoomScreen;
 import dev.compactmods.machines.neoforge.room.Rooms;
 import net.minecraft.client.gui.screens.MenuScreens;

@@ -3,7 +3,7 @@ package dev.compactmods.machines.neoforge.data.functions;
 import com.mojang.serialization.Codec;
 import dev.compactmods.machines.api.core.CMTags;
 import dev.compactmods.machines.machine.item.ICompactMachineItem;
-import dev.compactmods.machines.neoforge.machine.entity.BoundCompactMachineBlockEntity;
+import dev.compactmods.machines.neoforge.machine.block.BoundCompactMachineBlockEntity;
 import dev.compactmods.machines.neoforge.machine.item.BoundCompactMachineItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.storage.loot.LootContext;

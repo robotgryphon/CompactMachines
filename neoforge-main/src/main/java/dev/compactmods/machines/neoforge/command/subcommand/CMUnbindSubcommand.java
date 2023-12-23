@@ -8,7 +8,7 @@ import dev.compactmods.machines.api.core.CMCommands;
 import dev.compactmods.machines.api.dimension.CompactDimension;
 import dev.compactmods.machines.i18n.TranslationUtil;
 import dev.compactmods.machines.neoforge.config.ServerConfig;
-import dev.compactmods.machines.neoforge.machine.entity.BoundCompactMachineBlockEntity;
+import dev.compactmods.machines.neoforge.machine.block.BoundCompactMachineBlockEntity;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.arguments.coordinates.BlockPosArgument;

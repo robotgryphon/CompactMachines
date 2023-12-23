@@ -1,20 +1,28 @@
 package dev.compactmods.machines.neoforge.machine.block;
 
 import dev.compactmods.machines.LoggingUtil;
+import dev.compactmods.machines.api.core.Messages;
 import dev.compactmods.machines.api.shrinking.PSDTags;
+import dev.compactmods.machines.i18n.TranslationUtil;
+import dev.compactmods.machines.machine.EnumMachinePlayersBreakHandling;
 import dev.compactmods.machines.machine.item.ICompactMachineItem;
+import dev.compactmods.machines.neoforge.config.ServerConfig;
 import dev.compactmods.machines.neoforge.machine.Machines;
-import dev.compactmods.machines.neoforge.machine.entity.BoundCompactMachineBlockEntity;
 import dev.compactmods.machines.neoforge.machine.item.BoundCompactMachineItem;
 import dev.compactmods.machines.neoforge.machine.item.UnboundCompactMachineItem;
+import dev.compactmods.machines.neoforge.room.RoomHelper;
+import dev.compactmods.machines.neoforge.room.ui.MachineRoomMenu;
+import dev.compactmods.machines.util.PlayerUtil;
+import net.minecraft.commands.Commands;
 import net.minecraft.core.BlockPos;
-import net.minecraft.server.MinecraftServer;
+import net.minecraft.core.GlobalPos;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.NameTagItem;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelReader;
@@ -23,8 +31,13 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
+import net.neoforged.neoforge.common.CommonHooks;
+import net.neoforged.neoforge.network.NetworkHooks;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.Optional;
+import java.util.UUID;
 
 public class BoundCompactMachineBlock extends CompactMachineBlock implements EntityBlock {
     public BoundCompactMachineBlock(Properties props) {
@@ -43,7 +56,35 @@ public class BoundCompactMachineBlock extends CompactMachineBlock implements Ent
 
     @Override
     public float getDestroyProgress(BlockState state, Player player, BlockGetter level, BlockPos pos) {
-        return MachineBlockUtil.destroyProgress(state, player, level, pos);
+        int baseSpeedForge = CommonHooks.isCorrectToolForDrops(state, player) ? 30 : 100;
+        float normalHardness = player.getDigSpeed(state, pos) / baseSpeedForge;
+
+        if (level.getBlockEntity(pos) instanceof BoundCompactMachineBlockEntity bound) {
+            boolean hasPlayers = bound.hasPlayersInside();
+
+            // If there are players inside, check config for break handling
+            if (hasPlayers) {
+                EnumMachinePlayersBreakHandling hand = ServerConfig.MACHINE_PLAYER_BREAK_HANDLING.get();
+                switch (hand) {
+                    case UNBREAKABLE:
+                        return 0;
+
+                    case OWNER:
+                        Optional<UUID> ownerUUID = bound.getOwnerUUID();
+                        return ownerUUID
+                                .map(uuid -> player.getUUID() == uuid ? normalHardness : 0)
+                                .orElse(normalHardness);
+
+                    case ANYONE:
+                        return normalHardness;
+                }
+            }
+
+            // No players inside - let anyone break it
+            return normalHardness;
+        } else {
+            return normalHardness;
+        }
     }
 
     @Override
@@ -68,19 +109,68 @@ public class BoundCompactMachineBlock extends CompactMachineBlock implements Ent
     @NotNull
     @Override
     public InteractionResult use(@NotNull BlockState state, Level level, @NotNull BlockPos pos, Player player, @NotNull InteractionHand hand, @NotNull BlockHitResult hitResult) {
-        MinecraftServer server = level.getServer();
         ItemStack mainItem = player.getMainHandItem();
-        if (mainItem.is(PSDTags.ITEM) && player instanceof ServerPlayer sp) {
-            return MachineBlockUtil.tryRoomTeleport(level, pos, sp);
+        if (mainItem.is(PSDTags.ITEM)
+                && player instanceof ServerPlayer sp
+                && level.getBlockEntity(pos) instanceof BoundCompactMachineBlockEntity tile) {
+            // Try to teleport player into room
+            RoomHelper.teleportPlayerIntoMachine(level, sp, tile.getLevelPosition(), tile.connectedRoom());
+            return InteractionResult.SUCCESS;
         }
 
         // All other items, open preview screen
-        if(!level.isClientSide) {
+        if (!level.isClientSide) {
             level.getBlockEntity(pos, Machines.MACHINE_ENTITY.get()).ifPresent(machine -> {
-                MachineBlockUtil.roomPreviewScreen(pos, (ServerPlayer) player, server, machine);
+                final var roomCode = machine.connectedRoom();
+                if (player instanceof ServerPlayer sp) {
+
+                    NetworkHooks.openScreen(sp, MachineRoomMenu.makeProvider(sp.server, roomCode, machine.getLevelPosition()), (buf) -> {
+                        buf.writeBlockPos(pos);
+                        buf.writeJsonWithCodec(GlobalPos.CODEC, machine.getLevelPosition());
+                        buf.writeUtf(roomCode);
+
+                        // FIXME Renamable rooms
+//            roomName.ifPresentOrElse(name -> {
+//                buf.writeBoolean(true);
+//                buf.writeUtf(name);
+//            }, () -> {
+                        buf.writeBoolean(false);
+                        buf.writeUtf("");
+//            });
+                    });
+                }
             });
         }
 
         return InteractionResult.sidedSuccess(level.isClientSide);
+    }
+
+    @Nullable
+    public static InteractionResult tryApplyNametag(Level level, BlockPos pos, Player player) {
+        ItemStack mainItem = player.getMainHandItem();
+        if (mainItem.getItem() instanceof NameTagItem && mainItem.hasCustomHoverName()) {
+            if (level.getBlockEntity(pos) instanceof BoundCompactMachineBlockEntity tile) {
+                final var ownerProfile = tile.getOwnerUUID().flatMap(id -> PlayerUtil.getProfileByUUID(level, id));
+                boolean isOwner = ownerProfile.map(p -> p.getId().equals(player.getUUID())).orElse(false);
+                boolean isOp = player.hasPermissions(Commands.LEVEL_MODERATORS);
+
+                if (ownerProfile.isEmpty()) {
+                    return InteractionResult.FAIL;
+                }
+
+                if (!isOp || !isOwner)
+                    return InteractionResult.FAIL;
+                else {
+                    ownerProfile.ifPresent(owner -> {
+                        player.displayClientMessage(TranslationUtil.message(Messages.CANNOT_RENAME_NOT_OWNER,
+                                owner.getName()), true);
+                    });
+                }
+
+                final var newName = mainItem.getHoverName().getString(120);
+                // FIXME Renamable rooms Rooms.updateName(level.getServer(), tile.connectedRoom(), newName);
+            }
+        }
+        return null;
     }
 }

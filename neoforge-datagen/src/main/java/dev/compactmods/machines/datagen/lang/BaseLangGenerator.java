@@ -2,17 +2,12 @@ package dev.compactmods.machines.datagen.lang;
 
 import dev.compactmods.machines.api.core.Advancements;
 import dev.compactmods.machines.api.core.Constants;
-import dev.compactmods.machines.api.room.upgrade.RoomUpgrade;
 import dev.compactmods.machines.datagen.util.AdvancementLangBuilder;
 import dev.compactmods.machines.i18n.TranslationUtil;
-import dev.compactmods.machines.neoforge.Registries;
-import net.minecraft.Util;
 import net.minecraft.core.Direction;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.resources.ResourceLocation;
 import net.neoforged.neoforge.common.data.LanguageProvider;
-
-import java.util.function.Supplier;
 
 import static org.apache.commons.lang3.StringUtils.capitalize;
 
@@ -47,12 +42,6 @@ public abstract class BaseLangGenerator extends LanguageProvider {
 
     protected void addTooltip(ResourceLocation id, String translation) {
         add(TranslationUtil.tooltipId(id), translation);
-    }
-
-    protected void add(Supplier<RoomUpgrade> upgrade, String translation) {
-        final var u = upgrade.get();
-        final var id = Registries.UPGRADES.getKey(u);
-        add(Util.makeDescriptionId("upgrade.action", id), translation);
     }
 
     protected void addAdvancementTranslations() {

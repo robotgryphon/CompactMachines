@@ -1,4 +1,4 @@
-package dev.compactmods.machines.neoforge.wall;
+package dev.compactmods.machines.neoforge.room.block;
 
 public class SolidWallBlock extends ProtectedWallBlock {
     public SolidWallBlock(Properties props) {

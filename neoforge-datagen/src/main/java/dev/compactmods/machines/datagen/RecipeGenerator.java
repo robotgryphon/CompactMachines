@@ -1,7 +1,7 @@
 package dev.compactmods.machines.datagen;
 
+import dev.compactmods.machines.neoforge.room.Rooms;
 import dev.compactmods.machines.neoforge.shrinking.Shrinking;
-import dev.compactmods.machines.neoforge.wall.Walls;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.data.PackOutput;
 import net.minecraft.data.recipes.RecipeCategory;
@@ -20,7 +20,7 @@ public class RecipeGenerator extends RecipeProvider {
 
     @Override
     protected void buildRecipes(RecipeOutput recipeOutput) {
-        ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, Walls.ITEM_BREAKABLE_WALL.get(), 8)
+        ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, Rooms.ITEM_BREAKABLE_WALL.get(), 8)
                 .pattern("DDD")
                 .pattern("D D")
                 .pattern("DDD")

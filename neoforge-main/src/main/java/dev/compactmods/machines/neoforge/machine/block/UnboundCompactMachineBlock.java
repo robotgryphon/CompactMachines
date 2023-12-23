@@ -6,7 +6,6 @@ import dev.compactmods.machines.LoggingUtil;
 import dev.compactmods.machines.api.dimension.MissingDimensionException;
 import dev.compactmods.machines.api.shrinking.PSDTags;
 import dev.compactmods.machines.neoforge.machine.Machines;
-import dev.compactmods.machines.neoforge.machine.entity.UnboundCompactMachineEntity;
 import dev.compactmods.machines.neoforge.machine.item.MachineItemUtil;
 import dev.compactmods.machines.neoforge.machine.item.UnboundCompactMachineItem;
 import dev.compactmods.machines.neoforge.room.RoomHelper;
@@ -18,7 +17,6 @@ import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.Block;
@@ -48,11 +46,6 @@ public class UnboundCompactMachineBlock extends CompactMachineBlock implements E
     @Override
     public @Nullable BlockEntity newBlockEntity(@NotNull BlockPos pos, @NotNull BlockState state) {
         return new UnboundCompactMachineEntity(pos, state);
-    }
-
-    @Override
-    public float getDestroyProgress(BlockState state, Player player, BlockGetter level, BlockPos pos) {
-        return MachineBlockUtil.destroyProgressUnchecked(state, player, level, pos);
     }
 
     @Override
