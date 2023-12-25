@@ -3,14 +3,16 @@ package dev.compactmods.machines.neoforge;
 import dev.compactmods.compactmachines.api.room.IRoomRegistrar;
 import dev.compactmods.compactmachines.api.room.RoomApi;
 import dev.compactmods.compactmachines.api.room.owner.IRoomOwners;
-import dev.compactmods.compactmachines.api.room.spatial.IRoomChunkManager;
 import dev.compactmods.compactmachines.api.room.spawn.IRoomSpawnManagers;
 import dev.compactmods.machines.LoggingUtil;
 import dev.compactmods.machines.api.core.Constants;
 import dev.compactmods.machines.api.dimension.CompactDimension;
 import dev.compactmods.machines.api.dimension.MissingDimensionException;
 import dev.compactmods.machines.room.RoomApiInstance;
-import dev.compactmods.machines.room.RoomRegistration;
+import dev.compactmods.machines.room.RoomRegistrar;
+import dev.compactmods.machines.room.spatial.GraphChunkManager;
+import dev.compactmods.machines.room.spawn.RoomSpawnManagers;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.Mod;
@@ -43,18 +45,22 @@ public class ServerEventHandler {
     }
 
     @SubscribeEvent
-    public static void onServerStarting(final ServerStartingEvent server) {
+    public static void onServerStarting(final ServerStartingEvent evt) {
         final var modLog = LoggingUtil.modLog();
 
         try {
             modLog.debug("Setting up room API instances.");
-            final IRoomRegistrar registrar = RoomRegistration.forServer(server.getServer());
+            MinecraftServer server = evt.getServer();
+
+            final IRoomRegistrar registrar = RoomRegistrar.forServer(server);
             final IRoomOwners owners = null;
-            final IRoomSpawnManagers spawnManager = null;
-            final IRoomChunkManager chunkManager = null; // new GraphChunkManager();
+            final IRoomSpawnManagers spawnManager = new RoomSpawnManagers(server, registrar);
+
+            final var gcm = new GraphChunkManager();
+            registrar.allRooms().forEach(inst -> gcm.calculateChunks(inst.code(), inst.boundaries()));
 
             //noinspection UnstableApiUsage
-            RoomApi.INSTANCE = new RoomApiInstance(registrar, owners, spawnManager, chunkManager);
+            RoomApi.INSTANCE = new RoomApiInstance(registrar, owners, spawnManager, gcm);
             modLog.debug("Completed setting up room API instances.");
         } catch (MissingDimensionException e) {
             modLog.fatal("Failed to set up room API instance; dimension error.", e);

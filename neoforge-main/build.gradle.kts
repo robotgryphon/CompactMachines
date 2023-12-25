@@ -3,6 +3,7 @@
 import java.text.SimpleDateFormat
 import java.util.*
 
+
 plugins {
     id("java-library")
     id("eclipse")
@@ -21,6 +22,7 @@ val isRelease: Boolean = (System.getenv("RELEASE") ?: "false").equals("true", tr
 val neoforgeVersion: String = property("neoforge_version") as String
 val coreVersion: String = property("core_version") as String
 val featherVersion: String = property("feather_version") as String
+
 base {
     archivesName.set(modId)
     group = "dev.compactmods"
@@ -41,6 +43,16 @@ sourceSets.main {
     resources {
         srcDir("src/main/resources")
         srcDir("src/generated/resources")
+    }
+}
+
+sourceSets.test {
+    java {
+        srcDir("src/test/java")
+    }
+
+    resources {
+        srcDir("src/test/resources")
     }
 }
 
@@ -77,13 +89,13 @@ runs {
     }
 
     create("server") {
-        workingDirectory(file("run/server"))
         environmentVariables("CM_TEST_RESOURCES", project.file("src/test/resources").path)
     }
 
     create("gameTestServer") {
-        workingDirectory(file("run/gametest"))
+        systemProperty("forge.enabledGameTestNamespaces", modId)
         environmentVariable("CM_TEST_RESOURCES", file("src/test/resources").path)
+        modSource(project.sourceSets.test.get())
     }
 }
 
@@ -132,10 +144,10 @@ dependencies {
     implementation("com.aventrix.jnanoid", "jnanoid", "2.0.0")
     jarJar("com.aventrix.jnanoid", "jnanoid", "[2.0.0]")
 
-    implementation("dev.compactmods.compactmachines:core-api:$coreVersion")
-    implementation("dev.compactmods.compactmachines:room-api:$coreVersion")
-    implementation("dev.compactmods.compactmachines:room-upgrade-api:$coreVersion")
-    implementation("dev.compactmods.compactmachines:core:$coreVersion")
+    implementation("dev.compactmods.compactmachines:core-api")
+    implementation("dev.compactmods.compactmachines:room-api")
+    implementation("dev.compactmods.compactmachines:room-upgrade-api")
+    implementation("dev.compactmods.compactmachines:core")
 
 //    implementation("dev.compactmods.compactmachines:tunnels-api:$tunnelsApiVersion")
 //

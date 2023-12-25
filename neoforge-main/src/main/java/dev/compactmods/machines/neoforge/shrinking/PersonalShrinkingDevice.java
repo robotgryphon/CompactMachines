@@ -1,5 +1,6 @@
 package dev.compactmods.machines.neoforge.shrinking;
 
+import dev.compactmods.compactmachines.api.room.RoomApi;
 import dev.compactmods.machines.api.core.Messages;
 import dev.compactmods.machines.api.core.Tooltips;
 import dev.compactmods.machines.api.dimension.CompactDimension;
@@ -60,8 +61,14 @@ public class PersonalShrinkingDevice extends Item {
             ServerLevel playerDim = serverPlayer.serverLevel();
             if (playerDim.dimension().equals(CompactDimension.LEVEL_KEY)) {
                 if (player.isShiftKeyDown()) {
-
                     // FIXME Change Spawnpoint
+                    RoomApi.chunkManager()
+                            .findRoomByChunk(serverPlayer.chunkPosition())
+                            .map(RoomApi::spawnManager)
+                            .ifPresent(spawnManager -> {
+                                spawnManager.setPlayerSpawn(serverPlayer.getUUID(), player.position(), player.getRotationVector());
+                            });
+
 //                    final var roomInfo = CompactRoomProvider.instance(playerDim);
 //                    roomInfo.findByChunk(player.chunkPosition()).ifPresent(room -> {
 //                        if(room instanceof IMutableRoomRegistration mutableRoom) {

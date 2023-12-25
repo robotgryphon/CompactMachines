@@ -7,16 +7,18 @@ import net.minecraft.core.Vec3i;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.world.level.ChunkPos;
-import net.neoforged.gametest.GameTestHolder;
-import net.neoforged.gametest.PrefixGameTestTemplate;
+import net.neoforged.neoforge.gametest.GameTestHolder;
+import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
 import java.util.HashMap;
 
 @PrefixGameTestTemplate(false)
 @GameTestHolder(Constants.MOD_ID)
-public class MathTests {
+public class MathUtilTests {
 
-    @GameTest(template = "empty_1x1", batch = TestBatches.MATH)
+    private static final String BATCH = "MathUtil";
+
+    @GameTest(template = "empty_1x1", batch = BATCH)
     public static void positionGeneratorWorksCorrectly(final GameTestHelper test) {
         // Our generation works in a counter-clockwise spiral, starting at 0,0
         /*

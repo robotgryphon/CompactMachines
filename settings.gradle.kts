@@ -7,7 +7,10 @@ pluginManagement {
 
     repositories {
         mavenLocal()
+        mavenCentral()
         gradlePluginPortal()
+
+        // maven("https://maven.architectury.dev/")
 
         maven("https://maven.parchmentmc.org") {
             name = "ParchmentMC"
@@ -26,3 +29,9 @@ plugins {
 rootProject.name = "Compact Machines"
 include("neoforge-main")
 include("neoforge-datagen")
+
+includeBuild("core")
+
+//includeBuild("core:core-api")
+//includeBuild("core:room-api")
+//includeBuild("core:room-upgrade-api")

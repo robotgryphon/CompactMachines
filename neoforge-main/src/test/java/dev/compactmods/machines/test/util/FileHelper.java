@@ -3,6 +3,7 @@ package dev.compactmods.machines.test.util;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtAccounter;
 import net.minecraft.nbt.NbtIo;
 import net.minecraft.nbt.Tag;
 import org.jetbrains.annotations.Nullable;
@@ -49,18 +50,18 @@ public final class FileHelper {
 
     public static CompoundTag getNbtFromFile(String filename) throws IOException {
         InputStream isr = INSTANCE.getFileStream(filename);
-        return NbtIo.readCompressed(isr);
+        return NbtIo.readCompressed(isr, NbtAccounter.unlimitedHeap());
     }
 
     public static CompoundTag getNbtFromSavedDataFile(String filename) throws IOException {
         InputStream isr = INSTANCE.getFileStream(filename);
-        final var nbtRoot = NbtIo.readCompressed(isr);
+        final var nbtRoot = NbtIo.readCompressed(isr, NbtAccounter.unlimitedHeap());
         return nbtRoot.getCompound("data");
     }
 
     public static <T extends Tag> T getNbtFromSavedDataFile(String filename, Class<T> tagClass) throws IOException {
         InputStream isr = INSTANCE.getFileStream(filename);
-        final var nbtRoot = NbtIo.readCompressed(isr);
+        final var nbtRoot = NbtIo.readCompressed(isr, NbtAccounter.unlimitedHeap());
         final var tag = nbtRoot.get("data");
         if(tagClass.isInstance(tag))
             return tagClass.cast(tag);
