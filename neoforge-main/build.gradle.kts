@@ -3,15 +3,6 @@
 import java.text.SimpleDateFormat
 import java.util.*
 
-
-plugins {
-    id("java-library")
-    id("eclipse")
-    id("idea")
-    id("maven-publish")
-    id("net.neoforged.gradle.userdev") version ("7.0.57")
-}
-
 var envVersion: String = System.getenv("VERSION") ?: "9.9.9"
 if (envVersion.startsWith("v"))
     envVersion = envVersion.trimStart('v');
@@ -22,6 +13,14 @@ val isRelease: Boolean = (System.getenv("RELEASE") ?: "false").equals("true", tr
 val neoforgeVersion: String = property("neoforge_version") as String
 val coreVersion: String = property("core_version") as String
 val featherVersion: String = property("feather_version") as String
+
+plugins {
+    id("idea")
+    id("eclipse")
+    id("maven-publish")
+    id("java-library")
+    id("net.neoforged.gradle.userdev") version ("7.0.74")
+}
 
 base {
     archivesName.set(modId)

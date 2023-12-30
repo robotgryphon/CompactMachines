@@ -3,6 +3,7 @@ pluginManagement {
         id("idea")
         id("eclipse")
         id("maven-publish")
+        id("java-library")
     }
 
     repositories {
@@ -26,12 +27,7 @@ plugins {
     id("org.gradle.toolchains.foojay-resolver-convention") version("0.5.0")
 }
 
-rootProject.name = "Compact Machines"
 include("neoforge-main")
 include("neoforge-datagen")
 
 includeBuild("core")
-
-//includeBuild("core:core-api")
-//includeBuild("core:room-api")
-//includeBuild("core:room-upgrade-api")
