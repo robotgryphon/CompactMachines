@@ -32,7 +32,6 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.neoforged.neoforge.common.CommonHooks;
-import net.neoforged.neoforge.network.NetworkHooks;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -124,7 +123,7 @@ public class BoundCompactMachineBlock extends CompactMachineBlock implements Ent
                 final var roomCode = machine.connectedRoom();
                 if (player instanceof ServerPlayer sp) {
 
-                    NetworkHooks.openScreen(sp, MachineRoomMenu.makeProvider(sp.server, roomCode, machine.getLevelPosition()), (buf) -> {
+                    sp.openMenu(MachineRoomMenu.makeProvider(sp.server, roomCode, machine.getLevelPosition()), (buf) -> {
                         buf.writeBlockPos(pos);
                         buf.writeJsonWithCodec(GlobalPos.CODEC, machine.getLevelPosition());
                         buf.writeUtf(roomCode);

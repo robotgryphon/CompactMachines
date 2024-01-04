@@ -55,7 +55,7 @@ public class WorldBorderFixer {
         // Fix set compact world border if it was loaded weirdly
         cwBorder.setCenter(0, 0);
         cwBorder.setSize(WorldBorder.MAX_SIZE);
-        PacketDistributor.DIMENSION.with(() -> CompactDimension.LEVEL_KEY)
+        PacketDistributor.DIMENSION.with(CompactDimension.LEVEL_KEY)
                 .send(new ClientboundSetBorderSizePacket(cwBorder));
     }
 

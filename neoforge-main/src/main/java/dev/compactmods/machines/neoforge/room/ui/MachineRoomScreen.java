@@ -2,8 +2,6 @@ package dev.compactmods.machines.neoforge.room.ui;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import dev.compactmods.machines.api.core.Constants;
-import dev.compactmods.machines.neoforge.network.PlayerStartedRoomTrackingPacket;
-import dev.compactmods.machines.neoforge.network.RoomNetworkHandler;
 import dev.compactmods.machines.neoforge.shrinking.Shrinking;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
@@ -29,8 +27,8 @@ public class MachineRoomScreen extends AbstractContainerScreen<MachineRoomMenu> 
         this.inv = inv;
 
         // Send packet to server for block data
-        RoomNetworkHandler.CHANNEL.sendToServer(new PlayerStartedRoomTrackingPacket(menu.getRoom()));
-        updateBlockRender();
+        // RoomNetworkHandler.CHANNEL.sendToServer(new PlayerStartedRoomTrackingPacket(menu.getRoom()));
+        // updateBlockRender();
     }
 
     @Override
@@ -99,7 +97,14 @@ public class MachineRoomScreen extends AbstractContainerScreen<MachineRoomMenu> 
         pose.popPose();
     }
 
-//    @Override
+    @Override
+    public void render(GuiGraphics graphics, int pMouseX, int pMouseY, float pPartialTick) {
+        super.render(graphics, pMouseX, pMouseY, pPartialTick);
+
+        graphics.drawCenteredString(font, Component.literal("Room preview broken for a bit"), 0, 100, 0xFFCCCCCC);
+    }
+
+    //    @Override
 //    public void render(PoseStack pose, int mouseX, int mouseY, float partial) {
 //        this.renderBackground(pose);
 //        super.render(pose, mouseX, mouseY, partial);

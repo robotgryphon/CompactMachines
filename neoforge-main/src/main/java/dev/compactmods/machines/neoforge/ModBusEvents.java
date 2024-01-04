@@ -2,7 +2,6 @@ package dev.compactmods.machines.neoforge;
 
 import dev.compactmods.machines.LoggingUtil;
 import dev.compactmods.machines.api.core.Constants;
-import dev.compactmods.machines.neoforge.network.CompactMachinesNet;
 import dev.compactmods.machines.neoforge.network.RoomNetworkHandler;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.Mod;
@@ -16,7 +15,6 @@ public class ModBusEvents {
         var logger = LoggingUtil.modLog();
 
         logger.trace("Initializing network handler.");
-        CompactMachinesNet.setupMessages();
         RoomNetworkHandler.setupMessages();
     }
 }

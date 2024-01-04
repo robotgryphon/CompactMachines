@@ -3,13 +3,13 @@ package dev.compactmods.machines.neoforge.client;
 import com.mojang.blaze3d.platform.InputConstants;
 import dev.compactmods.machines.api.core.Constants;
 import dev.compactmods.machines.api.dimension.CompactDimension;
-import dev.compactmods.machines.neoforge.network.CompactMachinesNet;
 import dev.compactmods.machines.neoforge.network.PlayerRequestedLeavePacket;
 import net.minecraft.Util;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.resources.ResourceLocation;
 import net.neoforged.neoforge.client.settings.IKeyConflictContext;
+import net.neoforged.neoforge.network.PacketDistributor;
 
 public class RoomExitKeyMapping {
 
@@ -34,6 +34,6 @@ public class RoomExitKeyMapping {
     public static void handle() {
         final var level = Minecraft.getInstance().level;
         if(level != null && level.dimension().equals(CompactDimension.LEVEL_KEY))
-            CompactMachinesNet.CHANNEL.sendToServer(new PlayerRequestedLeavePacket());
+            PacketDistributor.SERVER.noArg().send(new PlayerRequestedLeavePacket());
     }
 }

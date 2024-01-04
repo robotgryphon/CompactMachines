@@ -19,7 +19,7 @@ plugins {
     id("eclipse")
     id("maven-publish")
     id("java-library")
-    id("net.neoforged.gradle.userdev") version ("7.0.74")
+    id("net.neoforged.gradle.userdev") version ("7.0.77")
 }
 
 base {
@@ -106,27 +106,6 @@ repositories {
             includeGroup("com.aventrix.jnanoid")
         }
     }
-
-//    maven("https://www.cursemaven.com") {
-//        name = "Curse Maven"
-//        content {
-//            includeGroup("curse.maven")
-//        }
-//    }
-//
-//    // location of the maven that hosts JEI files
-//    maven("https://maven.blamejared.com") {
-//        content {
-//            includeGroup("mezz.jei")
-//        }
-//    }
-//
-//    maven("https://maven.theillusivec4.top/") {
-//        name = "Illusive"
-//        content {
-//            includeGroup("top.theillusivec4.curios")
-//        }
-//    }
 
     maven("https://maven.pkg.github.com/compactmods/compactmachines-core") {
         name = "Github PKG Core"

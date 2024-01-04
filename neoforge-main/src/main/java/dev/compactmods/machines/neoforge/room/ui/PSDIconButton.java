@@ -1,11 +1,11 @@
 package dev.compactmods.machines.neoforge.room.ui;
 
-import dev.compactmods.machines.neoforge.network.CompactMachinesNet;
 import dev.compactmods.machines.neoforge.network.PlayerRequestedTeleportPacket;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.network.chat.Component;
 import net.neoforged.neoforge.client.gui.widget.ExtendedButton;
+import net.neoforged.neoforge.network.PacketDistributor;
 
 public class PSDIconButton extends ExtendedButton {
     private final MachineRoomScreen parent;
@@ -35,7 +35,7 @@ public class PSDIconButton extends ExtendedButton {
             var menu = psd.parent.getMenu();
             var mach = psd.parent.getMachine();
             var room = menu.getRoom();
-            CompactMachinesNet.CHANNEL.sendToServer(new PlayerRequestedTeleportPacket(mach, room));
+            PacketDistributor.SERVER.noArg().send(new PlayerRequestedTeleportPacket(mach, room));
         }
     }
 

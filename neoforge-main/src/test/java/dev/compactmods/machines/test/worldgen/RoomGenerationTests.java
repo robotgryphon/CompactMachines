@@ -25,6 +25,8 @@ public class RoomGenerationTests {
 
         CompactRoomGenerator.generateRoom(test.getLevel(), roomDims, roomCenter);
 
+
+
         test.setBlock(new BlockPos(7, 9, 7), Blocks.GOLD_BLOCK.defaultBlockState());
         CompactRoomGenerator.fillWithTemplate(test.getLevel(),
                 new ResourceLocation(Constants.MOD_ID, "template_max"),
