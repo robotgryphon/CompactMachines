@@ -29,5 +29,4 @@ plugins {
 
 include("neoforge-main")
 include("neoforge-datagen")
-
 includeBuild("core")

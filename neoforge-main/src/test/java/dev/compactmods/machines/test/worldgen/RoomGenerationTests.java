@@ -3,20 +3,64 @@ package dev.compactmods.machines.test.worldgen;
 import dev.compactmods.compactmachines.api.room.CompactRoomGenerator;
 import dev.compactmods.compactmachines.api.room.RoomTemplate;
 import dev.compactmods.machines.api.core.Constants;
+import dev.compactmods.machines.machine.LegacySizedTemplates;
 import dev.compactmods.machines.test.TestBatches;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Vec3i;
 import net.minecraft.gametest.framework.GameTest;
+import net.minecraft.gametest.framework.GameTestGenerator;
 import net.minecraft.gametest.framework.GameTestHelper;
+import net.minecraft.gametest.framework.TestFunction;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.Rotation;
+import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.gametest.GameTestHolder;
 import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
+import org.jetbrains.annotations.NotNull;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 @PrefixGameTestTemplate(false)
 @GameTestHolder(Constants.MOD_ID)
 public class RoomGenerationTests {
+
+    @GameTestGenerator
+    public static Collection<TestFunction> roomTests(final GameTestHelper test) {
+        List<TestFunction> funcs = new ArrayList<>();
+
+        for(var template : LegacySizedTemplates.values()) {
+            var func = makeTestFunction(template);
+            funcs.add(func);
+        }
+
+        return funcs;
+    }
+
+    private static TestFunction makeTestFunction(LegacySizedTemplates template) {
+        return new TestFunction(
+                "room_generation",
+                "builtin_roomgen_" + template.id().getPath(),
+                "empty_15x15",
+                Rotation.NONE,
+                200,
+                0,
+                true,
+                testHelper -> makeTemplateTest(testHelper, template.template())
+        );
+    }
+
+    @NotNull
+    private static void makeTemplateTest(GameTestHelper testHelper, RoomTemplate template) {
+        final AABB testBounds = testHelper.getBounds();
+
+        CompactRoomGenerator.generateRoom(testHelper.getLevel(), template, testBounds.getCenter());
+
+        testHelper.succeed();
+    }
 
     @GameTest(template = "empty_15x15", batch = TestBatches.ROOM_GENERATION)
     public static void checkRoomGeneratorColossal(final GameTestHelper test) {

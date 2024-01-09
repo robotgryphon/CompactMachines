@@ -88,7 +88,9 @@ runs {
     }
 
     create("server") {
+        systemProperty("forge.enabledGameTestNamespaces", modId)
         environmentVariables("CM_TEST_RESOURCES", project.file("src/test/resources").path)
+        modSource(project.sourceSets.test.get())
     }
 
     create("gameTestServer") {
