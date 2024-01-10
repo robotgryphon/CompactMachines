@@ -70,6 +70,11 @@ runs {
         systemProperty("forge.logging.console.level", "debug")
 
         dependencies {
+//            runtime("dev.compactmods.compactmachines:core-api")
+//            runtime("dev.compactmods.compactmachines:room-api")
+//            runtime("dev.compactmods.compactmachines:room-upgrade-api")
+//            runtime("dev.compactmods.compactmachines:core")
+
             runtime("dev.compactmods:feather:$featherVersion")
             runtime("com.aventrix.jnanoid:jnanoid:2.0.0")
         }
