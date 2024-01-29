@@ -1,5 +1,7 @@
 @file:Suppress("SpellCheckingInspection")
 
+import net.neoforged.gradle.common.extensions.MinecraftExtension
+import net.neoforged.gradle.dsl.common.extensions.RunnableSourceSet
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -14,12 +16,30 @@ val neoforgeVersion: String = property("neoforge_version") as String
 val coreVersion: String = property("core_version") as String
 val featherVersion: String = property("feather_version") as String
 
+val core = project(":core:core")
+val coreApi = project(":core:core-api")
+val roomApi = project(":core:room-api")
+val roomUpgradeApi = project(":core:room-upgrade-api")
+
+val coreProjects = listOf(core, coreApi, roomApi, roomUpgradeApi)
+
 plugins {
     id("idea")
     id("eclipse")
     id("maven-publish")
     id("java-library")
     id("net.neoforged.gradle.userdev") version ("7.0.77")
+}
+
+coreProjects.forEach {
+    project.evaluationDependsOn(it.path)
+
+    it.sourceSets.configureEach {
+        it.extensions.create<RunnableSourceSet>("runs")
+        it.extensions.configure<RunnableSourceSet>("runs") {
+            this.modIdentifier.set(modId)
+        }
+    }
 }
 
 base {
@@ -70,17 +90,14 @@ runs {
         systemProperty("forge.logging.console.level", "debug")
 
         dependencies {
-//            runtime("dev.compactmods.compactmachines:core-api")
-//            runtime("dev.compactmods.compactmachines:room-api")
-//            runtime("dev.compactmods.compactmachines:room-upgrade-api")
-//            runtime("dev.compactmods.compactmachines:core")
-
             runtime("dev.compactmods:feather:$featherVersion")
             runtime("com.aventrix.jnanoid:jnanoid:2.0.0")
         }
 
-        // ideaModule("Compact_Crafting.forge-main.main")
-        modSource(project.sourceSets.main.get())
+        modSource(sourceSets.main.get())
+        coreProjects.forEach {
+            modSource(it.sourceSets.main.get())
+        }
     }
 
     create("client") {
@@ -129,10 +146,15 @@ dependencies {
     implementation("com.aventrix.jnanoid", "jnanoid", "2.0.0")
     jarJar("com.aventrix.jnanoid", "jnanoid", "[2.0.0]")
 
-    implementation("dev.compactmods.compactmachines:core-api")
-    implementation("dev.compactmods.compactmachines:room-api")
-    implementation("dev.compactmods.compactmachines:room-upgrade-api")
-    implementation("dev.compactmods.compactmachines:core")
+    compileOnly(core)
+    compileOnly(coreApi)
+    compileOnly(roomApi)
+    compileOnly(roomUpgradeApi)
+
+//    implementation("dev.compactmods.compactmachines:core-api")
+//    implementation("dev.compactmods.compactmachines:room-api")
+//    implementation("dev.compactmods.compactmachines:room-upgrade-api")
+//    implementation("dev.compactmods.compactmachines:core")
 
 //    implementation("dev.compactmods.compactmachines:tunnels-api:$tunnelsApiVersion")
 //
@@ -151,105 +173,7 @@ dependencies {
     jarJar("dev.compactmods.compactmachines", "room-upgrade-api", "[$coreVersion]") {
         isTransitive = false
     }
-//
-//    jarJar("dev.compactmods.compactmachines", "tunnels-api", "[$tunnelsApiVersion]", classifier = "srg") {
-//        isTransitive = false
-//    }
 }
-
-//
-//val jei_version: String? by extra
-//val jei_mc_version: String by extra
-//val curios_version: String? by extra
-//
-//val runDepends: List<Project> = listOf(
-//        project(":forge-tunnels-api"),
-//        project(":forge-builtin")
-//)
-//
-//runDepends.forEach {
-//    project.evaluationDependsOn(it.path)
-//}
-//
-//dependencies {
-//    minecraft("net.neoforged", "forge", version = "${minecraft_version}-${forge_version}")
-//
-
-//
-//    implementation(project(":forge-tunnels-api"))
-//    testImplementation(project(":forge-tunnels-api"))
-//
-//    implementation(project(":forge-builtin"))
-//    testImplementation(project(":forge-builtin"))
-//
-
-//
-//    // JEI
-//    if (project.extra.has("jei_version") && project.extra.has("jei_mc_version")) {
-//        compileOnly(fg.deobf("mezz.jei:jei-${jei_mc_version}-common-api:${jei_version}"))
-//        compileOnly(fg.deobf("mezz.jei:jei-${jei_mc_version}-forge-api:${jei_version}"))
-//        runtimeOnly(fg.deobf("mezz.jei:jei-${jei_mc_version}-forge:${jei_version}"))
-//    }
-//
-//    // The One Probe
-//    implementation(fg.deobf("curse.maven:theoneprobe-245211:3927520"))
-//
-//    // Curios
-//    if (project.extra.has("curios_version")) {
-//        runtimeOnly(fg.deobf("top.theillusivec4.curios:curios-forge:${curios_version}"))
-//        compileOnly(fg.deobf("top.theillusivec4.curios:curios-forge:${curios_version}:api"))
-//    }
-//
-//    val include_test_mods: String? by project.extra
-//    if (!System.getenv().containsKey("CI") && include_test_mods.equals("true")) {
-//        // Nicephore - Screenshots and Stuff
-//        runtimeOnly(fg.deobf("curse.maven:nicephore-401014:3879841"))
-//
-//        // Testing Mods - Trash Cans, Pipez, Create, Refined Pipes, Pretty Pipes, Refined Storage
-//        runtimeOnly(fg.deobf("curse.maven:SuperMartijn642-454372:3910759"))
-//        runtimeOnly(fg.deobf("curse.maven:trashcans-394535:3871885"))
-//
-//        // Flywheel/Create - v0.6.8.a / v0.5.0i - Jan 29, 2023
-//        runtimeOnly(fg.deobf("curse.maven:flywheel-486392:4341471"))
-//        runtimeOnly(fg.deobf("curse.maven:create-328085:4371809"))
-//
-//        // 1.18 runtimeOnly(fg.deobf("curse.maven:refinedpipes-370696:3570151"))
-//
-//        // Pretty Pipes - 1.13.6 - Oct 25, 2022
-//        runtimeOnly(fg.deobf("curse.maven:prettypipes-376737:4049655"))
-//
-//        // Refined Storage - 1.11.6 - Mar 30, 2023
-//        runtimeOnly(fg.deobf("curse.maven:refinedstorage-243076:4465872"))
-//
-//        // Scalable Cat's Force, BdLib, Advanced Generators
-//        // 2.13.10-b10 - Oct 13, 2022 / 1.25.0.5 - Nov 20, 2022 / 1.4.0.5 - Nov 22, 2022
-//        runtimeOnly(fg.deobf("curse.maven:scalable-320926:4028119"))
-//        runtimeOnly(fg.deobf("curse.maven:bdlib-70496:4100704"))
-//        runtimeOnly(fg.deobf("curse.maven:advgen-223622:4104739"))
-//
-//        // Immersive Eng - 7.1.0-145 (Dec 31)
-//        // runtimeOnly(fg.deobf("curse.maven:immersiveeng-231951:3587149"))
-//
-//        // FTB Chunks
-////        runtimeOnly(fg.deobf("curse.maven:architectury-forge-419699:3781711"))
-////        runtimeOnly(fg.deobf("curse.maven:ftb-teams-404468:3725501"))
-////        runtimeOnly(fg.deobf("curse.maven:ftblib-404465:3725485"))
-////        runtimeOnly(fg.deobf("curse.maven:ftbchunks-314906:3780113"))
-//
-//        // Mekanism + Mek Generators - Tunnel testing
-//        // 10.3.8.477 - Feb 7, 2023 / 10.3.8.477 - Feb 7, 2023
-//        runtimeOnly(fg.deobf("curse.maven:mekanism-268560:4385637"))
-//        runtimeOnly(fg.deobf("curse.maven:mekanismgenerators-268566:4385639"))
-//
-//        // Soul Shards (FTB)
-//        // runtimeOnly(fg.deobf("curse.maven:polylib-576589:3751528"))
-//        // runtimeOnly(fg.deobf("curse.maven:soulshards-551523:3757202"))
-//
-//        // Everlasting Abilities
-//        // runtimeOnly(fg.deobf("curse.maven:cyclopscore-232758:3809427"))
-//        // runtimeOnly(fg.deobf("curse.maven:everlastabilities-248353:3768481"))
-//    }
-//}
 
 tasks.withType<ProcessResources> {
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
@@ -281,23 +205,3 @@ tasks.jar {
 tasks.jarJar {
     archiveClassifier.set("")
 }
-
-//val PACKAGES_URL = System.getenv("GH_PKG_URL") ?: "https://maven.pkg.github.com/compactmods/compactcrafting"
-//publishing {
-//    publications.register<MavenPublication>("forge") {
-//        artifactId = "$modId-forge"
-//        artifact(tasks.getByName("jar"))
-//        artifact(tasks.getByName("jarJar"))
-//    }
-//
-//    repositories {
-//        // GitHub Packages
-//        maven(PACKAGES_URL) {
-//            name = "GitHubPackages"
-//            credentials {
-//                username = System.getenv("GITHUB_ACTOR")
-//                password = System.getenv("GITHUB_TOKEN")
-//            }
-//        }
-//    }
-//}
