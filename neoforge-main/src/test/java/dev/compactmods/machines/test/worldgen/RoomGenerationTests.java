@@ -29,7 +29,7 @@ import java.util.List;
 public class RoomGenerationTests {
 
     @GameTestGenerator
-    public static Collection<TestFunction> roomTests(final GameTestHelper test) {
+    public static Collection<TestFunction> roomTests() {
         List<TestFunction> funcs = new ArrayList<>();
 
         for(var template : LegacySizedTemplates.values()) {
@@ -44,7 +44,7 @@ public class RoomGenerationTests {
         return new TestFunction(
                 "room_generation",
                 "builtin_roomgen_" + template.id().getPath(),
-                "empty_15x15",
+                Constants.MOD_ID + ":empty_15x15",
                 Rotation.NONE,
                 200,
                 0,
