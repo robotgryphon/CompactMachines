@@ -9,11 +9,9 @@ import net.neoforged.neoforge.network.registration.IPayloadRegistrar;
 @Mod.EventBusSubscriber(modid = Constants.MOD_ID, bus = Mod.EventBusSubscriber.Bus.MOD)
 public class CMNetworks {
 
-    public static IPayloadRegistrar main;
-
     @SubscribeEvent
     public static void onPacketRegistration(final RegisterPayloadHandlerEvent payloads) {
-        main = payloads.registrar(Constants.MOD_ID)
+        final IPayloadRegistrar main = payloads.registrar(Constants.MOD_ID)
                 .versioned("6.0.0");
 
         main.play(PlayerRequestedTeleportPacket.ID, PlayerRequestedTeleportPacket.READER, builder ->

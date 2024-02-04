@@ -1,13 +1,12 @@
 @file:Suppress("SpellCheckingInspection")
 
-import net.neoforged.gradle.common.extensions.MinecraftExtension
-import net.neoforged.gradle.dsl.common.extensions.RunnableSourceSet
+import net.neoforged.gradle.dsl.common.runs.run.Run
 import java.text.SimpleDateFormat
 import java.util.*
 
 var envVersion: String = System.getenv("VERSION") ?: "9.9.9"
 if (envVersion.startsWith("v"))
-    envVersion = envVersion.trimStart('v');
+    envVersion = envVersion.trimStart('v')
 
 val modId: String = property("mod_id") as String
 val isRelease: Boolean = (System.getenv("RELEASE") ?: "false").equals("true", true)
@@ -33,13 +32,6 @@ plugins {
 
 coreProjects.forEach {
     project.evaluationDependsOn(it.path)
-
-    it.sourceSets.configureEach {
-        it.extensions.create<RunnableSourceSet>("runs")
-        it.extensions.configure<RunnableSourceSet>("runs") {
-            this.modIdentifier.set(modId)
-        }
-    }
 }
 
 base {
@@ -78,6 +70,10 @@ sourceSets.test {
 minecraft {
     modIdentifier.set(modId)
     accessTransformers.file(project.file("src/main/resources/META-INF/accesstransformer.cfg"))
+}
+
+afterEvaluate {
+    showModClasses()
 }
 
 runs {
@@ -151,13 +147,11 @@ dependencies {
     compileOnly(roomApi)
     compileOnly(roomUpgradeApi)
 
-//    implementation("dev.compactmods.compactmachines:core-api")
-//    implementation("dev.compactmods.compactmachines:room-api")
-//    implementation("dev.compactmods.compactmachines:room-upgrade-api")
-//    implementation("dev.compactmods.compactmachines:core")
+    testCompileOnly(core)
+    testCompileOnly(coreApi)
+    testCompileOnly(roomApi)
+    testCompileOnly(roomUpgradeApi)
 
-//    implementation("dev.compactmods.compactmachines:tunnels-api:$tunnelsApiVersion")
-//
     jarJar("dev.compactmods.compactmachines", "core", "[$coreVersion]") {
         isTransitive = false
     }
@@ -180,7 +174,7 @@ tasks.withType<ProcessResources> {
 }
 
 tasks.withType<JavaCompile> {
-    options.encoding = "UTF-8";
+    options.encoding = "UTF-8"
 }
 
 tasks.withType<Jar> {
@@ -204,4 +198,29 @@ tasks.jar {
 
 tasks.jarJar {
     archiveClassifier.set("")
+}
+
+fun showModClasses() {
+    project.runs.forEach {
+        generateModClassesForRun(it)
+    }
+}
+
+fun generateModClassesForRun(run: Run) {
+    var sb: String = "";
+    run.modSources.get().forEach {
+        sb += ("$modId%%" + it.java.classesDirectory.get().asFile.absolutePath + ";")
+
+        val resClasses = it.resources.classesDirectory.orNull
+        if(resClasses != null)
+            sb += ("$modId%%" + resClasses.asFile.absolutePath + ";")
+
+        val dest = it.resources.destinationDirectory.orNull
+        if (dest != null)
+            sb += ("$modId%%" + dest.asFile.absolutePath + ";")
+    }
+
+    println(run.name)
+    println("MOD_CLASSES=$sb")
+    println()
 }
