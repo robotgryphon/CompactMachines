@@ -90,6 +90,12 @@ runs {
             runtime("com.aventrix.jnanoid:jnanoid:2.0.0")
         }
 
+        if(!System.getenv().containsKey("CI")) {
+            // JetBrains Runtime Hotswap
+            jvmArgument("-XX:+AllowEnhancedClassRedefinition")
+            jvmArgument("-XX:HotswapAgent=fatjar")
+        }
+
         modSource(sourceSets.main.get())
         coreProjects.forEach {
             modSource(it.sourceSets.main.get())

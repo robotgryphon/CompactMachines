@@ -11,10 +11,16 @@ import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructurePlaceSettings;
+import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
 
 public final class TestUtil {
+
+    public static AABB localBounds(GameTestHelper testHelper) {
+        var bounds = testHelper.getBounds();
+        return bounds.move(BlockPos.ZERO.subtract(testHelper.absolutePos(BlockPos.ZERO)));
+    }
 
     public static void loadStructureIntoTestArea(GameTestHelper test, ResourceLocation structure, BlockPos relLocation) {
         final var structures = test.getLevel().getStructureManager();

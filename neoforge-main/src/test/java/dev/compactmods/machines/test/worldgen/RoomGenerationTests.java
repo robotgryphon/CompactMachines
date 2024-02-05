@@ -3,22 +3,22 @@ package dev.compactmods.machines.test.worldgen;
 import dev.compactmods.compactmachines.api.room.CompactRoomGenerator;
 import dev.compactmods.compactmachines.api.room.RoomTemplate;
 import dev.compactmods.machines.api.core.Constants;
+import dev.compactmods.machines.api.util.BlockSpaceUtil;
 import dev.compactmods.machines.machine.LegacySizedTemplates;
 import dev.compactmods.machines.test.TestBatches;
+import dev.compactmods.machines.test.util.TestUtil;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Vec3i;
+import net.minecraft.core.Direction;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestGenerator;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.gametest.framework.TestFunction;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.Rotation;
 import net.minecraft.world.phys.AABB;
-import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.gametest.GameTestHolder;
 import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
-import org.jetbrains.annotations.NotNull;
+import org.apache.logging.log4j.LogManager;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -32,7 +32,7 @@ public class RoomGenerationTests {
     public static Collection<TestFunction> roomTests() {
         List<TestFunction> funcs = new ArrayList<>();
 
-        for(var template : LegacySizedTemplates.values()) {
+        for (var template : LegacySizedTemplates.values()) {
             var func = makeTestFunction(template);
             funcs.add(func);
         }
@@ -53,71 +53,65 @@ public class RoomGenerationTests {
         );
     }
 
-    @NotNull
     private static void makeTemplateTest(GameTestHelper testHelper, RoomTemplate template) {
-        final AABB testBounds = testHelper.getBounds();
+        final AABB localBounds = TestUtil.localBounds(testHelper);
+        final BlockPos testCenter = BlockPos.containing(localBounds.getCenter());
 
-        CompactRoomGenerator.generateRoom(testHelper.getLevel(), template, testBounds.getCenter());
+        var where = testHelper.getBounds().getCenter();
+        CompactRoomGenerator.generateRoom(testHelper.getLevel(), template, where);
+
+        testHelper.setBlock(testCenter, Blocks.RED_STAINED_GLASS);
+        testHelper.succeed();
+    }
+
+    @GameTest(template = "empty_15x15", batch = TestBatches.ROOM_GENERATION)
+    public static void checkOffsetsNormalTest(final GameTestHelper testHelper) {
+        final var logs = LogManager.getLogger();
+
+        AABB localBounds = TestUtil.localBounds(testHelper);
+
+        var center = BlockPos.containing(localBounds.getCenter());
+        testHelper.setBlock(center, Blocks.GOLD_BLOCK.defaultBlockState());
+
+        for(var dir : Direction.values()) {
+            var ob = BlockSpaceUtil.centerWallBlockPos(localBounds, dir);
+            testHelper.setBlock(ob, Blocks.ORANGE_STAINED_GLASS);
+        }
+
+        BlockSpaceUtil.forAllCorners(localBounds).forEach(pos -> {
+            testHelper.setBlock(pos, Blocks.BLACK_STAINED_GLASS);
+        });
 
         testHelper.succeed();
     }
 
     @GameTest(template = "empty_15x15", batch = TestBatches.ROOM_GENERATION)
-    public static void checkRoomGeneratorColossal(final GameTestHelper test) {
-        final var roomDims = new Vec3i(13, 13, 13);
-        final var roomCenter = Vec3.atCenterOf(test.absolutePos(new BlockPos(7, 2, 7)));
+    public static void checkRoomGeneratorNormal(final GameTestHelper testHelper) {
 
-        CompactRoomGenerator.generateRoom(test.getLevel(), roomDims, roomCenter);
+        AABB localBounds = TestUtil.localBounds(testHelper);
 
+        var center = BlockPos.containing(localBounds.getCenter());
+        testHelper.setBlock(center, Blocks.GOLD_BLOCK.defaultBlockState());
 
+        BlockSpaceUtil.forAllCorners(localBounds.deflate(5))
+                .forEach(bp -> testHelper.setBlock(bp, Blocks.IRON_BLOCK));
 
-        test.setBlock(new BlockPos(7, 9, 7), Blocks.GOLD_BLOCK.defaultBlockState());
-        CompactRoomGenerator.fillWithTemplate(test.getLevel(),
-                new ResourceLocation(Constants.MOD_ID, "template_max"),
-                roomDims, roomCenter);
-
-        test.succeed();
+        testHelper.succeed();
     }
 
     @GameTest(template = "empty_15x15", batch = TestBatches.ROOM_GENERATION)
-    public static void checkRoomGeneratorNormal(final GameTestHelper test) {
-        final var roomDims = new Vec3i(9, 9, 9);
-        final var roomCenter = Vec3.atCenterOf(test.absolutePos(new BlockPos(7, 2, 7)));
+    public static void checkRoomGeneratorWeirdShape(final GameTestHelper testHelper) {
 
-        CompactRoomGenerator.generateRoom(test.getLevel(), roomDims, roomCenter);
+        AABB localBounds = TestUtil.localBounds(testHelper);
 
-        test.setBlock(new BlockPos(7, 5, 7), Blocks.GOLD_BLOCK.defaultBlockState());
-        CompactRoomGenerator.fillWithTemplate(test.getLevel(),
-                RoomTemplate.NO_TEMPLATE,
-                roomDims, roomCenter);
+        final var roomDims = AABB.ofSize(localBounds.getCenter(), 5, 5, 9)
+                .move(testHelper.absolutePos(BlockPos.ZERO));
 
-        test.succeed();
-    }
+        CompactRoomGenerator.generateRoom(testHelper.getLevel(), roomDims);
 
-    @GameTest(template = "empty_15x15", batch = TestBatches.ROOM_GENERATION)
-    public static void checkRoomGeneratorSmall(final GameTestHelper test) {
-        final var roomDims = new Vec3i(5, 5, 5);
-        final var roomCenter = Vec3.atCenterOf(test.absolutePos(new BlockPos(7, 2, 7)));
+        var center = BlockPos.containing(localBounds.getCenter());
+        testHelper.setBlock(center, Blocks.GOLD_BLOCK.defaultBlockState());
 
-        CompactRoomGenerator.generateRoom(test.getLevel(), roomDims, roomCenter);
-
-        test.setBlock(new BlockPos(7, 4, 7), Blocks.GOLD_BLOCK.defaultBlockState());
-        CompactRoomGenerator.fillWithTemplate(test.getLevel(),
-                RoomTemplate.NO_TEMPLATE,
-                roomDims, roomCenter);
-
-        test.succeed();
-    }
-
-    @GameTest(template = "empty_15x15", batch = TestBatches.ROOM_GENERATION)
-    public static void checkRoomGeneratorWeirdShape(final GameTestHelper test) {
-        final var roomDims = new Vec3i(11, 2, 7);
-        final var roomCenter = Vec3.atCenterOf(test.absolutePos(new BlockPos(7, 2, 7)));
-
-        CompactRoomGenerator.generateRoom(test.getLevel(), roomDims, roomCenter);
-
-        // test.setBlock(new BlockPos(7, 3, 7), Blocks.GOLD_BLOCK.defaultBlockState());
-
-        test.succeed();
+        testHelper.succeed();
     }
 }
