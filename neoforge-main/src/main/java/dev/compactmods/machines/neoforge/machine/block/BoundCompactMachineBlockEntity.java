@@ -1,5 +1,6 @@
 package dev.compactmods.machines.neoforge.machine.block;
 
+import dev.compactmods.compactmachines.api.room.RoomApi;
 import dev.compactmods.machines.api.machine.IMachineBlockEntity;
 import dev.compactmods.machines.api.machine.MachineEntityNbt;
 import dev.compactmods.machines.api.machine.MachineNbt;
@@ -150,12 +151,13 @@ public class BoundCompactMachineBlockEntity extends BlockEntity implements IMach
             dimMachines.register(worldPosition, roomCode);
             this.roomCode = roomCode;
 
-            // FIXME - Rooms do not have colors on first creation; this should be pulled from the template!
-//            Rooms.registrar().get(roomCode).ifPresentOrElse(inst -> {
-//                this.roomColor = inst.registration().defaultMachineColor();
-//            }, () -> {
+            RoomApi.room(roomCode).ifPresentOrElse(inst -> {
+                this.roomColor = inst.defaultMachineColor();
+                this.hasMachineColorOverride = false;
+                this.setChanged();
+            }, () -> {
                 this.roomColor = DyeColor.WHITE.getTextColor();
-//            });
+            });
 
             this.setChanged();
         }

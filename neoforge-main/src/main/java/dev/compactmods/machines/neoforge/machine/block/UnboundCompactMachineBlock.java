@@ -69,10 +69,13 @@ public class UnboundCompactMachineBlock extends CompactMachineBlock implements E
                         // Generate a new machine room
                         final var newRoom = RoomApi.newRoom(server, template, sp.getUUID());
 
+                        // Change into a bound machine block
                         level.setBlock(pos, Machines.MACHINE_BLOCK.get().defaultBlockState(), Block.UPDATE_ALL);
 
+                        // Set up binding and enter
                         level.getBlockEntity(pos, Machines.MACHINE_ENTITY.get()).ifPresent(ent -> {
                             ent.setConnectedRoom(newRoom.code());
+
                             try {
                                 RoomHelper.teleportPlayerIntoRoom(server, sp, newRoom, ent.getLevelPosition());
                             } catch (MissingDimensionException e) {
