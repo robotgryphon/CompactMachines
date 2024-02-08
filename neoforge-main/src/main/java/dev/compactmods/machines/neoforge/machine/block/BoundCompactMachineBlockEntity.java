@@ -54,9 +54,15 @@ public class BoundCompactMachineBlockEntity extends BlockEntity implements IColo
             owner = null;
         }
 
+        if(nbt.contains(NBT_ROOM_COLOR)) {
+            roomColor = nbt.getInt(NBT_COLOR);
+        }
+
         if (nbt.contains(NBT_COLOR)) {
             machineColor = nbt.getInt(NBT_COLOR);
             hasMachineColorOverride = true;
+        } else {
+            hasMachineColorOverride = false;
         }
 
         if (level != null && !level.isClientSide)
@@ -65,13 +71,16 @@ public class BoundCompactMachineBlockEntity extends BlockEntity implements IColo
 
     @Override
     protected void saveAdditional(@NotNull CompoundTag nbt) {
+        super.saveAdditional(nbt);
+
         if (owner != null) {
             nbt.putUUID(NBT_OWNER, this.owner);
         }
 
-        if (hasMachineColorOverride) {
+        if (hasMachineColorOverride)
             nbt.putInt(NBT_COLOR, machineColor);
-        }
+
+        nbt.putInt(NBT_ROOM_COLOR, roomColor);
 
         if (roomCode != null)
             nbt.putString(NBT_ROOM_CODE, roomCode);
@@ -114,13 +123,15 @@ public class BoundCompactMachineBlockEntity extends BlockEntity implements IColo
             this.roomCode = tag.getString(NBT_ROOM_CODE);
         }
 
+        if (tag.contains(NBT_ROOM_COLOR)) {
+            roomColor = tag.getInt(NBT_ROOM_COLOR);
+        }
+
         if (tag.contains(NBT_COLOR)) {
             hasMachineColorOverride = true;
             machineColor = tag.getInt(NBT_COLOR);
-        }
-
-        if (tag.contains(NBT_ROOM_COLOR)) {
-            roomColor = tag.getInt(NBT_ROOM_COLOR);
+        } else {
+            hasMachineColorOverride = false;
         }
 
         if (tag.contains("owner"))
@@ -157,7 +168,6 @@ public class BoundCompactMachineBlockEntity extends BlockEntity implements IColo
             RoomApi.room(roomCode).ifPresentOrElse(inst -> {
                 this.roomColor = inst.defaultMachineColor();
                 this.hasMachineColorOverride = false;
-                this.setChanged();
             }, () -> {
                 this.roomColor = DyeColor.WHITE.getTextColor();
             });
@@ -180,8 +190,11 @@ public class BoundCompactMachineBlockEntity extends BlockEntity implements IColo
     }
 
     public void setColor(int color) {
-        this.machineColor = color;
-        this.hasMachineColorOverride = true;
+        if(color != roomColor) {
+            this.machineColor = color;
+            this.hasMachineColorOverride = true;
+            this.setChanged();
+        }
     }
 
     @NotNull

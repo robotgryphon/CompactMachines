@@ -2,7 +2,7 @@ package dev.compactmods.machines.neoforge.client.creative;
 
 import dev.compactmods.compactmachines.api.room.RoomInstance;
 import dev.compactmods.machines.api.Constants;
-import dev.compactmods.machines.neoforge.machine.item.BoundCompactMachineItem;
+import dev.compactmods.machines.api.machine.MachineCreator;
 import net.minecraft.world.item.CreativeModeTab;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -21,7 +21,7 @@ public class ExistingRoomCreativeTab {
         // TODO - Sync existing machine meta so stuff appears in creative
         if(evt.getTabKey() == CreativeTabs.EXISTING_MACHINES.getKey()) {
             for(var roomInfo : KNOWN_ROOMS.values()) {
-                evt.accept(BoundCompactMachineItem.createForRoom(roomInfo.code(), roomInfo.defaultMachineColor()), CreativeModeTab.TabVisibility.PARENT_AND_SEARCH_TABS);
+                evt.accept(MachineCreator.boundToRoom(roomInfo.code(), roomInfo.defaultMachineColor()), CreativeModeTab.TabVisibility.PARENT_AND_SEARCH_TABS);
             }
         }
     }

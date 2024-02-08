@@ -2,12 +2,13 @@ package dev.compactmods.machines.neoforge.machine.item;
 
 import dev.compactmods.machines.api.Constants;
 import dev.compactmods.machines.api.Tooltips;
+import dev.compactmods.machines.api.machine.MachineCreator;
+import dev.compactmods.machines.api.machine.item.IBoundCompactMachineItem;
 import dev.compactmods.machines.i18n.TranslationUtil;
-import dev.compactmods.machines.machine.item.ICompactMachineItem;
+import dev.compactmods.machines.api.machine.item.ICompactMachineItem;
 import dev.compactmods.machines.neoforge.machine.Machines;
 import net.minecraft.Util;
 import net.minecraft.core.Vec3i;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.BlockItem;
@@ -21,8 +22,8 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 import java.util.Optional;
 
-public class BoundCompactMachineItem extends BlockItem implements ICompactMachineItem {
-    public static final String NBT_ROOM_POSITION = "room_pos";
+public class BoundCompactMachineItem extends BlockItem implements IBoundCompactMachineItem {
+
     public static final String NBT_ROOM_DIMENSIONS = "room_dimensions";
 
     private static final String FALLBACK_ID = Util.makeDescriptionId("block", new ResourceLocation(Constants.MOD_ID, "bound_machine_fallback"));
@@ -31,50 +32,17 @@ public class BoundCompactMachineItem extends BlockItem implements ICompactMachin
         super(Machines.MACHINE_BLOCK.get(), builder);
     }
 
-    public static Component name(ItemStack stack) {
-        return MachineItemUtil.getMachineName(stack)
-                .map(Component::literal)
-                .orElse(Component.translatable(FALLBACK_ID));
-    }
     @Override
     public Component getName(ItemStack stack) {
-        return name(stack);
+        return getMachineName(stack)
+                .map(Component::literal)
+                .orElse(Component.translatable(FALLBACK_ID));
     }
 
     @NotNull
     @Override
     public String getDescriptionId(ItemStack stack) {
         return FALLBACK_ID;
-    }
-
-    public static Optional<String> getRoom(ItemStack stack) {
-        if (!stack.hasTag())
-            return Optional.empty();
-
-        var tag = stack.getTag();
-        if (tag == null || !tag.contains(NBT_ROOM_POSITION))
-            return Optional.empty();
-
-        return Optional.of(tag.getString(NBT_ROOM_POSITION));
-    }
-
-    public static void setRoom(ItemStack stack, String room) {
-        var tag = stack.getOrCreateTag();
-        tag.putString(NBT_ROOM_POSITION, room);
-    }
-
-    public static ItemStack createForRoom(String roomCode) {
-        ItemStack item = new ItemStack(Machines.BOUND_MACHINE_BLOCK_ITEM.get());
-        setRoom(item, roomCode);
-        ICompactMachineItem.setColor(item, DyeColor.WHITE.getTextColor());
-        return item;
-    }
-
-    public static ItemStack createForRoom(String roomCode, int color) {
-        ItemStack item = new ItemStack(Machines.BOUND_MACHINE_BLOCK_ITEM.get());
-        setRoom(item, roomCode);
-        ICompactMachineItem.setColor(item, color);
-        return item;
     }
 
     public static Vec3i getRoomSize(ItemStack stack) {
@@ -98,7 +66,7 @@ public class BoundCompactMachineItem extends BlockItem implements ICompactMachin
 
     @Override
     public void appendHoverText(ItemStack stack, @Nullable Level worldIn, List<Component> tooltip, TooltipFlag flagIn) {
-        // Try room binding
+        super.appendHoverText(stack, worldIn, tooltip, flagIn);
         getRoom(stack).ifPresent(room -> {
             // TODO - Server-synced room name list
             tooltip.add(TranslationUtil.tooltip(Tooltips.ROOM_NAME, room));

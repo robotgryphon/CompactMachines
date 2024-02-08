@@ -2,20 +2,20 @@ package dev.compactmods.machines.neoforge.machine.block;
 
 import dev.compactmods.machines.LoggingUtil;
 import dev.compactmods.machines.api.Messages;
+import dev.compactmods.machines.api.machine.MachineCreator;
+import dev.compactmods.machines.api.machine.item.IBoundCompactMachineItem;
 import dev.compactmods.machines.api.shrinking.PSDTags;
 import dev.compactmods.machines.i18n.TranslationUtil;
 import dev.compactmods.machines.machine.EnumMachinePlayersBreakHandling;
-import dev.compactmods.machines.machine.item.ICompactMachineItem;
 import dev.compactmods.machines.neoforge.config.ServerConfig;
 import dev.compactmods.machines.neoforge.machine.Machines;
-import dev.compactmods.machines.neoforge.machine.item.BoundCompactMachineItem;
-import dev.compactmods.machines.neoforge.machine.item.UnboundCompactMachineItem;
 import dev.compactmods.machines.neoforge.room.RoomHelper;
 import dev.compactmods.machines.neoforge.room.ui.MachineRoomMenu;
 import dev.compactmods.machines.util.PlayerUtil;
 import net.minecraft.commands.Commands;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.GlobalPos;
+import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -26,19 +26,21 @@ import net.minecraft.world.item.NameTagItem;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelReader;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.EntityBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.neoforged.neoforge.common.CommonHooks;
+import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Optional;
 import java.util.UUID;
 
-public class BoundCompactMachineBlock extends CompactMachineBlock implements EntityBlock {
+public class BoundCompactMachineBlock extends Block implements EntityBlock {
     public BoundCompactMachineBlock(Properties props) {
         super(props);
     }
@@ -46,11 +48,11 @@ public class BoundCompactMachineBlock extends CompactMachineBlock implements Ent
     @Override
     public ItemStack getCloneItemStack(BlockState state, HitResult target, LevelReader level, BlockPos pos, Player player) {
         if (level.getBlockEntity(pos) instanceof BoundCompactMachineBlockEntity be) {
-            return BoundCompactMachineItem.createForRoom(be.connectedRoom(), be.getColor());
+            return MachineCreator.boundToRoom(be.connectedRoom(), be.getColor());
         }
 
         LoggingUtil.modLog().warn("Warning: tried to pick block on a machine that does not have an associated block entity.");
-        return UnboundCompactMachineItem.unbound();
+        return MachineCreator.unbound();
     }
 
     @Override
@@ -88,14 +90,18 @@ public class BoundCompactMachineBlock extends CompactMachineBlock implements Ent
 
     @Override
     public void setPlacedBy(Level level, BlockPos pos, BlockState state, @Nullable LivingEntity placer, ItemStack stack) {
-        if (!level.isClientSide) {
-            level.getBlockEntity(pos, Machines.MACHINE_ENTITY.get()).ifPresent(tile -> {
-                // force client redraw
-                final int color = ICompactMachineItem.getMachineColor(stack);
-                tile.setColor(color);
-
-                BoundCompactMachineItem.getRoom(stack).ifPresent(tile::setConnectedRoom);
-            });
+        if (level.getBlockEntity(pos) instanceof BoundCompactMachineBlockEntity tile) {
+            // force client redraw
+            if (stack.getItem() instanceof IBoundCompactMachineItem bound) {
+                if (!level.isClientSide) {
+                    bound.getRoom(stack).ifPresent(tile::setConnectedRoom);
+                } else {
+                    final int color = bound.getMachineColor(stack);
+                    tile.setColor(color);
+                }
+//                    PacketDistributor.TRACKING_CHUNK.with(level.getChunkAt(pos))
+//                            .send(ClientboundBlockEntityDataPacket.create(tile));
+            }
         }
     }
 
@@ -149,17 +155,11 @@ public class BoundCompactMachineBlock extends CompactMachineBlock implements Ent
         ItemStack mainItem = player.getMainHandItem();
         if (mainItem.getItem() instanceof NameTagItem && mainItem.hasCustomHoverName()) {
             if (level.getBlockEntity(pos) instanceof BoundCompactMachineBlockEntity tile) {
-                final var ownerProfile = tile.getOwnerUUID().flatMap(id -> PlayerUtil.getProfileByUUID(level, id));
-                boolean isOwner = ownerProfile.map(p -> p.getId().equals(player.getUUID())).orElse(false);
+                boolean isOwner = tile.owner.equals(player.getUUID());
                 boolean isOp = player.hasPermissions(Commands.LEVEL_MODERATORS);
 
-                if (ownerProfile.isEmpty()) {
-                    return InteractionResult.FAIL;
-                }
-
-                if (!isOp || !isOwner)
-                    return InteractionResult.FAIL;
-                else {
+                if (!isOp || !isOwner) {
+                    final var ownerProfile = tile.getOwnerUUID().flatMap(id -> PlayerUtil.getProfileByUUID(level, id));
                     ownerProfile.ifPresent(owner -> {
                         player.displayClientMessage(TranslationUtil.message(Messages.CANNOT_RENAME_NOT_OWNER,
                                 owner.getName()), true);
@@ -171,5 +171,11 @@ public class BoundCompactMachineBlock extends CompactMachineBlock implements Ent
             }
         }
         return null;
+    }
+
+    @Override
+    public void onRemove(BlockState pState, Level pLevel, BlockPos pPos, BlockState pNewState, boolean pMovedByPiston) {
+        super.onRemove(pState, pLevel, pPos, pNewState, pMovedByPiston);
+        // TODO: Remove machine from room graph
     }
 }

@@ -4,9 +4,10 @@ import dev.compactmods.compactmachines.api.room.RoomApi;
 import dev.compactmods.compactmachines.api.room.RoomTemplate;
 import dev.compactmods.machines.LoggingUtil;
 import dev.compactmods.machines.api.dimension.MissingDimensionException;
+import dev.compactmods.machines.api.machine.MachineCreator;
+import dev.compactmods.machines.api.machine.item.IUnboundCompactMachineItem;
 import dev.compactmods.machines.api.shrinking.PSDTags;
 import dev.compactmods.machines.neoforge.machine.Machines;
-import dev.compactmods.machines.neoforge.machine.item.MachineItemUtil;
 import dev.compactmods.machines.neoforge.machine.item.UnboundCompactMachineItem;
 import dev.compactmods.machines.neoforge.room.RoomHelper;
 import net.minecraft.core.BlockPos;
@@ -28,7 +29,7 @@ import net.minecraft.world.phys.HitResult;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class UnboundCompactMachineBlock extends CompactMachineBlock implements EntityBlock {
+public class UnboundCompactMachineBlock extends Block implements EntityBlock {
     public UnboundCompactMachineBlock(Properties props) {
         super(props);
     }
@@ -40,7 +41,7 @@ public class UnboundCompactMachineBlock extends CompactMachineBlock implements E
             return UnboundCompactMachineItem.forTemplate(be.templateId(), temp);
         }
 
-        return UnboundCompactMachineItem.unbound();
+        return MachineCreator.unbound();
     }
 
     @Override
@@ -51,8 +52,10 @@ public class UnboundCompactMachineBlock extends CompactMachineBlock implements E
     @Override
     public void setPlacedBy(Level level, BlockPos pos, BlockState state, @Nullable LivingEntity placer, ItemStack stack) {
         level.getBlockEntity(pos, Machines.UNBOUND_MACHINE_ENTITY.get()).ifPresent(tile -> {
-            final var template = MachineItemUtil.getTemplateId(stack);
-            tile.setTemplate(template);
+            if(stack.getItem() instanceof IUnboundCompactMachineItem unbound) {
+                final var template = unbound.getTemplateId(stack);
+                tile.setTemplate(template);
+            }
         });
     }
 

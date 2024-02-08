@@ -2,7 +2,8 @@ package dev.compactmods.machines.neoforge.client.creative;
 
 import dev.compactmods.compactmachines.api.room.RoomTemplate;
 import dev.compactmods.machines.api.Constants;
-import dev.compactmods.machines.machine.item.ICompactMachineItem;
+import dev.compactmods.machines.api.machine.MachineCreator;
+import dev.compactmods.machines.api.machine.item.ICompactMachineItem;
 import dev.compactmods.machines.neoforge.CompactMachines;
 import dev.compactmods.machines.neoforge.machine.item.UnboundCompactMachineItem;
 import dev.compactmods.machines.neoforge.room.Rooms;
@@ -21,19 +22,14 @@ public interface CreativeTabs {
     ResourceLocation LINKED_MACHINES_RL = new ResourceLocation(Constants.MOD_ID, "linked_machines");
 
     DeferredHolder<CreativeModeTab, CreativeModeTab> NEW_MACHINES = TABS.register(MAIN_RL.getPath(), () -> CreativeModeTab.builder()
-            .icon(() -> {
-                final var ub = UnboundCompactMachineItem.unbound();
-                ICompactMachineItem.setColor(ub, DyeColor.WHITE.getTextColor());
-                return ub;
-            })
+            .icon(MachineCreator::unbound)
             .title(Component.translatableWithFallback("itemGroup.compactmachines.main", "Compact Machines"))
             .displayItems(CreativeTabs::fillItems)
             .build());
 
     DeferredHolder<CreativeModeTab, CreativeModeTab> EXISTING_MACHINES = TABS.register(LINKED_MACHINES_RL.getPath(), () -> CreativeModeTab.builder()
             .icon(() -> {
-                final var ub = UnboundCompactMachineItem.unbound();
-                ICompactMachineItem.setColor(ub, CompactMachines.BRAND_MACHINE_COLOR);
+                final var ub = MachineCreator.unboundColored(CompactMachines.BRAND_MACHINE_COLOR);
                 return ub;
             })
             .title(Component.translatableWithFallback("itemGroup.compactmachines.linked_machines", "Linked Machines"))
