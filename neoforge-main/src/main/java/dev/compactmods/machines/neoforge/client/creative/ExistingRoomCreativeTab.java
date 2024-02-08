@@ -1,6 +1,6 @@
 package dev.compactmods.machines.neoforge.client.creative;
 
-import dev.compactmods.compactmachines.api.room.RoomInstance;
+import dev.compactmods.machines.api.room.RoomInstance;
 import dev.compactmods.machines.api.Constants;
 import dev.compactmods.machines.api.machine.MachineCreator;
 import net.minecraft.world.item.CreativeModeTab;

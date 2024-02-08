@@ -8,11 +8,14 @@ var envVersion: String = System.getenv("VERSION") ?: "9.9.9"
 if (envVersion.startsWith("v"))
     envVersion = envVersion.trimStart('v')
 
+var coreVersion: String = System.getenv("CORE_VERSION") ?: "9.9.9"
+if (coreVersion.startsWith("v"))
+    coreVersion = coreVersion.trimStart('v')
+
 val modId: String = property("mod_id") as String
 val isRelease: Boolean = (System.getenv("RELEASE") ?: "false").equals("true", true)
 
 val neoforgeVersion: String = property("neoforge_version") as String
-val coreVersion: String = property("core_version") as String
 val featherVersion: String = property("feather_version") as String
 
 val core = project(":core:core")
@@ -157,22 +160,6 @@ dependencies {
     testCompileOnly(coreApi)
     testCompileOnly(roomApi)
     testCompileOnly(roomUpgradeApi)
-
-    jarJar("dev.compactmods.compactmachines", "core", "[$coreVersion]") {
-        isTransitive = false
-    }
-
-    jarJar("dev.compactmods.compactmachines", "core-api", "[$coreVersion]") {
-        isTransitive = false
-    }
-
-    jarJar("dev.compactmods.compactmachines", "room-api", "[$coreVersion]") {
-        isTransitive = false
-    }
-
-    jarJar("dev.compactmods.compactmachines", "room-upgrade-api", "[$coreVersion]") {
-        isTransitive = false
-    }
 }
 
 tasks.withType<ProcessResources> {

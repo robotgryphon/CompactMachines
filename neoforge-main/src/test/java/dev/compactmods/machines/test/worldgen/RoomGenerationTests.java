@@ -1,7 +1,7 @@
 package dev.compactmods.machines.test.worldgen;
 
-import dev.compactmods.compactmachines.api.room.CompactRoomGenerator;
-import dev.compactmods.compactmachines.api.room.RoomTemplate;
+import dev.compactmods.machines.api.room.CompactRoomGenerator;
+import dev.compactmods.machines.api.room.RoomTemplate;
 import dev.compactmods.machines.api.Constants;
 import dev.compactmods.machines.api.util.BlockSpaceUtil;
 import dev.compactmods.machines.machine.LegacySizedTemplates;

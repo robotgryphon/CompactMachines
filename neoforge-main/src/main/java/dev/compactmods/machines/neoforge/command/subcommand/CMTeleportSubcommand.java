@@ -4,7 +4,7 @@ import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import dev.compactmods.compactmachines.api.room.RoomApi;
+import dev.compactmods.machines.api.room.RoomApi;
 import dev.compactmods.machines.LoggingUtil;
 import dev.compactmods.machines.api.Messages;
 import dev.compactmods.machines.api.dimension.MissingDimensionException;

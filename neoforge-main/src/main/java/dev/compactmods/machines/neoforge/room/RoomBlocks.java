@@ -1,6 +1,6 @@
 package dev.compactmods.machines.neoforge.room;
 
-import dev.compactmods.compactmachines.api.room.RoomApi;
+import dev.compactmods.machines.api.room.RoomApi;
 import dev.compactmods.machines.api.dimension.CompactDimension;
 import dev.compactmods.machines.api.dimension.MissingDimensionException;
 import net.minecraft.core.BlockPos;

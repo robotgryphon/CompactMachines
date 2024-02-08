@@ -1,6 +1,6 @@
 package dev.compactmods.machines.neoforge;
 
-import dev.compactmods.compactmachines.api.room.RoomTemplate;
+import dev.compactmods.machines.api.room.RoomTemplate;
 import dev.compactmods.machines.api.Constants;
 import dev.compactmods.machines.neoforge.shrinking.Shrinking;
 import net.minecraft.commands.synchronization.ArgumentTypeInfo;

@@ -1,0 +1,47 @@
+name: Version Info
+
+env:
+  GH_PKG_URL: "https://maven.pkg.github.com/${{ github.repository }}"
+
+on:
+  workflow_dispatch:
+
+jobs:
+  vars:
+    name: Get Variables
+    runs-on: ubuntu-22.04
+    outputs:
+      version: ${{steps.version.outputs.version}}
+      coreVersion: ${{steps.coreVersion.outputs.version}}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          submodules: true
+          fetch-tags: true
+
+      - name: Version
+        id: version
+        uses: paulhatch/semantic-version@v5.0.2
+        with:
+          change_path: "neoforge-main"
+          version_format: "${major}.${minor}.${patch}.${increment}-nightly"
+          search_commit_body: true
+
+      - name: Enter Core
+        run: cd core
+
+      - name: Core Version
+        id: coreVersion
+        uses: paulhatch/semantic-version@v5.0.2
+        with:
+          version_format: "${major}.${minor}.${patch}"
+          search_commit_body: true
+
+  output:
+    name: Output Info
+    runs-on: ubuntu-20.04
+    needs: [ vars ]
+    steps:
+      - run: echo "version = ${{needs.vars.outputs.version}}; core version = ${{needs.vars.outputs.coreVersion}}"

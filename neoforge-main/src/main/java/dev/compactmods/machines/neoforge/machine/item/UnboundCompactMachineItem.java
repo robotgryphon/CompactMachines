@@ -1,10 +1,9 @@
 package dev.compactmods.machines.neoforge.machine.item;
 
-import dev.compactmods.compactmachines.api.room.RoomTemplate;
+import dev.compactmods.machines.api.room.RoomTemplate;
 import dev.compactmods.machines.api.Tooltips;
 import dev.compactmods.machines.api.machine.item.IUnboundCompactMachineItem;
 import dev.compactmods.machines.i18n.TranslationUtil;
-import dev.compactmods.machines.api.machine.item.ICompactMachineItem;
 import dev.compactmods.machines.neoforge.machine.Machines;
 import net.minecraft.ChatFormatting;
 import net.minecraft.Util;

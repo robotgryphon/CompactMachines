@@ -1,6 +1,6 @@
 package dev.compactmods.machines.neoforge.machine.block;
 
-import dev.compactmods.compactmachines.api.room.RoomApi;
+import dev.compactmods.machines.api.room.RoomApi;
 import dev.compactmods.machines.api.machine.IColoredMachine;
 import dev.compactmods.machines.machine.graph.DimensionMachineGraph;
 import dev.compactmods.machines.neoforge.machine.Machines;

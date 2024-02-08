@@ -1,9 +1,8 @@
 package dev.compactmods.machines.neoforge.client.creative;
 
-import dev.compactmods.compactmachines.api.room.RoomTemplate;
+import dev.compactmods.machines.api.room.RoomTemplate;
 import dev.compactmods.machines.api.Constants;
 import dev.compactmods.machines.api.machine.MachineCreator;
-import dev.compactmods.machines.api.machine.item.ICompactMachineItem;
 import dev.compactmods.machines.neoforge.CompactMachines;
 import dev.compactmods.machines.neoforge.machine.item.UnboundCompactMachineItem;
 import dev.compactmods.machines.neoforge.room.Rooms;
@@ -11,7 +10,6 @@ import dev.compactmods.machines.neoforge.shrinking.Shrinking;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.CreativeModeTab;
-import net.minecraft.world.item.DyeColor;
 import net.neoforged.neoforge.registries.DeferredHolder;
 
 import static dev.compactmods.machines.neoforge.Registries.TABS;

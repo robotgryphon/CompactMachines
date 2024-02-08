@@ -1,6 +1,6 @@
 package dev.compactmods.machines.neoforge.room;
 
-import dev.compactmods.compactmachines.api.room.history.RoomEntryPoint;
+import dev.compactmods.machines.api.room.history.RoomEntryPoint;
 import dev.compactmods.machines.neoforge.Registries;
 import dev.compactmods.machines.neoforge.room.block.SolidWallBlock;
 import dev.compactmods.machines.neoforge.room.ui.MachineRoomMenu;

@@ -1,14 +1,11 @@
 package dev.compactmods.machines.neoforge.room;
 
-import dev.compactmods.compactmachines.api.room.RoomApi;
-import dev.compactmods.compactmachines.api.room.RoomInstance;
-import dev.compactmods.compactmachines.api.room.exceptions.NonexistentRoomException;
-import dev.compactmods.compactmachines.api.room.history.IPlayerRoomEntryPointManager;
-import dev.compactmods.compactmachines.api.room.history.RoomEntryPoint;
+import dev.compactmods.machines.api.room.RoomApi;
+import dev.compactmods.machines.api.room.RoomInstance;
+import dev.compactmods.machines.api.room.history.RoomEntryPoint;
 import dev.compactmods.machines.LoggingUtil;
 import dev.compactmods.machines.api.dimension.CompactDimension;
 import dev.compactmods.machines.api.dimension.MissingDimensionException;
-import dev.compactmods.machines.api.location.GlobalPosWithRotation;
 import dev.compactmods.machines.neoforge.dimension.SimpleTeleporter;
 import dev.compactmods.machines.neoforge.util.ForgePlayerUtil;
 import net.minecraft.core.GlobalPos;
@@ -16,10 +13,8 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.Level;
 import org.apache.logging.log4j.Logger;
-import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.Nonnull;
-import java.util.Optional;
 
 public abstract class RoomHelper {
 

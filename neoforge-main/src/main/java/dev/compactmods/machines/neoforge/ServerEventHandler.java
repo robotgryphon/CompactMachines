@@ -1,9 +1,9 @@
 package dev.compactmods.machines.neoforge;
 
-import dev.compactmods.compactmachines.api.room.IRoomRegistrar;
-import dev.compactmods.compactmachines.api.room.RoomApi;
-import dev.compactmods.compactmachines.api.room.owner.IRoomOwners;
-import dev.compactmods.compactmachines.api.room.spawn.IRoomSpawnManagers;
+import dev.compactmods.machines.api.room.IRoomRegistrar;
+import dev.compactmods.machines.api.room.RoomApi;
+import dev.compactmods.machines.api.room.owner.IRoomOwners;
+import dev.compactmods.machines.api.room.spawn.IRoomSpawnManagers;
 import dev.compactmods.machines.LoggingUtil;
 import dev.compactmods.machines.api.Constants;
 import dev.compactmods.machines.api.dimension.CompactDimension;

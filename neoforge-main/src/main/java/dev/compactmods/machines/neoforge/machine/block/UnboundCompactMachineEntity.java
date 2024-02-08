@@ -1,6 +1,6 @@
 package dev.compactmods.machines.neoforge.machine.block;
 
-import dev.compactmods.compactmachines.api.room.RoomTemplate;
+import dev.compactmods.machines.api.room.RoomTemplate;
 import dev.compactmods.machines.api.machine.IColoredMachine;
 import dev.compactmods.machines.neoforge.machine.Machines;
 import net.minecraft.core.BlockPos;
