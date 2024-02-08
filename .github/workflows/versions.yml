@@ -7,8 +7,29 @@ on:
   workflow_dispatch:
 
 jobs:
-  vars:
-    name: Get Variables
+  core:
+    name: Get Core Variables
+    runs-on: ubuntu-22.04
+    outputs:
+      coreVersion: ${{steps.coreVersion.outputs.version}}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          repository: 'robotgryphon/compactmachines-core'
+          fetch-tags: true
+          fetch-depth: 0
+
+      - name: Version
+        id: version
+        uses: paulhatch/semantic-version@v5.0.2
+        with:
+          version_format: "${major}.${minor}.${patch}"
+          search_commit_body: true
+
+  main:
+    name: Get Main Variables
     runs-on: ubuntu-22.04
     outputs:
       version: ${{steps.version.outputs.version}}
@@ -18,7 +39,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          submodules: true
+          submodules: false
           fetch-tags: true
           fetch-depth: 0
 
@@ -30,19 +51,9 @@ jobs:
           version_format: "${major}.${minor}.${patch}.${increment}-nightly"
           search_commit_body: true
 
-      - name: Enter Core
-        run: cd core
-
-      - name: Core Version
-        id: coreVersion
-        uses: paulhatch/semantic-version@v5.0.2
-        with:
-          version_format: "${major}.${minor}.${patch}"
-          search_commit_body: true
-
   output:
     name: Output Info
     runs-on: ubuntu-20.04
-    needs: [ vars ]
+    needs: [ core, main ]
     steps:
-      - run: echo "version = ${{needs.vars.outputs.version}}; core version = ${{needs.vars.outputs.coreVersion}}"
+      - run: echo "version = ${{needs.main.outputs.version}}; core version = ${{needs.core.outputs.coreVersion}}"
