@@ -20,6 +20,7 @@ jobs:
         with:
           submodules: true
           fetch-tags: true
+          fetch-depth: 0
 
       - name: Version
         id: version
@@ -31,6 +32,9 @@ jobs:
 
       - name: Enter Core
         run: cd core
+
+      - name: Unshallow Core
+        run: git fetch --prune --unshallow
 
       - name: Core Version
         id: coreVersion
