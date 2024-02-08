@@ -1,7 +1,7 @@
 package dev.compactmods.machines.neoforge.room;
 
-import dev.compactmods.machines.api.core.Constants;
-import dev.compactmods.machines.api.core.Messages;
+import dev.compactmods.machines.api.Constants;
+import dev.compactmods.machines.api.Messages;
 import dev.compactmods.machines.api.dimension.CompactDimension;
 import dev.compactmods.machines.i18n.TranslationUtil;
 import net.minecraft.ChatFormatting;

@@ -6,7 +6,7 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import dev.compactmods.compactmachines.api.room.RoomApi;
 import dev.compactmods.machines.LoggingUtil;
-import dev.compactmods.machines.api.core.CMCommands;
+import dev.compactmods.machines.api.command.CMCommands;
 import dev.compactmods.machines.i18n.TranslationUtil;
 import dev.compactmods.machines.neoforge.config.ServerConfig;
 import dev.compactmods.machines.neoforge.machine.block.BoundCompactMachineBlockEntity;

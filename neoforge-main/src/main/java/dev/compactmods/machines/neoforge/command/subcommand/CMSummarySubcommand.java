@@ -3,7 +3,7 @@ package dev.compactmods.machines.neoforge.command.subcommand;
 import com.mojang.brigadier.builder.ArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import dev.compactmods.compactmachines.api.room.RoomApi;
-import dev.compactmods.machines.api.core.CMCommands;
+import dev.compactmods.machines.api.command.CMCommands;
 import dev.compactmods.machines.i18n.TranslationUtil;
 import dev.compactmods.machines.machine.graph.DimensionMachineGraph;
 import net.minecraft.ChatFormatting;

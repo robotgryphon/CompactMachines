@@ -5,9 +5,8 @@ import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import dev.compactmods.compactmachines.api.room.RoomApi;
-import dev.compactmods.compactmachines.api.room.exceptions.NonexistentRoomException;
 import dev.compactmods.machines.LoggingUtil;
-import dev.compactmods.machines.api.core.Messages;
+import dev.compactmods.machines.api.Messages;
 import dev.compactmods.machines.api.dimension.MissingDimensionException;
 import dev.compactmods.machines.i18n.TranslationUtil;
 import dev.compactmods.machines.neoforge.command.argument.Suggestors;
@@ -44,7 +43,7 @@ public class CMTeleportSubcommand {
         RoomApi.registrar().get(roomCode).ifPresentOrElse(room -> {
             try {
                 RoomHelper.teleportPlayerIntoRoom(server, player, room);
-            } catch (MissingDimensionException | NonexistentRoomException e) {
+            } catch (MissingDimensionException e) {
                 // TODO LOGS
             }
         }, () -> {

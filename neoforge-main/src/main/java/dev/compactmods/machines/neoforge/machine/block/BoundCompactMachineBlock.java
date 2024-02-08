@@ -1,7 +1,7 @@
 package dev.compactmods.machines.neoforge.machine.block;
 
 import dev.compactmods.machines.LoggingUtil;
-import dev.compactmods.machines.api.core.Messages;
+import dev.compactmods.machines.api.Messages;
 import dev.compactmods.machines.api.shrinking.PSDTags;
 import dev.compactmods.machines.i18n.TranslationUtil;
 import dev.compactmods.machines.machine.EnumMachinePlayersBreakHandling;

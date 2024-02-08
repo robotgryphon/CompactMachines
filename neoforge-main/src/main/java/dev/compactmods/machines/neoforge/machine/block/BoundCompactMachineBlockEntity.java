@@ -1,9 +1,7 @@
 package dev.compactmods.machines.neoforge.machine.block;
 
 import dev.compactmods.compactmachines.api.room.RoomApi;
-import dev.compactmods.machines.api.machine.IMachineBlockEntity;
-import dev.compactmods.machines.api.machine.MachineEntityNbt;
-import dev.compactmods.machines.api.machine.MachineNbt;
+import dev.compactmods.machines.api.machine.IColoredMachine;
 import dev.compactmods.machines.machine.graph.DimensionMachineGraph;
 import dev.compactmods.machines.neoforge.machine.Machines;
 import net.minecraft.core.BlockPos;
@@ -21,7 +19,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Optional;
 import java.util.UUID;
 
-public class BoundCompactMachineBlockEntity extends BlockEntity implements IMachineBlockEntity {
+public class BoundCompactMachineBlockEntity extends BlockEntity implements IColoredMachine {
 
     protected UUID owner;
     private String roomCode;
@@ -33,6 +31,11 @@ public class BoundCompactMachineBlockEntity extends BlockEntity implements IMach
     @Nullable
     private Component customName;
 
+    public static final String NBT_OWNER = "owner";
+    public static final String NBT_COLOR = "machine_color";
+    public static final String NBT_ROOM_CODE = "room_code";
+    public static final String NBT_ROOM_COLOR = "room_color";
+
     public BoundCompactMachineBlockEntity(BlockPos pos, BlockState state) {
         super(Machines.MACHINE_ENTITY.get(), pos, state);
     }
@@ -41,18 +44,18 @@ public class BoundCompactMachineBlockEntity extends BlockEntity implements IMach
     public void load(@NotNull CompoundTag nbt) {
         super.load(nbt);
 
-        if (nbt.contains(MachineEntityNbt.NBT_ROOM_CODE)) {
-            this.roomCode = nbt.getString(MachineEntityNbt.NBT_ROOM_CODE);
+        if (nbt.contains(NBT_ROOM_CODE)) {
+            this.roomCode = nbt.getString(NBT_ROOM_CODE);
         }
 
-        if (nbt.contains(MachineNbt.OWNER)) {
-            owner = nbt.getUUID(MachineNbt.OWNER);
+        if (nbt.contains(NBT_OWNER)) {
+            owner = nbt.getUUID(NBT_OWNER);
         } else {
             owner = null;
         }
 
-        if (nbt.contains(MachineEntityNbt.NBT_CUSTOM_COLOR)) {
-            machineColor = nbt.getInt(MachineNbt.NBT_COLOR);
+        if (nbt.contains(NBT_COLOR)) {
+            machineColor = nbt.getInt(NBT_COLOR);
             hasMachineColorOverride = true;
         }
 
@@ -63,15 +66,15 @@ public class BoundCompactMachineBlockEntity extends BlockEntity implements IMach
     @Override
     protected void saveAdditional(@NotNull CompoundTag nbt) {
         if (owner != null) {
-            nbt.putUUID(MachineNbt.OWNER, this.owner);
+            nbt.putUUID(NBT_OWNER, this.owner);
         }
 
         if (hasMachineColorOverride) {
-            nbt.putInt(MachineEntityNbt.NBT_CUSTOM_COLOR, machineColor);
+            nbt.putInt(NBT_COLOR, machineColor);
         }
 
         if (roomCode != null)
-            nbt.putString(MachineEntityNbt.NBT_ROOM_CODE, roomCode);
+            nbt.putString(NBT_ROOM_CODE, roomCode);
     }
 
     @Override
@@ -80,7 +83,7 @@ public class BoundCompactMachineBlockEntity extends BlockEntity implements IMach
 
         if (this.roomCode != null) {
             // data.putString(ROOM_POS_NBT, room);
-            data.putString(MachineEntityNbt.NBT_ROOM_CODE, roomCode);
+            data.putString(NBT_ROOM_CODE, roomCode);
         }
 
         if (level instanceof ServerLevel) {
@@ -90,9 +93,9 @@ public class BoundCompactMachineBlockEntity extends BlockEntity implements IMach
         }
 
         if (hasMachineColorOverride)
-            data.putInt(MachineEntityNbt.NBT_CUSTOM_COLOR, machineColor);
+            data.putInt(NBT_COLOR, machineColor);
         else
-            data.putInt(MachineEntityNbt.NBT_ROOM_COLOR, getColor());
+            data.putInt(NBT_ROOM_COLOR, getColor());
 
         return data;
     }
@@ -107,17 +110,17 @@ public class BoundCompactMachineBlockEntity extends BlockEntity implements IMach
 
         }
 
-        if (tag.contains(MachineEntityNbt.NBT_ROOM_CODE)) {
-            this.roomCode = tag.getString(MachineEntityNbt.NBT_ROOM_CODE);
+        if (tag.contains(NBT_ROOM_CODE)) {
+            this.roomCode = tag.getString(NBT_ROOM_CODE);
         }
 
-        if (tag.contains(MachineEntityNbt.NBT_CUSTOM_COLOR)) {
+        if (tag.contains(NBT_COLOR)) {
             hasMachineColorOverride = true;
-            machineColor = tag.getInt(MachineNbt.NBT_COLOR);
+            machineColor = tag.getInt(NBT_COLOR);
         }
 
-        if (tag.contains(MachineEntityNbt.NBT_ROOM_COLOR)) {
-            roomColor = tag.getInt(MachineEntityNbt.NBT_ROOM_COLOR);
+        if (tag.contains(NBT_ROOM_COLOR)) {
+            roomColor = tag.getInt(NBT_ROOM_COLOR);
         }
 
         if (tag.contains("owner"))

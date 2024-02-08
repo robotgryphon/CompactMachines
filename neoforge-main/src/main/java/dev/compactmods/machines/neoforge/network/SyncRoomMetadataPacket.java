@@ -1,6 +1,6 @@
 package dev.compactmods.machines.neoforge.network;
 
-import dev.compactmods.machines.api.core.Constants;
+import dev.compactmods.machines.api.Constants;
 import dev.compactmods.machines.neoforge.room.client.ClientRoomPacketHandler;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;

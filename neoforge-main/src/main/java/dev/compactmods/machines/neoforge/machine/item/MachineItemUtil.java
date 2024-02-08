@@ -1,7 +1,6 @@
 package dev.compactmods.machines.neoforge.machine.item;
 
 import dev.compactmods.compactmachines.api.room.RoomTemplate;
-import dev.compactmods.machines.api.machine.MachineNbt;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.nbt.Tag;
 import net.minecraft.resources.ResourceLocation;
@@ -11,7 +10,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Optional;
 
 public class MachineItemUtil {
-    public static final String NBT_TEMPLATE_ID = MachineNbt.NBT_TEMPLATE_ID;
+    public static final String NBT_TEMPLATE_ID = "template_id";
     public static final String NBT_CUSTOM_NAME = "custom_name";
 
     public static ItemStack setTemplate(ItemStack stack, ResourceLocation templateId) {

@@ -1,8 +1,7 @@
 package dev.compactmods.machines.neoforge.machine.item;
 
-import dev.compactmods.machines.api.core.Constants;
-import dev.compactmods.machines.api.core.Tooltips;
-import dev.compactmods.machines.api.machine.MachineNbt;
+import dev.compactmods.machines.api.Constants;
+import dev.compactmods.machines.api.Tooltips;
 import dev.compactmods.machines.i18n.TranslationUtil;
 import dev.compactmods.machines.machine.item.ICompactMachineItem;
 import dev.compactmods.machines.neoforge.machine.Machines;
@@ -23,8 +22,8 @@ import java.util.List;
 import java.util.Optional;
 
 public class BoundCompactMachineItem extends BlockItem implements ICompactMachineItem {
-    public static final String ROOM_NBT = "room_pos";
-    public static final String ROOM_DIMENSIONS_NBT = "room_dimensions";
+    public static final String NBT_ROOM_POSITION = "room_pos";
+    public static final String NBT_ROOM_DIMENSIONS = "room_dimensions";
 
     private static final String FALLBACK_ID = Util.makeDescriptionId("block", new ResourceLocation(Constants.MOD_ID, "bound_machine_fallback"));
 
@@ -48,34 +47,20 @@ public class BoundCompactMachineItem extends BlockItem implements ICompactMachin
         return FALLBACK_ID;
     }
 
-    @Deprecated(forRemoval = true, since = "5.2.0")
-    public static Optional<Integer> getMachineId(ItemStack stack) {
-        if (!stack.hasTag())
-            return Optional.empty();
-
-        CompoundTag machineData = stack.getOrCreateTag();
-        if (machineData.contains(MachineNbt.ID)) {
-            int c = machineData.getInt(MachineNbt.ID);
-            return c > -1 ? Optional.of(c) : Optional.empty();
-        }
-
-        return Optional.empty();
-    }
-
     public static Optional<String> getRoom(ItemStack stack) {
         if (!stack.hasTag())
             return Optional.empty();
 
         var tag = stack.getTag();
-        if (tag == null || !tag.contains(ROOM_NBT))
+        if (tag == null || !tag.contains(NBT_ROOM_POSITION))
             return Optional.empty();
 
-        return Optional.of(tag.getString(ROOM_NBT));
+        return Optional.of(tag.getString(NBT_ROOM_POSITION));
     }
 
     public static void setRoom(ItemStack stack, String room) {
         var tag = stack.getOrCreateTag();
-        tag.putString(ROOM_NBT, room);
+        tag.putString(NBT_ROOM_POSITION, room);
     }
 
     public static ItemStack createForRoom(String roomCode) {
@@ -95,14 +80,14 @@ public class BoundCompactMachineItem extends BlockItem implements ICompactMachin
     public static Vec3i getRoomSize(ItemStack stack) {
         if (!stack.hasTag()) return Vec3i.ZERO;
         final var tag = stack.getTag();
-        if (tag == null || tag.isEmpty() || !tag.contains(ROOM_DIMENSIONS_NBT)) return Vec3i.ZERO;
-        final var dimNbt = tag.getIntArray(ROOM_DIMENSIONS_NBT);
+        if (tag == null || tag.isEmpty() || !tag.contains(NBT_ROOM_DIMENSIONS)) return Vec3i.ZERO;
+        final var dimNbt = tag.getIntArray(NBT_ROOM_DIMENSIONS);
         return new Vec3i(dimNbt[0], dimNbt[1], dimNbt[2]);
     }
 
     public static ItemStack setRoomSize(ItemStack stack, Vec3i innerBounds) {
         var tag = stack.getOrCreateTag();
-        tag.putIntArray(ROOM_DIMENSIONS_NBT, new int[]{
+        tag.putIntArray(NBT_ROOM_DIMENSIONS, new int[]{
                 innerBounds.getX(),
                 innerBounds.getY(),
                 innerBounds.getZ()
@@ -113,14 +98,10 @@ public class BoundCompactMachineItem extends BlockItem implements ICompactMachin
 
     @Override
     public void appendHoverText(ItemStack stack, @Nullable Level worldIn, List<Component> tooltip, TooltipFlag flagIn) {
-        // Try room binding; if failed, try old machine ID binding
-        getRoom(stack).ifPresentOrElse(room -> {
+        // Try room binding
+        getRoom(stack).ifPresent(room -> {
             // TODO - Server-synced room name list
             tooltip.add(TranslationUtil.tooltip(Tooltips.ROOM_NAME, room));
-        }, () -> {
-            getMachineId(stack).ifPresent(id -> {
-                tooltip.add(TranslationUtil.tooltip(Tooltips.Machines.ID, id));
-            });
         });
     }
 }

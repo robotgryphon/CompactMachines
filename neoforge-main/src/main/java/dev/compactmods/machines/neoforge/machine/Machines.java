@@ -1,6 +1,6 @@
 package dev.compactmods.machines.neoforge.machine;
 
-import dev.compactmods.machines.api.machine.MachineIds;
+import dev.compactmods.machines.api.machine.MachineConstants;
 import dev.compactmods.machines.neoforge.Registries;
 import dev.compactmods.machines.neoforge.machine.block.BoundCompactMachineBlock;
 import dev.compactmods.machines.neoforge.machine.block.UnboundCompactMachineBlock;
@@ -39,11 +39,11 @@ public interface Machines {
     DeferredItem<UnboundCompactMachineItem> UNBOUND_MACHINE_BLOCK_ITEM = Registries.ITEMS.register("new_machine",
             () -> new UnboundCompactMachineItem(MACHINE_ITEM_PROPS.get()));
 
-    DeferredHolder<BlockEntityType<?>, BlockEntityType<UnboundCompactMachineEntity>> UNBOUND_MACHINE_ENTITY = Registries.BLOCK_ENTITIES.register(MachineIds.UNBOUND_MACHINE_ENTITY.getPath(), () ->
+    DeferredHolder<BlockEntityType<?>, BlockEntityType<UnboundCompactMachineEntity>> UNBOUND_MACHINE_ENTITY = Registries.BLOCK_ENTITIES.register(MachineConstants.UNBOUND_MACHINE_ENTITY.getPath(), () ->
             BlockEntityType.Builder.of(UnboundCompactMachineEntity::new, UNBOUND_MACHINE_BLOCK.get())
                     .build(null));
 
-    DeferredHolder<BlockEntityType<?>,BlockEntityType<BoundCompactMachineBlockEntity>> MACHINE_ENTITY = Registries.BLOCK_ENTITIES.register(MachineIds.BOUND_MACHINE_ENTITY.getPath(), () ->
+    DeferredHolder<BlockEntityType<?>,BlockEntityType<BoundCompactMachineBlockEntity>> MACHINE_ENTITY = Registries.BLOCK_ENTITIES.register(MachineConstants.BOUND_MACHINE_ENTITY.getPath(), () ->
             BlockEntityType.Builder.of(BoundCompactMachineBlockEntity::new, MACHINE_BLOCK.get())
                     .build(null));
 

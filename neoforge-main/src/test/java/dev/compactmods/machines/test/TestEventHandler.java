@@ -1,8 +1,7 @@
 package dev.compactmods.machines.test;
 
 import com.google.common.collect.ImmutableSet;
-import dev.compactmods.machines.LoggingUtil;
-import dev.compactmods.machines.api.core.Constants;
+import dev.compactmods.machines.api.Constants;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.packs.PackType;
 import net.minecraft.server.packs.repository.FolderRepositorySource;
@@ -14,7 +13,6 @@ import net.neoforged.neoforge.event.server.ServerStartedEvent;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.io.File;
 import java.nio.file.Path;
 import java.util.concurrent.ExecutionException;
 

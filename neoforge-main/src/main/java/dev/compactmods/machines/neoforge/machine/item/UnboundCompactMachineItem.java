@@ -1,8 +1,7 @@
 package dev.compactmods.machines.neoforge.machine.item;
 
 import dev.compactmods.compactmachines.api.room.RoomTemplate;
-import dev.compactmods.machines.api.core.Tooltips;
-import dev.compactmods.machines.api.machine.MachineEntityNbt;
+import dev.compactmods.machines.api.Tooltips;
 import dev.compactmods.machines.i18n.TranslationUtil;
 import dev.compactmods.machines.machine.item.ICompactMachineItem;
 import dev.compactmods.machines.neoforge.machine.Machines;
@@ -26,6 +25,8 @@ import java.util.List;
  * but has an assigned template to use.
  */
 public class UnboundCompactMachineItem extends BlockItem implements ICompactMachineItem {
+
+    public static final String NBT_TEMPLATE_ID = "template_id";
 
     public UnboundCompactMachineItem(Properties builder) {
         super(Machines.UNBOUND_MACHINE_BLOCK.get(), builder);
@@ -76,7 +77,7 @@ public class UnboundCompactMachineItem extends BlockItem implements ICompactMach
         ICompactMachineItem.setColor(stack, template.color());
 
         final var tag = stack.getOrCreateTag();
-        tag.putString(MachineEntityNbt.NBT_TEMPLATE_ID, templateId.toString());
+        tag.putString(NBT_TEMPLATE_ID, templateId.toString());
         return stack;
     }
 }

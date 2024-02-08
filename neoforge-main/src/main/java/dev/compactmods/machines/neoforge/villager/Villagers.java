@@ -1,7 +1,7 @@
 package dev.compactmods.machines.neoforge.villager;
 
 import com.google.common.collect.ImmutableSet;
-import dev.compactmods.machines.api.core.Constants;
+import dev.compactmods.machines.api.Constants;
 import dev.compactmods.machines.neoforge.Registries;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceKey;

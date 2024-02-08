@@ -5,7 +5,7 @@ import dev.compactmods.compactmachines.api.room.RoomApi;
 import dev.compactmods.compactmachines.api.room.owner.IRoomOwners;
 import dev.compactmods.compactmachines.api.room.spawn.IRoomSpawnManagers;
 import dev.compactmods.machines.LoggingUtil;
-import dev.compactmods.machines.api.core.Constants;
+import dev.compactmods.machines.api.Constants;
 import dev.compactmods.machines.api.dimension.CompactDimension;
 import dev.compactmods.machines.api.dimension.MissingDimensionException;
 import dev.compactmods.machines.room.RoomApiInstance;

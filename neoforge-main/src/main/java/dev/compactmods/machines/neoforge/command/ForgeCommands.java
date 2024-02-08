@@ -1,6 +1,6 @@
 package dev.compactmods.machines.neoforge.command;
 
-import dev.compactmods.machines.api.core.Constants;
+import dev.compactmods.machines.api.Constants;
 import dev.compactmods.machines.command.Commands;
 import dev.compactmods.machines.neoforge.command.subcommand.CMEjectSubcommand;
 import dev.compactmods.machines.neoforge.command.subcommand.CMGiveMachineSubcommand;

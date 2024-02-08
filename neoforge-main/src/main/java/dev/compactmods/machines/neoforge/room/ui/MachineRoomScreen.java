@@ -1,7 +1,7 @@
 package dev.compactmods.machines.neoforge.room.ui;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-import dev.compactmods.machines.api.core.Constants;
+import dev.compactmods.machines.api.Constants;
 import dev.compactmods.machines.neoforge.shrinking.Shrinking;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;

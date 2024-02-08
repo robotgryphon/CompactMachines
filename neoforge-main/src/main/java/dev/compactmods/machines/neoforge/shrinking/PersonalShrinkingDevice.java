@@ -1,8 +1,8 @@
 package dev.compactmods.machines.neoforge.shrinking;
 
 import dev.compactmods.compactmachines.api.room.RoomApi;
-import dev.compactmods.machines.api.core.Messages;
-import dev.compactmods.machines.api.core.Tooltips;
+import dev.compactmods.machines.api.Messages;
+import dev.compactmods.machines.api.Tooltips;
 import dev.compactmods.machines.api.dimension.CompactDimension;
 import dev.compactmods.machines.i18n.TranslationUtil;
 import dev.compactmods.machines.neoforge.room.RoomHelper;

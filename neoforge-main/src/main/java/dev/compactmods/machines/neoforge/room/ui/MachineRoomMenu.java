@@ -1,7 +1,7 @@
 package dev.compactmods.machines.neoforge.room.ui;
 
 import dev.compactmods.machines.LoggingUtil;
-import dev.compactmods.machines.api.core.Constants;
+import dev.compactmods.machines.api.Constants;
 import dev.compactmods.machines.api.dimension.MissingDimensionException;
 import dev.compactmods.machines.neoforge.room.RoomBlocks;
 import dev.compactmods.machines.neoforge.room.Rooms;

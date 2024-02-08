@@ -1,7 +1,7 @@
 package dev.compactmods.machines.neoforge;
 
 import dev.compactmods.machines.LoggingUtil;
-import dev.compactmods.machines.api.core.Constants;
+import dev.compactmods.machines.api.Constants;
 import dev.compactmods.machines.neoforge.network.RoomNetworkHandler;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.Mod;

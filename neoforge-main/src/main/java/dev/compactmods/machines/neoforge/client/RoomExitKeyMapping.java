@@ -1,7 +1,7 @@
 package dev.compactmods.machines.neoforge.client;
 
 import com.mojang.blaze3d.platform.InputConstants;
-import dev.compactmods.machines.api.core.Constants;
+import dev.compactmods.machines.api.Constants;
 import dev.compactmods.machines.api.dimension.CompactDimension;
 import dev.compactmods.machines.neoforge.network.PlayerRequestedLeavePacket;
 import net.minecraft.Util;

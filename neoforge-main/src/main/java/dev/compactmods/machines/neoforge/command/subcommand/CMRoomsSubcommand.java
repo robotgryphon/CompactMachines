@@ -4,10 +4,10 @@ import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import dev.compactmods.compactmachines.api.room.RoomApi;
-import dev.compactmods.machines.api.core.CMCommands;
-import dev.compactmods.machines.api.core.Messages;
+import dev.compactmods.machines.api.command.CMCommands;
+import dev.compactmods.machines.api.Messages;
 import dev.compactmods.machines.api.dimension.CompactDimension;
-import dev.compactmods.machines.api.machine.MachineTags;
+import dev.compactmods.machines.api.machine.MachineConstants;
 import dev.compactmods.machines.i18n.TranslationUtil;
 import dev.compactmods.machines.neoforge.machine.block.BoundCompactMachineBlockEntity;
 import net.minecraft.commands.CommandSourceStack;
@@ -43,7 +43,7 @@ public class CMRoomsSubcommand {
         final var block = BlockPosArgument.getLoadedBlockPos(ctx, "pos");
         final var level = ctx.getSource().getLevel();
 
-        if (!level.getBlockState(block).is(MachineTags.BLOCK)) {
+        if (!level.getBlockState(block).is(MachineConstants.MACHINE_BLOCK)) {
             ctx.getSource().sendFailure(TranslationUtil.command(CMCommands.NOT_A_MACHINE_BLOCK));
             return -1;
         }

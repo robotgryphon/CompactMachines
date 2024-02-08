@@ -3,10 +3,12 @@ package dev.compactmods.machines.neoforge.room;
 import dev.compactmods.compactmachines.api.room.RoomApi;
 import dev.compactmods.compactmachines.api.room.RoomInstance;
 import dev.compactmods.compactmachines.api.room.exceptions.NonexistentRoomException;
+import dev.compactmods.compactmachines.api.room.history.IPlayerRoomEntryPointManager;
+import dev.compactmods.compactmachines.api.room.history.RoomEntryPoint;
 import dev.compactmods.machines.LoggingUtil;
 import dev.compactmods.machines.api.dimension.CompactDimension;
 import dev.compactmods.machines.api.dimension.MissingDimensionException;
-import dev.compactmods.machines.location.PreciseDimensionalPosition;
+import dev.compactmods.machines.api.location.GlobalPosWithRotation;
 import dev.compactmods.machines.neoforge.dimension.SimpleTeleporter;
 import dev.compactmods.machines.neoforge.util.ForgePlayerUtil;
 import net.minecraft.core.GlobalPos;
@@ -17,6 +19,7 @@ import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.Nonnull;
+import java.util.Optional;
 
 public abstract class RoomHelper {
 
@@ -37,16 +40,8 @@ public abstract class RoomHelper {
             }
 
             try {
-                final var entry = PreciseDimensionalPosition.fromPlayer(player);
-
                 teleportPlayerIntoRoom(serv, player, roomInfo);
-
-                // Mark the player as inside the machine, set external spawn, and yeet
-                // FIXME - Player history
-//                player.getCapability(RoomCapabilities.ROOM_HISTORY).ifPresent(hist -> {
-//                    hist.addHistory(new PlayerRoomHistoryItem(entry, machinePos));
-//                });
-            } catch (MissingDimensionException | NonexistentRoomException e) {
+            } catch (MissingDimensionException e) {
                 LOGS.fatal("Critical error; could not enter a freshly-created room instance.", e);
             }
         });
@@ -65,31 +60,27 @@ public abstract class RoomHelper {
 //        CompactMachinesNet.CHANNEL.send(PacketDistributor.PLAYER.with(() -> player), sync);
     }
 
-    public static void teleportPlayerIntoRoom(MinecraftServer serv, ServerPlayer player, RoomInstance room) throws MissingDimensionException, NonexistentRoomException {
-        teleportPlayerIntoRoom(serv, player, room, null);
-    }
-
-    public static void teleportPlayerIntoRoom(MinecraftServer serv, ServerPlayer player, RoomInstance room, @Nullable GlobalPos from)
+    public static void teleportPlayerIntoRoom(MinecraftServer serv, ServerPlayer player, RoomInstance room)
             throws MissingDimensionException {
         final var compactDim = CompactDimension.forServer(serv);
+
+        addEntryForPlayer(player);
+
         serv.submitAsync(() -> {
-            // FIXME SPAWN MANAGEMENT
             final var spawns = room.spawns().get().spawns();
             final var spawn = spawns.forPlayer(player.getUUID()).orElse(spawns.defaultSpawn());
             player.changeDimension(compactDim, SimpleTeleporter.to(spawn.position(), spawn.rotation()));
         });
 
-        if (from != null) {
-            // Mark the player as inside the machine, set external spawn
-            // FIXME - Player history
-//            player.getCapability(RoomCapabilities.ROOM_HISTORY).ifPresent(hist -> {
-//                var entry = PreciseDimensionalPosition.fromPlayer(player);
-//                hist.addHistory(new PlayerRoomHistoryItem(entry, from));
-//            });
-        }
-
         // Mark current room, invalidates any listeners + debug screen
         RoomHelper.setCurrentRoom(serv, player, room);
+    }
+
+    private static void addEntryForPlayer(ServerPlayer player) {
+        // Mark the player as inside the machine, set external spawn
+        player.setData(Rooms.LAST_ROOM_ENTRYPOINT, RoomEntryPoint.fromPlayer(player));
+        // TODO: Full history tracking here
+        // RoomApi.playerTracking(player).push();
     }
 
     public static void teleportPlayerOutOfRoom(@Nonnull ServerPlayer serverPlayer) {
@@ -98,41 +89,22 @@ public abstract class RoomHelper {
         if (!serverPlayer.level().dimension().equals(CompactDimension.LEVEL_KEY))
             return;
 
-        // FIXME - GET ME OUT OF HERE
-        ForgePlayerUtil.teleportPlayerToRespawnOrOverworld(serv, serverPlayer);
+        // Nice to have: serverPlayer.getDataOrElse(Rooms.LAST_ROOM_ENTRYPOINT, lastEntry -> {}, () -> {})
+        if(!serverPlayer.hasData(Rooms.LAST_ROOM_ENTRYPOINT)) {
+            // PlayerUtil.howDidYouGetThere(serverPlayer);
+            ForgePlayerUtil.teleportPlayerToRespawnOrOverworld(serv, serverPlayer);
+        } else {
+            final var lastEntry = serverPlayer.getData(Rooms.LAST_ROOM_ENTRYPOINT);
 
-//        serverPlayer.getCapability(RoomCapabilities.ROOM_HISTORY)
-//                .resolve()
-//                .ifPresentOrElse(hist -> {
-//                    if (hist.hasHistory()) {
-//                        final var roomProvider = CompactRoomProvider.instance(serv);
-//                        final IRoomHistoryItem prevArea = hist.pop();
-//                        // Mark current room, invalidates any listeners + debug screen
-//                        serverPlayer.getCapability(CURRENT_ROOM_META).ifPresent(provider -> {
-//                            // Check entry dimension - if it isn't a machine room, clear room info
-//                            if (!prevArea.getEntryLocation().dimension().equals(CompactDimension.LEVEL_KEY))
-//                                provider.clearCurrent();
-//                            else {
-//                                roomProvider.findByChunk(prevArea.getEntryLocation().chunkPos()).ifPresent(roomMeta -> {
-//                                    provider.setCurrent(new PlayerRoomMetadataProvider.CurrentRoomData(roomMeta.code(), roomMeta.owner(roomProvider)));
-//                                });
-//                            }
-//                        });
-//
-//                        var spawnPoint = prevArea.getEntryLocation();
-//                        final var enteredMachine = prevArea.getMachine().pos();
-//
-//                        final var level = spawnPoint.level(serv);
-//                        serverPlayer.changeDimension(level, SimpleTeleporter.lookingAt(spawnPoint.position(), enteredMachine));
-//                    } else {
-//                        PlayerUtil.howDidYouGetThere(serverPlayer);
-//
-//                        hist.clear();
-//                        ForgePlayerUtil.teleportPlayerToRespawnOrOverworld(serv, serverPlayer);
-//                    }
-//                }, () -> {
-//                    PlayerUtil.howDidYouGetThere(serverPlayer);
-//                    ForgePlayerUtil.teleportPlayerToRespawnOrOverworld(serv, serverPlayer);
-//                });
+            final var location = lastEntry.entryLocation();
+            assert serv != null;
+            final var level = serv.getLevel(location.dimension());
+            assert level != null;
+            serverPlayer.changeDimension(level, SimpleTeleporter.to(location.position(), location.rotation()));
+
+            // TODO: FULL HISTORY TRACKING
+            serverPlayer.removeData(Rooms.LAST_ROOM_ENTRYPOINT);
+        }
+
     }
 }

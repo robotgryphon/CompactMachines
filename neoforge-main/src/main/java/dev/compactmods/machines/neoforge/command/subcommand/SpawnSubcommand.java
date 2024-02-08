@@ -4,7 +4,7 @@ import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.ArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import dev.compactmods.compactmachines.api.room.RoomApi;
-import dev.compactmods.machines.api.core.CMCommands;
+import dev.compactmods.machines.api.command.CMCommands;
 import dev.compactmods.machines.i18n.TranslationUtil;
 import dev.compactmods.machines.neoforge.config.ServerConfig;
 import net.minecraft.commands.CommandSourceStack;

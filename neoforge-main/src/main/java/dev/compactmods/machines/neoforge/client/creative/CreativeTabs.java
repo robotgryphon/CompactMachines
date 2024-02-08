@@ -1,7 +1,7 @@
 package dev.compactmods.machines.neoforge.client.creative;
 
 import dev.compactmods.compactmachines.api.room.RoomTemplate;
-import dev.compactmods.machines.api.core.Constants;
+import dev.compactmods.machines.api.Constants;
 import dev.compactmods.machines.machine.item.ICompactMachineItem;
 import dev.compactmods.machines.neoforge.CompactMachines;
 import dev.compactmods.machines.neoforge.machine.item.UnboundCompactMachineItem;

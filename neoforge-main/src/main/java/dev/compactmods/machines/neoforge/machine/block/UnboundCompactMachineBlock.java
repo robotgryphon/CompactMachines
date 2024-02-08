@@ -77,7 +77,7 @@ public class UnboundCompactMachineBlock extends CompactMachineBlock implements E
                             ent.setConnectedRoom(newRoom.code());
 
                             try {
-                                RoomHelper.teleportPlayerIntoRoom(server, sp, newRoom, ent.getLevelPosition());
+                                RoomHelper.teleportPlayerIntoRoom(server, sp, newRoom);
                             } catch (MissingDimensionException e) {
                                 throw new RuntimeException(e);
                             }
