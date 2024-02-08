@@ -33,9 +33,6 @@ jobs:
       - name: Enter Core
         run: cd core
 
-      - name: Unshallow Core
-        run: git fetch --prune --unshallow
-
       - name: Core Version
         id: coreVersion
         uses: paulhatch/semantic-version@v5.0.2
