@@ -26,7 +26,7 @@ public interface CreativeTabs {
                 ICompactMachineItem.setColor(ub, DyeColor.WHITE.getTextColor());
                 return ub;
             })
-            .title(Component.translatable("itemGroup.compactmachines.main"))
+            .title(Component.translatableWithFallback("itemGroup.compactmachines.main", "Compact Machines"))
             .displayItems(CreativeTabs::fillItems)
             .build());
 
@@ -36,7 +36,7 @@ public interface CreativeTabs {
                 ICompactMachineItem.setColor(ub, CompactMachines.BRAND_MACHINE_COLOR);
                 return ub;
             })
-            .title(Component.translatable("itemGroup.compactmachines.linked_machines"))
+            .title(Component.translatableWithFallback("itemGroup.compactmachines.linked_machines", "Linked Machines"))
             .withTabsBefore(MAIN_RL)
             .withSearchBar()
             .build());
