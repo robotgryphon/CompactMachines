@@ -12,7 +12,6 @@ if (envVersion.startsWith("v"))
 val modId: String = property("mod_id") as String
 val isRelease: Boolean = (System.getenv("RELEASE") ?: "false").equals("true", true)
 
-val neoforgeVersion: String = property("neoforge_version") as String
 val featherVersion: String = property("feather_version") as String
 
 val core = project(":core:core")
@@ -144,12 +143,13 @@ repositories {
 }
 
 dependencies {
-    implementation("net.neoforged:neoforge:${neoforgeVersion}")
+    implementation(libraries.neoforge.get())
 
     implementation("com.aventrix.jnanoid", "jnanoid", "2.0.0")
-    jarJar("com.aventrix.jnanoid", "jnanoid", "[2.0.0]") {
-        isTransitive = false
-    }
+    jarJar(libraries.jnanoid.get())
+//    jarJar("com.aventrix.jnanoid", "jnanoid", "[2.0.0]") {
+//        isTransitive = false
+//    }
 
     compileOnly(core)
     compileOnly(coreApi)
@@ -195,7 +195,7 @@ tasks.withType<Jar> {
                 "Implementation-Vendor" to "CompactMods",
                 "Implementation-Timestamp" to now,
                 "Minecraft-Version" to libraries.versions.minecraft.get(),
-                "NeoForge-Version" to neoforgeVersion,
+                "NeoForge-Version" to libraries.versions.neoforge.get(),
                 "Main-Commit" to mainGit.head().id,
                 "Core-Commit" to coreGit.head().id
         ))

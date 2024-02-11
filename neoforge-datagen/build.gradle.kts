@@ -7,8 +7,6 @@ plugins {
 }
 
 val mod_id: String by extra
-val neoforgeVersion: String = property("neoforge_version") as String
-
 val mainProject: Project = project(":neoforge-main")
 evaluationDependsOn(mainProject.path)
 
@@ -63,13 +61,7 @@ repositories {
 }
 
 dependencies {
-    implementation("net.neoforged:neoforge:${neoforgeVersion}")
-
-//    implementation("dev.compactmods.compactmachines:core-api:$coreVersion")
-//    implementation("dev.compactmods.compactmachines:room-api:$coreVersion")
-//    implementation("dev.compactmods.compactmachines:room-upgrade-api:$coreVersion")
-//    implementation("dev.compactmods.compactmachines:core:$coreVersion")
-
+    implementation(libraries.neoforge.get())
     implementation(mainProject)
 }
 

@@ -3,10 +3,16 @@ dependencyResolutionManagement {
         library("feather", "dev.compactmods", "feather")
                 .versionRef("feather")
 
-        library("jnanoid", "com.aventrix.jnanoid:jnanoid:2.0.0")
+        library("jnanoid", "com.aventrix.jnanoid", "jnanoid")
+                .versionRef("jnanoid")
+
+        library("neoforge", "net.neoforged", "neoforge")
+                .versionRef("neoforge")
 
         version("minecraft", "1.20.4")
-        version("feather", "[0.1.6,2.0)")
+        version("feather", "[0.1.6, 2.0)")
+        version("jnanoid", "[2.0.0, 3)")
+        version("neoforge", "20.4.153-beta")
     }
 }
 
@@ -40,7 +46,7 @@ pluginManagement {
 }
 
 plugins {
-    id("org.gradle.toolchains.foojay-resolver-convention") version("0.5.0")
+    id("org.gradle.toolchains.foojay-resolver-convention") version ("0.5.0")
 }
 
 include(":core:core")
