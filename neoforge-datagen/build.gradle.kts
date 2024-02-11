@@ -3,13 +3,11 @@ plugins {
     id("eclipse")
     id("idea")
     id("maven-publish")
-    id("net.neoforged.gradle.userdev") version ("7.0.77")
+    id("net.neoforged.gradle.userdev") version ("7.0.93")
 }
 
 val mod_id: String by extra
-
-val neoforge_version: String by extra
-val coreVersion: String = property("core_version") as String
+val neoforgeVersion: String = property("neoforge_version") as String
 
 val mainProject: Project = project(":neoforge-main")
 evaluationDependsOn(mainProject.path)
@@ -65,16 +63,14 @@ repositories {
 }
 
 dependencies {
-    implementation("net.neoforged:neoforge:${neoforge_version}")
+    implementation("net.neoforged:neoforge:${neoforgeVersion}")
 
-    implementation("dev.compactmods.compactmachines:core-api:$coreVersion")
-    implementation("dev.compactmods.compactmachines:room-api:$coreVersion")
-    implementation("dev.compactmods.compactmachines:room-upgrade-api:$coreVersion")
-    implementation("dev.compactmods.compactmachines:core:$coreVersion")
+//    implementation("dev.compactmods.compactmachines:core-api:$coreVersion")
+//    implementation("dev.compactmods.compactmachines:room-api:$coreVersion")
+//    implementation("dev.compactmods.compactmachines:room-upgrade-api:$coreVersion")
+//    implementation("dev.compactmods.compactmachines:core:$coreVersion")
 
-    implementation(project(":neoforge-main")) {
-        isTransitive = false
-    }
+    implementation(mainProject)
 }
 
 tasks.compileJava {

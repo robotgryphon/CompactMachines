@@ -54,6 +54,5 @@ project(":core:room-api").projectDir = file("./core/room-api")
 project(":core:room-upgrade-api").projectDir = file("./core/room-upgrade-api")
 
 include("neoforge-main")
-// include("neoforge-datagen")
-// includeBuild("core")
+include("neoforge-datagen")
 

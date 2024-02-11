@@ -27,7 +27,7 @@ plugins {
     id("eclipse")
     id("maven-publish")
     id("java-library")
-    id("net.neoforged.gradle.userdev") version ("7.0.77")
+    id("net.neoforged.gradle.userdev") version ("7.0.93")
     id("org.ajoberstar.grgit") version("5.2.1")
 }
 
