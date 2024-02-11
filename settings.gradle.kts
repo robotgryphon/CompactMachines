@@ -1,9 +1,12 @@
 dependencyResolutionManagement {
     versionCatalogs.create("libraries") {
-        library("feather", "dev.compactmods:feather:0.1.6")
+        library("feather", "dev.compactmods", "feather")
+                .versionRef("feather")
+
         library("jnanoid", "com.aventrix.jnanoid:jnanoid:2.0.0")
 
         version("minecraft", "1.20.4")
+        version("feather", "[0.1.6,2.0)")
     }
 }
 

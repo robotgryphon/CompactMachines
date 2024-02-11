@@ -1,16 +1,13 @@
 @file:Suppress("SpellCheckingInspection")
 
 import net.neoforged.gradle.dsl.common.runs.run.Run
+import org.ajoberstar.grgit.Grgit
 import java.text.SimpleDateFormat
 import java.util.*
 
 var envVersion: String = System.getenv("VERSION") ?: "9.9.9"
 if (envVersion.startsWith("v"))
     envVersion = envVersion.trimStart('v')
-
-var coreVersion: String = System.getenv("CORE_VERSION") ?: "9.9.9"
-if (coreVersion.startsWith("v"))
-    coreVersion = coreVersion.trimStart('v')
 
 val modId: String = property("mod_id") as String
 val isRelease: Boolean = (System.getenv("RELEASE") ?: "false").equals("true", true)
@@ -31,6 +28,7 @@ plugins {
     id("maven-publish")
     id("java-library")
     id("net.neoforged.gradle.userdev") version ("7.0.77")
+    id("org.ajoberstar.grgit") version("5.2.1")
 }
 
 coreProjects.forEach {
@@ -149,7 +147,9 @@ dependencies {
     implementation("net.neoforged:neoforge:${neoforgeVersion}")
 
     implementation("com.aventrix.jnanoid", "jnanoid", "2.0.0")
-    jarJar("com.aventrix.jnanoid", "jnanoid", "[2.0.0]")
+    jarJar("com.aventrix.jnanoid", "jnanoid", "[2.0.0]") {
+        isTransitive = false
+    }
 
     compileOnly(core)
     compileOnly(coreApi)
@@ -160,6 +160,10 @@ dependencies {
     testCompileOnly(coreApi)
     testCompileOnly(roomApi)
     testCompileOnly(roomUpgradeApi)
+
+    jarJar("dev.compactmods", "feather", libraries.feather.get().version) {
+        isTransitive = false
+    }
 }
 
 tasks.withType<ProcessResources> {
@@ -171,26 +175,47 @@ tasks.withType<JavaCompile> {
 }
 
 tasks.withType<Jar> {
+
+    val coreGit = Grgit.open {
+        currentDir = project.rootDir.resolve("core")
+    }
+
+    val mainGit = Grgit.open {
+        currentDir = project.rootDir
+    }
+
     manifest {
         val now = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ").format(Date())
         attributes(mapOf(
                 "Specification-Title" to "Compact Machines",
-                "Specification-Vendor" to "",
-                "Specification-Version" to "1", // We are version 1 of ourselves
+                "Specification-Vendor" to "CompactMods",
+                "Specification-Version" to "2",
                 "Implementation-Title" to "Compact Machines",
                 "Implementation-Version" to archiveVersion,
-                "Implementation-Vendor" to "",
-                "Implementation-Timestamp" to now
+                "Implementation-Vendor" to "CompactMods",
+                "Implementation-Timestamp" to now,
+                "Minecraft-Version" to libraries.versions.minecraft.get(),
+                "NeoForge-Version" to neoforgeVersion,
+                "Main-Commit" to mainGit.head().id,
+                "Core-Commit" to coreGit.head().id
         ))
     }
 }
 
 tasks.jar {
     archiveClassifier.set("slim")
+    from(sourceSets.main.get().output)
+    coreProjects.forEach {
+        from (it.sourceSets.main.get().output)
+    }
 }
 
 tasks.jarJar {
     archiveClassifier.set("")
+    from(sourceSets.main.get().output)
+    coreProjects.forEach {
+        from (it.sourceSets.main.get().output)
+    }
 }
 
 fun showModClasses() {
