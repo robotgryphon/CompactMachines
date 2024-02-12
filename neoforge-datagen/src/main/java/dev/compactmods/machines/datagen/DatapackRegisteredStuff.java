@@ -86,9 +86,9 @@ public class DatapackRegisteredStuff extends DatapackBuiltinEntriesProvider {
 
         final var cmBiome = biomes.getOrThrow(ResourceKey.create(Registries.BIOME, COMPACT_BIOME));
 
-        var flatSettings = new FlatLevelGeneratorSettings(Optional.empty(), cmBiome, Collections.emptyList());
-        flatSettings.withBiomeAndLayers(
-                List.of(new FlatLayerInfo(1, Dimension.BLOCK_MACHINE_VOID_AIR.get())),
+        var flatSettings = new FlatLevelGeneratorSettings(Optional.empty(), cmBiome, Collections.emptyList())
+                .withBiomeAndLayers(
+                        List.of(new FlatLayerInfo(256, Dimension.BLOCK_MACHINE_VOID_AIR.get())),
                         Optional.empty(),
                         cmBiome
                 );
