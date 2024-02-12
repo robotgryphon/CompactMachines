@@ -1,5 +1,5 @@
 plugins {
-    id("java-library")
+    id("java")
     id("eclipse")
     id("idea")
     id("maven-publish")
@@ -9,6 +9,13 @@ plugins {
 val mod_id: String by extra
 val mainProject: Project = project(":neoforge-main")
 evaluationDependsOn(mainProject.path)
+
+val core = project(":core:core")
+val coreApi = project(":core:core-api")
+val roomApi = project(":core:room-api")
+val roomUpgradeApi = project(":core:room-upgrade-api")
+
+val coreProjects = listOf(core, coreApi, roomApi, roomUpgradeApi)
 
 base {
     group = "dev.compactmods.compactmachines"
@@ -32,14 +39,14 @@ runs {
         // Recommended logging level for the console
         systemProperty("forge.logging.console.level", "debug")
 
-        // ideaModule("Compact_Crafting.forge-main.main")
         modSource(project.sourceSets.main.get())
         modSource(mainProject.sourceSets.main.get())
+
+        coreProjects.forEach { modSource(it.sourceSets.main.get()) }
     }
 
     create("data") {
         dataGenerator(true)
-        workingDirectory(file("run/data"))
 
         programArguments("--mod", "compactmachines")
         programArguments("--all")
@@ -62,7 +69,10 @@ repositories {
 
 dependencies {
     implementation(libraries.neoforge.get())
-    implementation(mainProject)
+    compileOnly(mainProject)
+    coreProjects.forEach {
+        compileOnly(it)
+    }
 }
 
 tasks.compileJava {

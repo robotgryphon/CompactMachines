@@ -44,3 +44,5 @@ forge-main/src/generated/
 neoforge-main/runs/
 
 .architectury-transformer/
+
+neoforge-datagen/runs/

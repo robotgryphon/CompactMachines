@@ -1,6 +1,6 @@
 package dev.compactmods.machines.datagen;
 
-import dev.compactmods.machines.api.core.Constants;
+import dev.compactmods.machines.api.Constants;
 import dev.compactmods.machines.datagen.compat.curios.CurioEntityGenerator;
 import dev.compactmods.machines.datagen.compat.curios.CurioSlotGenerator;
 import dev.compactmods.machines.datagen.lang.EnglishLangGenerator;
@@ -36,7 +36,7 @@ public class DataGeneration {
                 List.of(new LootTableProvider.SubProviderEntry(BlockLootGenerator::new, LootContextParamSets.BLOCK))
         ));
 
-        generator.addProvider(server, new RecipeGenerator(packOut, holderLookup));
+        generator.addProvider(server, new RecipeGenerator(packOut));
 
         final var blocks = new BlockTagGenerator(packOut, fileHelper, holderLookup);
         generator.addProvider(server, blocks);

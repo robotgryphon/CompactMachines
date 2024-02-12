@@ -1,7 +1,7 @@
 package dev.compactmods.machines.datagen.tags;
 
-import dev.compactmods.machines.api.core.CMTags;
-import dev.compactmods.machines.api.core.Constants;
+import dev.compactmods.machines.api.Constants;
+import dev.compactmods.machines.api.machine.MachineConstants;
 import dev.compactmods.machines.neoforge.machine.Machines;
 import dev.compactmods.machines.neoforge.room.Rooms;
 import net.minecraft.core.HolderLookup;
@@ -20,7 +20,7 @@ public class BlockTagGenerator extends BlockTagsProvider {
 
     @Override
     protected void addTags(HolderLookup.Provider provider) {
-        var allMachines = tag(CMTags.MACHINE_BLOCK);
+        var allMachines = tag(MachineConstants.MACHINE_BLOCK);
         var pickaxe = tag(BlockTags.MINEABLE_WITH_PICKAXE);
         var ironTool = tag(BlockTags.NEEDS_IRON_TOOL);
 
@@ -33,7 +33,7 @@ public class BlockTagGenerator extends BlockTagsProvider {
         pickaxe.add(boundMachine);
         ironTool.add(boundMachine);
 
-        var unboundTag = tag(CMTags.UNBOUND_MACHINE_BLOCK);
+        var unboundTag = tag(MachineConstants.UNBOUND_MACHINE_BLOCK);
         var unboundMachine = Machines.UNBOUND_MACHINE_BLOCK.get();
         allMachines.add(unboundMachine);
         unboundTag.add(unboundMachine);

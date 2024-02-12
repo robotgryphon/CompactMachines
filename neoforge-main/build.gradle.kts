@@ -72,10 +72,6 @@ minecraft {
     accessTransformers.file(project.file("src/main/resources/META-INF/accesstransformer.cfg"))
 }
 
-afterEvaluate {
-    showModClasses()
-}
-
 runs {
     // applies to all the run configs below
     configureEach {
@@ -216,29 +212,4 @@ tasks.jarJar {
     coreProjects.forEach {
         from (it.sourceSets.main.get().output)
     }
-}
-
-fun showModClasses() {
-    project.runs.forEach {
-        generateModClassesForRun(it)
-    }
-}
-
-fun generateModClassesForRun(run: Run) {
-    var sb: String = "";
-    run.modSources.get().forEach {
-        sb += ("$modId%%" + it.java.classesDirectory.get().asFile.absolutePath + ";")
-
-        val resClasses = it.resources.classesDirectory.orNull
-        if(resClasses != null)
-            sb += ("$modId%%" + resClasses.asFile.absolutePath + ";")
-
-        val dest = it.resources.destinationDirectory.orNull
-        if (dest != null)
-            sb += ("$modId%%" + dest.asFile.absolutePath + ";")
-    }
-
-    println(run.name)
-    println("MOD_CLASSES=$sb")
-    println()
 }

@@ -1,6 +1,6 @@
 package dev.compactmods.machines.datagen.tags;
 
-import dev.compactmods.machines.api.core.CMTags;
+import dev.compactmods.machines.api.machine.MachineConstants;
 import dev.compactmods.machines.api.shrinking.PSDTags;
 import dev.compactmods.machines.neoforge.Registries;
 import dev.compactmods.machines.neoforge.machine.Machines;
@@ -21,7 +21,7 @@ public class ItemTagGenerator extends ItemTagsProvider {
     @Override
     protected void addTags(HolderLookup.Provider provider) {
         // var upgradeTag = tag(CMTags.ROOM_UPGRADE_ITEM);
-        var machinesTag = tag(CMTags.MACHINE_ITEM);
+        var machinesTag = tag(MachineConstants.MACHINE_ITEM);
 
         var boundMachineItem = Machines.BOUND_MACHINE_BLOCK_ITEM.get();
         var unboundMachineItem = Machines.UNBOUND_MACHINE_BLOCK_ITEM.get();

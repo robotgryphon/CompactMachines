@@ -1,9 +1,9 @@
 package dev.compactmods.machines.datagen.lang;
 
-import dev.compactmods.machines.api.core.CMCommands;
-import dev.compactmods.machines.api.core.Constants;
-import dev.compactmods.machines.api.core.Messages;
-import dev.compactmods.machines.api.core.Tooltips;
+import dev.compactmods.machines.api.Constants;
+import dev.compactmods.machines.api.Messages;
+import dev.compactmods.machines.api.Tooltips;
+import dev.compactmods.machines.api.command.CMCommands;
 import dev.compactmods.machines.neoforge.client.RoomExitKeyMapping;
 import dev.compactmods.machines.neoforge.room.Rooms;
 import dev.compactmods.machines.neoforge.shrinking.Shrinking;

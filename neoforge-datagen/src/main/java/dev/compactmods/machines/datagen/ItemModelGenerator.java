@@ -1,6 +1,6 @@
 package dev.compactmods.machines.datagen;
 
-import dev.compactmods.machines.api.core.Constants;
+import dev.compactmods.machines.api.Constants;
 import dev.compactmods.machines.neoforge.machine.Machines;
 import net.minecraft.data.PackOutput;
 import net.neoforged.neoforge.client.model.generators.ItemModelProvider;
@@ -23,8 +23,8 @@ public class ItemModelGenerator extends ItemModelProvider {
         withExistingParent("personal_shrinking_device", mcLoc("item/generated"))
                 .texture("layer0", modLoc("item/personal_shrinking_device"));
 
-        withExistingParent("tunnel", mcLoc("item/generated"))
-                .texture("layer0", modLoc("item/tunnel"));
+//        withExistingParent("tunnel", mcLoc("item/generated"))
+//                .texture("layer0", modLoc("item/tunnel"));
 
 //        withExistingParent(MachineRoomUpgrades.ROOM_UPGRADE.getId().toString(), mcLoc("item/generated"))
 //                .texture("layer0", modLoc("upgrades/chunkloader"));

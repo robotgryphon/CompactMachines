@@ -14,8 +14,8 @@ import net.neoforged.neoforge.common.Tags;
 import java.util.concurrent.CompletableFuture;
 
 public class RecipeGenerator extends RecipeProvider {
-    public RecipeGenerator(PackOutput packOutput, CompletableFuture<HolderLookup.Provider> holderLookup) {
-        super(packOutput, holderLookup);
+    public RecipeGenerator(PackOutput packOutput) {
+        super(packOutput);
     }
 
     @Override

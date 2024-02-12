@@ -1,7 +1,7 @@
 package dev.compactmods.machines.datagen;
 
-import dev.compactmods.compactmachines.api.room.RoomTemplate;
-import dev.compactmods.machines.api.core.Constants;
+import dev.compactmods.machines.api.room.RoomTemplate;
+import dev.compactmods.machines.api.Constants;
 import dev.compactmods.machines.api.dimension.CompactDimension;
 import dev.compactmods.machines.datagen.util.DimensionTypeBuilder;
 import dev.compactmods.machines.machine.LegacySizedTemplates;
@@ -89,9 +89,9 @@ public class DatapackRegisteredStuff extends DatapackBuiltinEntriesProvider {
         var flatSettings = new FlatLevelGeneratorSettings(Optional.empty(), cmBiome, Collections.emptyList());
         flatSettings.withBiomeAndLayers(
                 List.of(new FlatLayerInfo(1, Dimension.BLOCK_MACHINE_VOID_AIR.get())),
-                Optional.empty(),
-                cmBiome
-        );
+                        Optional.empty(),
+                        cmBiome
+                );
 
         var stem = new LevelStem(dimTypes.getOrThrow(CompactDimension.DIM_TYPE_KEY), new FlatLevelSource(flatSettings));
         ctx.register(ResourceKey.create(Registries.LEVEL_STEM, CompactDimension.LEVEL_KEY.location()), stem);
