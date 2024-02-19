@@ -6,6 +6,7 @@ import dev.compactmods.machines.LoggingUtil;
 import dev.compactmods.machines.api.dimension.MissingDimensionException;
 import dev.compactmods.machines.api.machine.MachineCreator;
 import dev.compactmods.machines.api.machine.item.IUnboundCompactMachineItem;
+import dev.compactmods.machines.api.room.history.RoomEntryPoint;
 import dev.compactmods.machines.api.shrinking.PSDTags;
 import dev.compactmods.machines.neoforge.machine.Machines;
 import dev.compactmods.machines.neoforge.machine.item.UnboundCompactMachineItem;
@@ -80,7 +81,7 @@ public class UnboundCompactMachineBlock extends Block implements EntityBlock {
                             ent.setConnectedRoom(newRoom.code());
 
                             try {
-                                RoomHelper.teleportPlayerIntoRoom(server, sp, newRoom);
+                                RoomHelper.teleportPlayerIntoRoom(server, sp, newRoom, RoomEntryPoint.playerEnteringMachine(player));
                             } catch (MissingDimensionException e) {
                                 throw new RuntimeException(e);
                             }

@@ -57,8 +57,7 @@ public class RoomGenerationTests {
         final AABB localBounds = TestUtil.localBounds(testHelper);
         final BlockPos testCenter = BlockPos.containing(localBounds.getCenter());
 
-        var where = testHelper.getBounds().getCenter();
-        CompactRoomGenerator.generateRoom(testHelper.getLevel(), template, where);
+        CompactRoomGenerator.generateRoom(testHelper.getLevel(), localBounds);
 
         testHelper.setBlock(testCenter, Blocks.RED_STAINED_GLASS);
         testHelper.succeed();

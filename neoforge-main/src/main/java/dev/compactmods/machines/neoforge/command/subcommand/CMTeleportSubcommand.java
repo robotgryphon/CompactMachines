@@ -8,6 +8,7 @@ import dev.compactmods.machines.api.room.RoomApi;
 import dev.compactmods.machines.LoggingUtil;
 import dev.compactmods.machines.api.Messages;
 import dev.compactmods.machines.api.dimension.MissingDimensionException;
+import dev.compactmods.machines.api.room.history.RoomEntryPoint;
 import dev.compactmods.machines.i18n.TranslationUtil;
 import dev.compactmods.machines.neoforge.command.argument.Suggestors;
 import dev.compactmods.machines.neoforge.config.ServerConfig;
@@ -42,7 +43,7 @@ public class CMTeleportSubcommand {
     private static void teleportToRoom(CommandSourceStack src, MinecraftServer server, ServerPlayer player, String roomCode) {
         RoomApi.registrar().get(roomCode).ifPresentOrElse(room -> {
             try {
-                RoomHelper.teleportPlayerIntoRoom(server, player, room);
+                RoomHelper.teleportPlayerIntoRoom(server, player, room, RoomEntryPoint.playerUsingCommand(player));
             } catch (MissingDimensionException e) {
                 // TODO LOGS
             }

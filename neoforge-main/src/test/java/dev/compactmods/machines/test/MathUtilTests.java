@@ -7,6 +7,7 @@ import net.minecraft.core.Vec3i;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.world.level.ChunkPos;
+import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.gametest.GameTestHolder;
 import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
@@ -40,9 +41,9 @@ public class MathUtilTests {
 
         tests.forEach((id, expectedChunk) -> {
             Vec3i byIndex = MathUtil.getRegionPositionByIndex(id);
-            BlockPos finalPos = MathUtil.getCenterWithY(byIndex, 0);
+            Vec3 finalPos = MathUtil.getCenterWithY(byIndex, 0);
 
-            ChunkPos calculatedChunk = new ChunkPos(finalPos);
+            ChunkPos calculatedChunk = new ChunkPos(BlockPos.containing(finalPos));
 
             String error = String.format("Generation did not match for %s.", id);
             if(!expectedChunk.equals(calculatedChunk))

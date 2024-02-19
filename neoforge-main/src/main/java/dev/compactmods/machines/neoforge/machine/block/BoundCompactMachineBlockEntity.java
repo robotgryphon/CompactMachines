@@ -2,7 +2,6 @@ package dev.compactmods.machines.neoforge.machine.block;
 
 import dev.compactmods.machines.api.room.RoomApi;
 import dev.compactmods.machines.api.machine.IColoredMachine;
-import dev.compactmods.machines.machine.graph.DimensionMachineGraph;
 import dev.compactmods.machines.neoforge.machine.Machines;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.GlobalPos;
@@ -157,12 +156,13 @@ public class BoundCompactMachineBlockEntity extends BlockEntity implements IColo
 
     public void setConnectedRoom(String roomCode) {
         if (level instanceof ServerLevel sl) {
-            final var dimMachines = DimensionMachineGraph.forDimension(sl);
-            if (this.roomCode != null) {
-                dimMachines.unregisterMachine(worldPosition);
-            }
-
-            dimMachines.register(worldPosition, roomCode);
+            // FIXME: Register machine location in room's connection graph
+//            final var dimMachines = DimensionMachineGraph.forDimension(sl);
+//            if (this.roomCode != null) {
+//                dimMachines.unregisterMachine(worldPosition);
+//            }
+//
+//            dimMachines.register(worldPosition, roomCode);
             this.roomCode = roomCode;
 
             RoomApi.room(roomCode).ifPresentOrElse(inst -> {
@@ -178,8 +178,9 @@ public class BoundCompactMachineBlockEntity extends BlockEntity implements IColo
 
     public void disconnect() {
         if (level instanceof ServerLevel sl) {
-            final var dimMachines = DimensionMachineGraph.forDimension(sl);
-            dimMachines.unregisterMachine(worldPosition);
+            // FIXME: Room machine graph unregister
+//            final var dimMachines = DimensionMachineGraph.forDimension(sl);
+//            dimMachines.unregisterMachine(worldPosition);
 
             sl.setBlock(worldPosition, Machines.UNBOUND_MACHINE_BLOCK.get().defaultBlockState(), Block.UPDATE_ALL);
         }

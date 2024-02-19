@@ -10,7 +10,7 @@ dependencyResolutionManagement {
                 .versionRef("neoforge")
 
         version("minecraft", "1.20.4")
-        version("feather", "[0.1.6, 2.0)")
+        version("feather", "[0.1.8, 2.0)")
         version("jnanoid", "[2.0.0, 3)")
         version("neoforge", "20.4.153-beta")
     }

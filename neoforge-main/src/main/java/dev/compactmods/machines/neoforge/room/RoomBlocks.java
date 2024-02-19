@@ -20,7 +20,7 @@ public class RoomBlocks {
         final var compactDim = server.getLevel(CompactDimension.LEVEL_KEY);
         final var chunkSource = compactDim.getChunkSource();
         return RoomApi.room(room).map(instance -> {
-            final var chunkLoading = instance.chunks().get()
+            final var chunkLoading = RoomApi.chunks(room)
                     .stream()
                     .map(cp -> chunkSource.getChunkFuture(cp.x, cp.z, ChunkStatus.FULL, true))
                     .toList();

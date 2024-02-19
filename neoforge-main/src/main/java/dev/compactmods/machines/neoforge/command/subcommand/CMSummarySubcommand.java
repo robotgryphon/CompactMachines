@@ -5,7 +5,6 @@ import com.mojang.brigadier.context.CommandContext;
 import dev.compactmods.machines.api.room.RoomApi;
 import dev.compactmods.machines.api.command.CMCommands;
 import dev.compactmods.machines.i18n.TranslationUtil;
-import dev.compactmods.machines.machine.graph.DimensionMachineGraph;
 import net.minecraft.ChatFormatting;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
@@ -25,15 +24,17 @@ public class CMSummarySubcommand {
         src.sendSuccess(() -> TranslationUtil.command(CMCommands.LEVEL_REGISTERED).withStyle(ChatFormatting.DARK_GREEN), false);
 
         final var ls = LongStream.builder();
-        serv.getAllLevels().forEach(sl -> {
-            final var machineData = DimensionMachineGraph.forDimension(sl);
-            long numRegistered = machineData.machines().count();
 
-            if(numRegistered > 0) {
-                src.sendSuccess(() -> TranslationUtil.command(CMCommands.MACHINE_REG_DIM, sl.dimension().location().toString(), numRegistered), false);
-                ls.add(numRegistered);
-            }
-        });
+        // FIXME: Per-dimension machine count
+//        serv.getAllLevels().forEach(sl -> {
+//            final var machineData = DimensionMachineGraph.forDimension(sl);
+//            long numRegistered = machineData.machines().count();
+//
+//            if(numRegistered > 0) {
+//                src.sendSuccess(() -> TranslationUtil.command(CMCommands.MACHINE_REG_DIM, sl.dimension().location().toString(), numRegistered), false);
+//                ls.add(numRegistered);
+//            }
+//        });
 
         long grandTotal = ls.build().sum();
         src.sendSuccess(() -> TranslationUtil.command(CMCommands.MACHINE_REG_TOTAL, grandTotal).withStyle(ChatFormatting.GOLD), false);

@@ -52,15 +52,7 @@ public class ServerEventHandler {
             modLog.debug("Setting up room API instances.");
             MinecraftServer server = evt.getServer();
 
-            final IRoomRegistrar registrar = RoomRegistrar.forServer(server);
-            final IRoomOwners owners = null;
-            final IRoomSpawnManagers spawnManager = new RoomSpawnManagers(server, registrar);
-
-            final var gcm = new GraphChunkManager();
-            registrar.allRooms().forEach(inst -> gcm.calculateChunks(inst.code(), inst.boundaries()));
-
-            //noinspection UnstableApiUsage
-            RoomApi.INSTANCE = new RoomApiInstance(registrar, owners, spawnManager, gcm);
+            RoomApi.INSTANCE = RoomApiInstance.forServer(server);
             modLog.debug("Completed setting up room API instances.");
         } catch (MissingDimensionException e) {
             modLog.fatal("Failed to set up room API instance; dimension error.", e);

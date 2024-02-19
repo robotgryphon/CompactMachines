@@ -7,6 +7,9 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.AirBlock;
 import net.minecraft.world.level.block.Blocks;
@@ -18,9 +21,23 @@ public class VoidAirBlock extends AirBlock {
     // FIXME final public static DamageSource DAMAGE_SOURCE = new DamageSource(MOD_ID + "_voidair");
 
     public VoidAirBlock() {
-        super(BlockBehaviour.Properties.ofFullCopy(Blocks.AIR).noCollission().air().noLootTable());
+        super(BlockBehaviour.Properties.of()
+                .isValidSpawn((state, level, pos, entity) -> false)
+                .strength(-1.0F, 3600000.0F)
+                .noTerrainParticles()
+                .noLootTable()
+                .forceSolidOn());
     }
 
+    @Override
+    public boolean canEntityDestroy(BlockState state, BlockGetter level, BlockPos pos, Entity entity) {
+        return false;
+    }
+
+    @Override
+    public boolean canHarvestBlock(BlockState state, BlockGetter level, BlockPos pos, Player player) {
+        return false;
+    }
 
     @Override
     public void entityInside(BlockState pState, Level pLevel, BlockPos pPos, Entity pEntity) {

@@ -139,13 +139,10 @@ repositories {
 }
 
 dependencies {
-    implementation(libraries.neoforge.get())
+    implementation(libraries.neoforge)
 
-    implementation("com.aventrix.jnanoid", "jnanoid", "2.0.0")
-    jarJar(libraries.jnanoid.get())
-//    jarJar("com.aventrix.jnanoid", "jnanoid", "[2.0.0]") {
-//        isTransitive = false
-//    }
+    implementation(libraries.jnanoid)
+    jarJar(libraries.jnanoid)
 
     compileOnly(core)
     compileOnly(coreApi)
@@ -157,7 +154,7 @@ dependencies {
     testCompileOnly(roomApi)
     testCompileOnly(roomUpgradeApi)
 
-    jarJar("dev.compactmods", "feather", libraries.feather.get().version) {
+    jarJar(libraries.feather) {
         isTransitive = false
     }
 }

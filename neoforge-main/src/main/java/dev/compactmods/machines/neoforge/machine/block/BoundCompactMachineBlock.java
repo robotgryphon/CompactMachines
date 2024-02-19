@@ -15,7 +15,6 @@ import dev.compactmods.machines.util.PlayerUtil;
 import net.minecraft.commands.Commands;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.GlobalPos;
-import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -33,7 +32,6 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.neoforged.neoforge.common.CommonHooks;
-import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -94,7 +92,13 @@ public class BoundCompactMachineBlock extends Block implements EntityBlock {
             // force client redraw
             if (stack.getItem() instanceof IBoundCompactMachineItem bound) {
                 if (!level.isClientSide) {
-                    bound.getRoom(stack).ifPresent(tile::setConnectedRoom);
+                    bound.getRoom(stack).ifPresent(roomCode -> {
+                        if(placer instanceof ServerPlayer sp && RoomHelper.entityInsideRoom(sp, roomCode)) {
+                            // TODO: Ouroboros advancement
+                        }
+
+                        tile.setConnectedRoom(roomCode);
+                    });
                 } else {
                     final int color = bound.getMachineColor(stack);
                     tile.setColor(color);
@@ -118,6 +122,7 @@ public class BoundCompactMachineBlock extends Block implements EntityBlock {
         if (mainItem.is(PSDTags.ITEM)
                 && player instanceof ServerPlayer sp
                 && level.getBlockEntity(pos) instanceof BoundCompactMachineBlockEntity tile) {
+
             // Try to teleport player into room
             RoomHelper.teleportPlayerIntoMachine(level, sp, tile.getLevelPosition(), tile.connectedRoom());
             return InteractionResult.SUCCESS;

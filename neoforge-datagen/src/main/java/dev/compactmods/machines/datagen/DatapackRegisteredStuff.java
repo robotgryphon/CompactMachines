@@ -35,6 +35,7 @@ import java.util.concurrent.CompletableFuture;
 
 public class DatapackRegisteredStuff extends DatapackBuiltinEntriesProvider {
     private static final ResourceLocation COMPACT_BIOME = new ResourceLocation(Constants.MOD_ID, "machine");
+    private static final int DIMENSION_HEIGHT = 48;
 
     private static final RegistrySetBuilder BUILDER = new RegistrySetBuilder()
             .add(Registries.BIOME, DatapackRegisteredStuff::generateBiomes)
@@ -76,7 +77,7 @@ public class DatapackRegisteredStuff extends DatapackBuiltinEntriesProvider {
                 .fixedTime(18000L)
                 .natural(false)
                 .raids(false)
-                .heightBounds(0, 256)
+                .heightBounds(0, DIMENSION_HEIGHT)
                 .build());
     }
 
@@ -88,7 +89,7 @@ public class DatapackRegisteredStuff extends DatapackBuiltinEntriesProvider {
 
         var flatSettings = new FlatLevelGeneratorSettings(Optional.empty(), cmBiome, Collections.emptyList())
                 .withBiomeAndLayers(
-                        List.of(new FlatLayerInfo(256, Dimension.BLOCK_MACHINE_VOID_AIR.get())),
+                        List.of(new FlatLayerInfo(DIMENSION_HEIGHT, Dimension.BLOCK_MACHINE_VOID_AIR.get())),
                         Optional.empty(),
                         cmBiome
                 );
@@ -97,7 +98,6 @@ public class DatapackRegisteredStuff extends DatapackBuiltinEntriesProvider {
         ctx.register(ResourceKey.create(Registries.LEVEL_STEM, CompactDimension.LEVEL_KEY.location()), stem);
     }
 
-    @SuppressWarnings("removal")
     private static void addRoomTemplates(BootstapContext<RoomTemplate> ctx) {
         ctx.register(ResourceKey.create(RoomTemplate.REGISTRY_KEY, LegacySizedTemplates.EMPTY_TINY.id()), LegacySizedTemplates.EMPTY_TINY.template());
         ctx.register(ResourceKey.create(RoomTemplate.REGISTRY_KEY, new ResourceLocation(Constants.MOD_ID, "small")), LegacySizedTemplates.EMPTY_SMALL.template());
