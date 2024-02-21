@@ -1,6 +1,7 @@
 package dev.compactmods.machines.neoforge.util;
 
 import dev.compactmods.machines.neoforge.dimension.SimpleTeleporter;
+import dev.compactmods.machines.neoforge.room.Rooms;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -19,11 +20,6 @@ public class ForgePlayerUtil {
 
         player.changeDimension(level, SimpleTeleporter.to(worldPos));
 
-        // FIXME Room info sync
-//        player.getCapability(RoomHelper.CURRENT_ROOM_META).ifPresent(provider -> {
-//            provider.clearCurrent();
-//            CompactMachinesNet.CHANNEL.send(PacketDistributor.PLAYER.with(() -> player),
-//                    new SyncRoomMetadataPacket("", Util.NIL_UUID));
-//        });
+        player.removeData(Rooms.LAST_ROOM_ENTRYPOINT);
     }
 }

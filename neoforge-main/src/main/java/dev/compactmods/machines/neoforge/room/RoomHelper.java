@@ -7,12 +7,14 @@ import dev.compactmods.machines.LoggingUtil;
 import dev.compactmods.machines.api.dimension.CompactDimension;
 import dev.compactmods.machines.api.dimension.MissingDimensionException;
 import dev.compactmods.machines.neoforge.dimension.SimpleTeleporter;
+import dev.compactmods.machines.neoforge.shrinking.Shrinking;
 import dev.compactmods.machines.neoforge.util.ForgePlayerUtil;
 import dev.compactmods.machines.player.PlayerEntryPointHistory;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.GlobalPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
@@ -50,7 +52,7 @@ public abstract class RoomHelper {
             throws MissingDimensionException {
         final var compactDim = CompactDimension.forServer(serv);
 
-        final var history = PlayerEntryPointHistory.forServer(serv, 5);
+        final var history = PlayerEntryPointHistory.forServer(serv);
         final var result = history.enterRoom(player, room.code(), entryPoint);
 
         LOGS.debug("Entry result: {}", result);
@@ -63,7 +65,10 @@ public abstract class RoomHelper {
             }
 
             case SUCCESS -> {
+
                 serv.submitAsync(() -> {
+                    player.getCooldowns().addCooldown(Shrinking.PERSONAL_SHRINKING_DEVICE.get(), 25);
+
                     final var spawns = RoomApi.spawnManager(room.code()).spawns();
                     final var spawn = spawns.forPlayer(player.getUUID()).orElse(spawns.defaultSpawn());
                     player.changeDimension(compactDim, SimpleTeleporter.to(spawn.position(), spawn.rotation()));
@@ -80,44 +85,41 @@ public abstract class RoomHelper {
             return;
 
         MinecraftServer serv = serverPlayer.getServer();
-        PlayerEntryPointHistory history = null;
-        try {
-            history = PlayerEntryPointHistory.forServer(serv, 5);
-        } catch (MissingDimensionException e) {
-            ForgePlayerUtil.teleportPlayerToRespawnOrOverworld(serv, serverPlayer);
-        }
+        assert serv != null;
 
-        if (history == null) {
-            LOGS.error("Error: could not build historical data for players. BAD. Sending player to their overworld spawn instead..");
+        final PlayerEntryPointHistory history;
+        try {
+            history = PlayerEntryPointHistory.forServer(serv);
+        } catch (MissingDimensionException e) {
+            LOGS.error("Missing compact dimension data. Teleporting player {} to their default spawn...", serverPlayer.getUUID());
             ForgePlayerUtil.teleportPlayerToRespawnOrOverworld(serv, serverPlayer);
             return;
         }
 
-        // Nice to have: serverPlayer.getDataOrElse(Rooms.LAST_ROOM_ENTRYPOINT, lastEntry -> {}, () -> {})
-        if (!serverPlayer.hasData(Rooms.LAST_ROOM_ENTRYPOINT)) {
-            // PlayerUtil.howDidYouGetThere(serverPlayer);
-            ForgePlayerUtil.teleportPlayerToRespawnOrOverworld(serv, serverPlayer);
-            history.clearHistory(serverPlayer);
-        } else {
-            final var lastEntry = serverPlayer.getData(Rooms.LAST_ROOM_ENTRYPOINT);
+        serv.submit(() -> {
+            history.lastHistory(serverPlayer).ifPresentOrElse(
+                    before -> {
+                        serverPlayer.getCooldowns().addCooldown(Shrinking.PERSONAL_SHRINKING_DEVICE.get(), 25);
 
-            final var location = lastEntry.entryLocation();
-            assert serv != null;
-            final var level = serv.getLevel(location.dimension());
-            assert level != null;
-            serverPlayer.changeDimension(level, SimpleTeleporter.to(location.position(), location.rotation()));
+                        serverPlayer.setData(Rooms.LAST_ROOM_ENTRYPOINT, before.entryPoint());
+                        history.popHistory(serverPlayer, 1);
 
-//            serv.submitAsync(() -> {
-//                final PlayerEntryPointHistory h;
-//                try {
-//                    h = PlayerEntryPointHistory.forServer(serv, 5);
-//                    final var stack = h.history(serverPlayer, 1);
-//                    serverPlayer.setData(Rooms.LAST_ROOM_ENTRYPOINT, stack.peek());
-//                } catch (MissingDimensionException e) {
-//                    throw new RuntimeException(e);
-//                }
-//            });
-        }
+                        final var location = before.entryPoint().entryLocation();
+                        final var level = serv.getLevel(location.dimension());
+                        if (level != null) {
+                            LOGS.debug("Teleporting player {} to {} as they jump up a level...", serverPlayer.getUUID(), location);
+                            serverPlayer.changeDimension(level, SimpleTeleporter.to(location.position(), location.rotation()));
+                        } else {
+                            LOGS.error("Player tracking points to an unknown dimension. Teleporting player {} to their default spawn instead.", serverPlayer.getUUID());
+                            ForgePlayerUtil.teleportPlayerToRespawnOrOverworld(serv, serverPlayer);
+                        }
+                    },
+                    () -> {
+                        serverPlayer.removeData(Rooms.LAST_ROOM_ENTRYPOINT);
+                        ForgePlayerUtil.teleportPlayerToRespawnOrOverworld(serv, serverPlayer);
+                    }
+            );
 
+        });
     }
 }

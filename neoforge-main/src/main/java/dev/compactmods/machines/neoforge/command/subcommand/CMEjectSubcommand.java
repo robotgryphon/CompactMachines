@@ -39,7 +39,7 @@ public class CMEjectSubcommand {
 
         server.submitAsync(() -> {
             try {
-                PlayerEntryPointHistory.forServer(server, 5).clearHistory(player);
+                PlayerEntryPointHistory.forServer(server).clearHistory(player);
             } catch (MissingDimensionException e) {
                 throw new RuntimeException(e);
             }
