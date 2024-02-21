@@ -36,8 +36,8 @@ public class ItemModelGenerator extends ItemModelProvider {
         basic(Shrinking.ENLARGING_MODULE)
                 .texture("layer0", modLoc("item/atom_enlarger"));
 
-        basic(Shrinking.RESIZING_MODULE)
-                .texture("layer0", modLoc("item/atom_resizer"));
+//        basic(Shrinking.RESIZING_MODULE)
+//                .texture("layer0", modLoc("item/atom_resizer"));
     }
 
     private ItemModelBuilder basic(ResourceLocation name) {

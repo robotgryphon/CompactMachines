@@ -5,6 +5,7 @@ import dev.compactmods.machines.api.Messages;
 import dev.compactmods.machines.api.Tooltips;
 import dev.compactmods.machines.api.command.CMCommands;
 import dev.compactmods.machines.neoforge.client.RoomExitKeyMapping;
+import dev.compactmods.machines.neoforge.client.creative.CreativeTabs;
 import dev.compactmods.machines.neoforge.room.Rooms;
 import dev.compactmods.machines.neoforge.shrinking.Shrinking;
 import net.minecraft.Util;
@@ -27,7 +28,6 @@ public class EnglishLangGenerator extends BaseLangGenerator {
         add("machine.compactmachines.large", "%s (%s)".formatted(machineTranslation, "Large"));
         add("machine.compactmachines.giant", "%s (%s)".formatted(machineTranslation, "Giant"));
         add("machine.compactmachines.colossal", "%s (%s)".formatted(machineTranslation, "Colossal"));
-        add("machine.compactmachines.absurd", "%s (%s)".formatted(machineTranslation, "Absurd"));
 
         addMessage(Messages.CANNOT_ENTER_MACHINE, "You fumble with the shrinking device, to no avail. It refuses to work.");
         addMessage(Messages.NO_MACHINE_DATA, "No machine data loaded; report this.");
@@ -45,39 +45,24 @@ public class EnglishLangGenerator extends BaseLangGenerator {
 
         addMessage(Messages.CANNOT_RENAME_NOT_OWNER, "Only %s may rename this room.");
 
-        addCommand(CMCommands.NOT_IN_COMPACT_DIMENSION, "Cannot use that command outside of a machine room.");
-        addCommand(CMCommands.FAILED_CMD_FILE_ERROR, "Failed to execute command; there was a file error. Check logs.");
-        addCommand(CMCommands.MACHINE_NOT_BOUND, "Machine at %s is not bound to a room.");
-        addCommand(CMCommands.ROOM_REG_COUNT, "Number of registered rooms: %s");
-        addCommand(CMCommands.MACHINE_REG_DIM, "[%s]: %s");
-        addCommand(CMCommands.MACHINE_REG_TOTAL, "Total: %s");
-        addCommand(CMCommands.LEVEL_REGISTERED, "Compact Machine dimension found.");
-        addCommand(CMCommands.LEVEL_NOT_FOUND, "Compact Machine dimension could not be found.");
-        addCommand(CMCommands.ROOM_NOT_FOUND, "Room [%s] could not be found.");
-        addCommand(CMCommands.SPAWN_CHANGED_SUCCESSFULLY, "Spawn point for room [%s] was changed successfully.");
+        commands();
 
         addAdvancementTranslations();
 
         addBlock(Rooms.BLOCK_BREAKABLE_WALL, "Compact Machine Wall");
         addBlock(Rooms.BLOCK_SOLID_WALL, "Solid Compact Machine Wall");
-        // addBlock(Tunnels.BLOCK_TUNNEL_WALL, "Solid Compact Machine Wall (with Tunnel)");
-        add(Util.makeDescriptionId("block", new ResourceLocation(Constants.MOD_ID, "bound_machine_fallback")), "Bound Compact Machine");
 
         add(Shrinking.PERSONAL_SHRINKING_DEVICE.get(), "Personal Shrinking Device");
+        add(Shrinking.SHRINKING_MODULE.get(), "Atom Shrinking Module");
+        add(Shrinking.ENLARGING_MODULE.get(), "Atom Enlarging Module");
+
 
         add(Constants.MOD_ID + ".direction.side", "Side: %s");
         add(Constants.MOD_ID + ".connected_block", "Connected: %s");
 
-//        addTunnel(BuiltInTunnels.ITEM_TUNNEL_DEF, "Item Tunnel");
-//        addTunnel(BuiltInTunnels.FLUID_TUNNEL_DEF, "Fluid Tunnel");
-//        addTunnel(BuiltInTunnels.FORGE_ENERGY, "Energy Tunnel");
-        // addTunnel(Tunnels.REDSTONE_IN_DEF.get(), "Redstone Tunnel (In)");
-        // addTunnel(Tunnels.REDSTONE_OUT_DEF.get(), "Redstone Tunnel (Out)");
-
-        addTooltip(Tooltips.Details.PERSONAL_SHRINKING_DEVICE, "Used as in-game documentation and to enter Compact Machines.");
+        addTooltip(Tooltips.Details.PERSONAL_SHRINKING_DEVICE, "Used to enter Compact Machines.");
         addTooltip(Tooltips.Details.SOLID_WALL, "Warning! Unbreakable for non-creative players!");
 
-        addTooltip(Tooltips.CRAFT_TO_UPGRADE, "Craft to upgrade to a new machine.");
         addTooltip(Tooltips.HINT_HOLD_SHIFT, "Hold shift for details.");
         addTooltip(Tooltips.UNKNOWN_PLAYER_NAME, "Unknown Player");
 
@@ -85,9 +70,6 @@ public class EnglishLangGenerator extends BaseLangGenerator {
         addTooltip(Tooltips.Machines.OWNER, "Owner: %s");
         addTooltip(Tooltips.Machines.SIZE, "Internal Size: %1$sx%1$sx%1$s");
         addTooltip(Tooltips.Machines.BOUND_TO, "Bound to: %1$s");
-
-        addTooltip(Tooltips.TUNNEL_TYPE, "Type ID: %1$s");
-        addTooltip(Tooltips.UNKNOWN_TUNNEL_TYPE, "Unknown Tunnel Type (%s)");
 
         addTooltip(Tooltips.ROOM_NAME, "Bound to room: %s");
 
@@ -114,19 +96,13 @@ public class EnglishLangGenerator extends BaseLangGenerator {
 
         addMessage(Messages.UNKNOWN_ROOM_CHUNK, "Unknown room at %s; please verify it exists.");
 
-        add("itemGroup." + Constants.MOD_ID, "Compact Machines");
+        addCreativeTab(CreativeTabs.MAIN_RL, "Compact Machines");
+        addCreativeTab(CreativeTabs.LINKED_MACHINES_RL, "Compact Machines - Linked Machines");
 
         add("biome." + Constants.MOD_ID + ".machine", "Compact Machine");
 
-        add("compactmachines.psd.pages.machines.title", "Compact Machines");
-        add("compactmachines.psd.pages.machines", "Compact Machines are the core mechanic of this mod. They allow you to build large " +
-                "rooms in a single block space connected to the outside world. They come in various sizes ranging from 3x3x3 to 13x13x13.\n\n" +
-                "You can use Tunnels to connect the outside block faces with any of the inside walls to transport items, fluids etc.\n\n" +
-                "You can enter a Compact Machine by right-clicking it with a Personal Shrinking Device. Please use JEI to look up crafting recipes.");
-
         add("jei.compactmachines.machines", "Machines are used to make pocket dimensions. Craft a machine and place it in world, then use a Personal Shrinking Device to go inside.");
-        add("jei.compactmachines.shrinking_device", "Use the Personal Shrinking Device (PSD) on a machine in order to enter a compact space. " +
-                "You can also right click it in the overworld for more info.");
+        add("jei.compactmachines.shrinking_device", "Use the Personal Shrinking Device (PSD) on a machine in order to enter a compact space.");
         // add("death.attack." + VoidAirBlock.DAMAGE_SOURCE.msgId, "%1$s failed to enter the void");
 
         add("curios.identifier.psd", "Personal Shrinking Device");
@@ -136,5 +112,18 @@ public class EnglishLangGenerator extends BaseLangGenerator {
 
         add(RoomExitKeyMapping.CATEGORY, "Compact Machines");
         add(RoomExitKeyMapping.NAME, "Quick-Exit Compact Machine");
+    }
+
+    private void commands() {
+        addCommand(CMCommands.NOT_IN_COMPACT_DIMENSION, "Cannot use that command outside of a machine room.");
+        addCommand(CMCommands.FAILED_CMD_FILE_ERROR, "Failed to execute command; there was a file error. Check logs.");
+        addCommand(CMCommands.MACHINE_NOT_BOUND, "Machine at %s is not bound to a room.");
+        addCommand(CMCommands.ROOM_REG_COUNT, "Number of registered rooms: %s");
+        addCommand(CMCommands.MACHINE_REG_DIM, "[%s]: %s");
+        addCommand(CMCommands.MACHINE_REG_TOTAL, "Total: %s");
+        addCommand(CMCommands.LEVEL_REGISTERED, "Compact Machine dimension found.");
+        addCommand(CMCommands.LEVEL_NOT_FOUND, "Compact Machine dimension could not be found.");
+        addCommand(CMCommands.ROOM_NOT_FOUND, "Room [%s] could not be found.");
+        addCommand(CMCommands.SPAWN_CHANGED_SUCCESSFULLY, "Spawn point for room [%s] was changed successfully.");
     }
 }

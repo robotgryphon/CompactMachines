@@ -4,6 +4,8 @@ import dev.compactmods.machines.api.Constants;
 import dev.compactmods.machines.api.advancement.Advancements;
 import dev.compactmods.machines.datagen.util.AdvancementLangBuilder;
 import dev.compactmods.machines.i18n.TranslationUtil;
+import dev.compactmods.machines.neoforge.client.creative.CreativeTabs;
+import net.minecraft.Util;
 import net.minecraft.core.Direction;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.resources.ResourceLocation;
@@ -42,6 +44,10 @@ public abstract class BaseLangGenerator extends LanguageProvider {
 
     protected void addTooltip(ResourceLocation id, String translation) {
         add(TranslationUtil.tooltipId(id), translation);
+    }
+
+    protected void addCreativeTab(ResourceLocation id, String translation) {
+        add(Util.makeDescriptionId("itemGroup", id), translation);
     }
 
     protected void addAdvancementTranslations() {

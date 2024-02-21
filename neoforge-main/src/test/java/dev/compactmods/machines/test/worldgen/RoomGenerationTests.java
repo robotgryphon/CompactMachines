@@ -4,7 +4,7 @@ import dev.compactmods.machines.api.room.CompactRoomGenerator;
 import dev.compactmods.machines.api.room.RoomTemplate;
 import dev.compactmods.machines.api.Constants;
 import dev.compactmods.machines.api.util.BlockSpaceUtil;
-import dev.compactmods.machines.machine.LegacySizedTemplates;
+import dev.compactmods.machines.machine.BuiltInRoomTemplate;
 import dev.compactmods.machines.test.TestBatches;
 import dev.compactmods.machines.test.util.TestUtil;
 import net.minecraft.core.BlockPos;
@@ -32,25 +32,21 @@ public class RoomGenerationTests {
     public static Collection<TestFunction> roomTests() {
         List<TestFunction> funcs = new ArrayList<>();
 
-        for (var template : LegacySizedTemplates.values()) {
-            var func = makeTestFunction(template);
+        for (var template : BuiltInRoomTemplate.values()) {
+            var func = new TestFunction(
+                    "room_generation",
+                    "builtin_roomgen_" + template.id().getPath(),
+                    Constants.MOD_ID + ":empty_15x15",
+                    Rotation.NONE,
+                    200,
+                    0,
+                    true,
+                    testHelper -> makeTemplateTest(testHelper, template.template())
+            );
             funcs.add(func);
         }
 
         return funcs;
-    }
-
-    private static TestFunction makeTestFunction(LegacySizedTemplates template) {
-        return new TestFunction(
-                "room_generation",
-                "builtin_roomgen_" + template.id().getPath(),
-                Constants.MOD_ID + ":empty_15x15",
-                Rotation.NONE,
-                200,
-                0,
-                true,
-                testHelper -> makeTemplateTest(testHelper, template.template())
-        );
     }
 
     private static void makeTemplateTest(GameTestHelper testHelper, RoomTemplate template) {

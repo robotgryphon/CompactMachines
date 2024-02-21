@@ -11,7 +11,7 @@ public class Shrinking {
 
     public static final DeferredItem<Item> SHRINKING_MODULE = Registries.ITEMS.register("shrinking_module", Registries::basicItem);
     public static final DeferredItem<Item> ENLARGING_MODULE = Registries.ITEMS.register("enlarging_module", Registries::basicItem);
-    public static final DeferredItem<Item> RESIZING_MODULE = Registries.ITEMS.register("resizing_module", Registries::basicItem);
+    // public static final DeferredItem<Item> RESIZING_MODULE = Registries.ITEMS.register("resizing_module", Registries::basicItem);
 
     public static void prepare() {
 

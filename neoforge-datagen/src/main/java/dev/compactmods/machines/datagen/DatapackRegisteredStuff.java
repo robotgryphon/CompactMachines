@@ -4,11 +4,9 @@ import dev.compactmods.machines.api.room.RoomTemplate;
 import dev.compactmods.machines.api.Constants;
 import dev.compactmods.machines.api.dimension.CompactDimension;
 import dev.compactmods.machines.datagen.util.DimensionTypeBuilder;
-import dev.compactmods.machines.machine.LegacySizedTemplates;
 import dev.compactmods.machines.neoforge.dimension.Dimension;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.RegistrySetBuilder;
-import net.minecraft.core.Vec3i;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.data.PackOutput;
 import net.minecraft.data.worldgen.BiomeDefaultFeatures;
@@ -99,14 +97,15 @@ public class DatapackRegisteredStuff extends DatapackBuiltinEntriesProvider {
     }
 
     private static void addRoomTemplates(BootstapContext<RoomTemplate> ctx) {
-        ctx.register(ResourceKey.create(RoomTemplate.REGISTRY_KEY, LegacySizedTemplates.EMPTY_TINY.id()), LegacySizedTemplates.EMPTY_TINY.template());
-        ctx.register(ResourceKey.create(RoomTemplate.REGISTRY_KEY, new ResourceLocation(Constants.MOD_ID, "small")), LegacySizedTemplates.EMPTY_SMALL.template());
-        ctx.register(ResourceKey.create(RoomTemplate.REGISTRY_KEY, new ResourceLocation(Constants.MOD_ID, "normal")), LegacySizedTemplates.EMPTY_NORMAL.template());
-        ctx.register(ResourceKey.create(RoomTemplate.REGISTRY_KEY, new ResourceLocation(Constants.MOD_ID, "large")), LegacySizedTemplates.EMPTY_LARGE.template());
-        ctx.register(ResourceKey.create(RoomTemplate.REGISTRY_KEY, new ResourceLocation(Constants.MOD_ID, "giant")), LegacySizedTemplates.EMPTY_GIANT.template());
-        ctx.register(ResourceKey.create(RoomTemplate.REGISTRY_KEY, new ResourceLocation(Constants.MOD_ID, "colossal")), LegacySizedTemplates.EMPTY_COLOSSAL.template());
-        ctx.register(ResourceKey.create(RoomTemplate.REGISTRY_KEY, new ResourceLocation(Constants.MOD_ID, "absurd")), new RoomTemplate(new Vec3i(25, 25, 25),
-                FastColor.ARGB32.color(255, 0, 166, 88),
-                RoomTemplate.NO_TEMPLATE));
+        roomTemplate(ctx, "tiny",       new RoomTemplate(3, FastColor.ARGB32.color(255, 201, 91, 19)));
+        roomTemplate(ctx, "small",      new RoomTemplate(5, FastColor.ARGB32.color(255, 212, 210, 210)));
+        roomTemplate(ctx, "normal",     new RoomTemplate(7, FastColor.ARGB32.color(255, 251, 242, 54)));
+        roomTemplate(ctx, "large",      new RoomTemplate(9, FastColor.ARGB32.color(255, 33, 27, 46)));
+        roomTemplate(ctx, "giant",      new RoomTemplate(11, FastColor.ARGB32.color(255, 67, 214, 205)));
+        roomTemplate(ctx, "colossal",   new RoomTemplate(13, FastColor.ARGB32.color(255, 66, 63, 66)));
+    }
+
+    private static void roomTemplate(BootstapContext<RoomTemplate> ctx, String name, RoomTemplate template) {
+        ctx.register(ResourceKey.create(RoomTemplate.REGISTRY_KEY, new ResourceLocation(Constants.MOD_ID, name)), template);
     }
 }

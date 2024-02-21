@@ -1,5 +1,6 @@
 package dev.compactmods.machines.neoforge;
 
+import com.mojang.datafixers.kinds.Const;
 import dev.compactmods.machines.api.Constants;
 import dev.compactmods.machines.command.Commands;
 import dev.compactmods.machines.neoforge.client.ClientConfig;
@@ -12,6 +13,7 @@ import dev.compactmods.machines.neoforge.machine.Machines;
 import dev.compactmods.machines.neoforge.room.Rooms;
 import dev.compactmods.machines.neoforge.shrinking.Shrinking;
 import dev.compactmods.machines.neoforge.villager.Villagers;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.FastColor;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModLoadingContext;
@@ -44,5 +46,9 @@ public class CompactMachines {
         mlCtx.registerConfig(ModConfig.Type.CLIENT, ClientConfig.CONFIG);
         mlCtx.registerConfig(ModConfig.Type.COMMON, CommonConfig.CONFIG);
         mlCtx.registerConfig(ModConfig.Type.SERVER, ServerConfig.CONFIG);
+    }
+
+    public static ResourceLocation rl(String id) {
+        return new ResourceLocation(Constants.MOD_ID, id);
     }
 }
