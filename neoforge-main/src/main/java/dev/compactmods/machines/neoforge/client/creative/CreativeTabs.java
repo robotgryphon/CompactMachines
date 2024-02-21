@@ -38,6 +38,9 @@ public interface CreativeTabs {
     static void fillItems(CreativeModeTab.ItemDisplayParameters params, CreativeModeTab.Output output) {
         output.accept(Shrinking.PERSONAL_SHRINKING_DEVICE.get(), CreativeModeTab.TabVisibility.PARENT_AND_SEARCH_TABS);
         output.accept(Rooms.ITEM_BREAKABLE_WALL.get(), CreativeModeTab.TabVisibility.PARENT_AND_SEARCH_TABS);
+        output.accept(Shrinking.SHRINKING_MODULE.get(), CreativeModeTab.TabVisibility.PARENT_AND_SEARCH_TABS);
+        output.accept(Shrinking.ENLARGING_MODULE.get(), CreativeModeTab.TabVisibility.PARENT_AND_SEARCH_TABS);
+        output.accept(Shrinking.RESIZING_MODULE.get(), CreativeModeTab.TabVisibility.PARENT_AND_SEARCH_TABS);
 
         final var lookup = params.holders().lookupOrThrow(RoomTemplate.REGISTRY_KEY);
         final var machines = lookup.listElements()

@@ -2,9 +2,16 @@ package dev.compactmods.machines.datagen;
 
 import dev.compactmods.machines.api.Constants;
 import dev.compactmods.machines.neoforge.machine.Machines;
+import dev.compactmods.machines.neoforge.shrinking.Shrinking;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.data.PackOutput;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.Item;
+import net.neoforged.neoforge.client.model.generators.ItemModelBuilder;
 import net.neoforged.neoforge.client.model.generators.ItemModelProvider;
 import net.neoforged.neoforge.common.data.ExistingFileHelper;
+
+import java.util.function.Supplier;
 
 public class ItemModelGenerator extends ItemModelProvider {
 
@@ -20,15 +27,25 @@ public class ItemModelGenerator extends ItemModelProvider {
         withExistingParent("solid_wall", modLoc("block/wall"));
         withExistingParent("wall", modLoc("block/wall"));
 
-        withExistingParent("personal_shrinking_device", mcLoc("item/generated"))
+        basic(modLoc("personal_shrinking_device"))
                 .texture("layer0", modLoc("item/personal_shrinking_device"));
 
-//        withExistingParent("tunnel", mcLoc("item/generated"))
-//                .texture("layer0", modLoc("item/tunnel"));
+        basic(Shrinking.SHRINKING_MODULE)
+                .texture("layer0", modLoc("item/atom_shrinker"));
 
-//        withExistingParent(MachineRoomUpgrades.ROOM_UPGRADE.getId().toString(), mcLoc("item/generated"))
-//                .texture("layer0", modLoc("upgrades/chunkloader"));
-//
-//        withExistingParent(MachineRoomUpgrades.WORKBENCH_ITEM.getId().getPath(), modLoc("block/workbench"));
+        basic(Shrinking.ENLARGING_MODULE)
+                .texture("layer0", modLoc("item/atom_enlarger"));
+
+        basic(Shrinking.RESIZING_MODULE)
+                .texture("layer0", modLoc("item/atom_resizer"));
+    }
+
+    private ItemModelBuilder basic(ResourceLocation name) {
+        return withExistingParent(name.getPath(), mcLoc("item/generated"));
+    }
+
+    private ItemModelBuilder basic(Supplier<Item> supplier) {
+        Item i = supplier.get();
+        return basic(BuiltInRegistries.ITEM.getKey(i));
     }
 }
