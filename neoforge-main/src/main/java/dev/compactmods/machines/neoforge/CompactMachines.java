@@ -1,6 +1,5 @@
 package dev.compactmods.machines.neoforge;
 
-import com.google.common.collect.ImmutableSet;
 import dev.compactmods.machines.api.Constants;
 import dev.compactmods.machines.command.Commands;
 import dev.compactmods.machines.neoforge.client.ClientConfig;
@@ -18,10 +17,6 @@ import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModLoadingContext;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.config.ModConfig;
-import org.apache.logging.log4j.Marker;
-import org.apache.logging.log4j.MarkerManager;
-
-import java.util.Set;
 
 @Mod(Constants.MOD_ID)
 public class CompactMachines {
