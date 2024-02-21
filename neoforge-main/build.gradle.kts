@@ -12,8 +12,6 @@ if (envVersion.startsWith("v"))
 val modId: String = property("mod_id") as String
 val isRelease: Boolean = (System.getenv("RELEASE") ?: "false").equals("true", true)
 
-val featherVersion: String = property("feather_version") as String
-
 val core = project(":core:core")
 val coreApi = project(":core:core-api")
 val roomApi = project(":core:room-api")
@@ -82,7 +80,7 @@ runs {
         systemProperty("forge.logging.console.level", "debug")
 
         dependencies {
-            runtime("dev.compactmods:feather:$featherVersion")
+            runtime("dev.compactmods:feather:${libraries.versions.feather.get()}")
             runtime("com.aventrix.jnanoid:jnanoid:2.0.0")
         }
 
@@ -154,6 +152,7 @@ dependencies {
     testCompileOnly(roomApi)
     testCompileOnly(roomUpgradeApi)
 
+    implementation(libraries.feather)
     jarJar(libraries.feather) {
         isTransitive = false
     }
