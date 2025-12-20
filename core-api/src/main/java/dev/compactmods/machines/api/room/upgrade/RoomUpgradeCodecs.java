@@ -14,7 +14,7 @@ public interface RoomUpgradeCodecs {
     @SuppressWarnings("unchecked")
     Codec<RoomUpgradeComponent> DISPATCH_CODEC = Codec.lazyInitialized(() -> {
         final var reg = BuiltInRegistries.REGISTRY
-                .getOptional(CompactMachines.modRL("room_upgrades"))
+                .getOptional(CompactMachines.identifier("room_upgrades"))
                 .map(r -> (Registry<RoomUpgradeComponentType<?>>) r);
 
         return (Codec<RoomUpgradeComponent>) reg

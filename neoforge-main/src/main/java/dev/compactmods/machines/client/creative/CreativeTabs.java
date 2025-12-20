@@ -6,14 +6,14 @@ import dev.compactmods.machines.machine.Machines;
 import dev.compactmods.machines.room.Rooms;
 import dev.compactmods.machines.shrinking.Shrinking;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.CreativeModeTab;
 
 import static dev.compactmods.machines.CMRegistries.TABS;
 
 public interface CreativeTabs {
 
-    ResourceLocation MAIN_RL = CompactMachines.modRL("main");
+    Identifier MAIN_RL = CompactMachines.identifier("main");
 
     static void prepare() {
         TABS.register(MAIN_RL.getPath(), () -> CreativeModeTab.builder()

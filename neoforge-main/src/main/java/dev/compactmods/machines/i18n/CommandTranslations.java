@@ -1,7 +1,7 @@
 package dev.compactmods.machines.i18n;
 
 import dev.compactmods.machines.api.CompactMachines;
-import net.minecraft.Util;
+import net.minecraft.util.Util;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Player;
 
@@ -16,15 +16,15 @@ public interface CommandTranslations {
             .translatableWithFallback(IDs.MACHINE_GIVEN, "Created a new machine item and gave it to %s.", player.getDisplayName());
 
     interface IDs {
-        String CANNOT_GIVE_MACHINE = Util.makeDescriptionId("commands.machines", CompactMachines.modRL("cannot_give_machine_item"));
+        String CANNOT_GIVE_MACHINE = Util.makeDescriptionId("commands.machines", CompactMachines.identifier("cannot_give_machine_item"));
 
-        String MACHINE_GIVEN = Util.makeDescriptionId("commands.machines", CompactMachines.modRL("machine_given_successfully"));
+        String MACHINE_GIVEN = Util.makeDescriptionId("commands.machines", CompactMachines.identifier("machine_given_successfully"));
 
         /**
          * Used for displaying the number of registered rooms via summary commands.
          */
-        String ROOM_COUNT = Util.makeDescriptionId("commands.rooms", CompactMachines.modRL("room_reg_count"));
+        String ROOM_COUNT = Util.makeDescriptionId("commands.rooms", CompactMachines.identifier("room_reg_count"));
 
-        String SPAWN_CHANGED_SUCCESSFULLY = Util.makeDescriptionId("commands.rooms", CompactMachines.modRL("spawn_changed_successfully"));
+        String SPAWN_CHANGED_SUCCESSFULLY = Util.makeDescriptionId("commands.rooms", CompactMachines.identifier("spawn_changed_successfully"));
     }
 }

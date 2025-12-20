@@ -4,12 +4,11 @@ import com.google.common.collect.ImmutableList;
 import dev.compactmods.machines.api.machine.MachineColor;
 import dev.compactmods.machines.api.room.RoomDimensions;
 import dev.compactmods.machines.api.room.RoomStructureInfo;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.CommonColors;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Collections;
 import java.util.Optional;
 
 public class RoomTemplateBuilder {
@@ -46,7 +45,7 @@ public class RoomTemplateBuilder {
 		return this;
 	}
 
-	public RoomTemplateBuilder addStructure(ResourceLocation template, RoomStructureInfo.RoomStructurePlacement placement) {
+	public RoomTemplateBuilder addStructure(Identifier template, RoomStructureInfo.RoomStructurePlacement placement) {
 		this.structures.add(new RoomStructureInfo(template, placement));
 		return this;
 	}

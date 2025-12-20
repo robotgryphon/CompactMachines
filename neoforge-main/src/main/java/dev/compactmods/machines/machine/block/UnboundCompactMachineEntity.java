@@ -17,7 +17,7 @@ import net.minecraft.core.component.DataComponents;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.ComponentSerialization;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.ProblemReporter;
 import net.minecraft.world.item.DyeColor;
@@ -36,7 +36,7 @@ import java.util.Optional;
 public class UnboundCompactMachineEntity extends BlockEntity implements IUnboundCompactMachineBlockEntity {
 
     private MachineColor machineColor;
-    private @Nullable ResourceLocation templateId;
+    private @Nullable Identifier templateId;
     private @Nullable Component customName;
 
     public UnboundCompactMachineEntity(BlockPos pos, BlockState state) {
@@ -72,7 +72,7 @@ public class UnboundCompactMachineEntity extends BlockEntity implements IUnbound
     protected void loadAdditional(ValueInput input) {
         super.loadAdditional(input);
         this.machineColor = input.read(CMDataComponents.KEY_MACHINE_COLOR, MachineColor.CODEC).orElse(MachineColor.DEFAULT);
-        this.templateId = input.read(NBT_TEMPLATE_ID, ResourceLocation.CODEC).orElse(RoomTemplate.NO_TEMPLATE);
+        this.templateId = input.read(NBT_TEMPLATE_ID, Identifier.CODEC).orElse(RoomTemplate.NO_TEMPLATE);
         this.customName = input.read("CustomName", ComponentSerialization.CODEC).orElse(null);
     }
 
@@ -80,7 +80,7 @@ public class UnboundCompactMachineEntity extends BlockEntity implements IUnbound
     protected void saveAdditional(ValueOutput output) {
         super.saveAdditional(output);
         output.store(CMDataComponents.KEY_MACHINE_COLOR, MachineColor.CODEC, this.machineColor);
-        output.storeNullable(NBT_TEMPLATE_ID, ResourceLocation.CODEC, templateId);
+        output.storeNullable(NBT_TEMPLATE_ID, Identifier.CODEC, templateId);
         output.storeNullable("CustomName", ComponentSerialization.CODEC, this.customName);
     }
 
@@ -98,17 +98,17 @@ public class UnboundCompactMachineEntity extends BlockEntity implements IUnbound
         this.machineColor = input.read(CMDataComponents.KEY_MACHINE_COLOR, MachineColor.CODEC)
                 .orElse(MachineColor.fromDyeColor(DyeColor.WHITE));
 
-        this.templateId = input.read(NBT_TEMPLATE_ID, ResourceLocation.CODEC).orElse(RoomTemplate.NO_TEMPLATE);
+        this.templateId = input.read(NBT_TEMPLATE_ID, Identifier.CODEC).orElse(RoomTemplate.NO_TEMPLATE);
         this.customName = input.read("CustomName", ComponentSerialization.CODEC).orElse(null);
     }
 
-    public void setTemplate(ResourceLocation template) {
+    public void setTemplate(Identifier template) {
         this.templateId = template;
         this.setChanged();
     }
 
     @Nullable
-    public ResourceLocation templateId() {
+    public Identifier templateId() {
         return templateId;
     }
 

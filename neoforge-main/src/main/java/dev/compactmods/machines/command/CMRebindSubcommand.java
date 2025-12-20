@@ -16,7 +16,7 @@ public class CMRebindSubcommand {
 
     public static LiteralArgumentBuilder<CommandSourceStack> make() {
         final var subRoot = Commands.literal("rebind")
-                .requires(cs -> cs.hasPermission(Commands.LEVEL_GAMEMASTERS));
+                .requires(Commands.hasPermission(Commands.LEVEL_GAMEMASTERS));
 
         subRoot.then(Commands.argument("pos", BlockPosArgument.blockPos())
                 .then(Commands.argument("bindTo", StringArgumentType.string())

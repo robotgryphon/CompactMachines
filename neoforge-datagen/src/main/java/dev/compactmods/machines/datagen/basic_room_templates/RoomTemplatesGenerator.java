@@ -42,6 +42,6 @@ public class RoomTemplatesGenerator extends DatapackBuiltinEntriesProvider {
     }
 
     private static void roomTemplate(BootstrapContext<RoomTemplate> ctx, String name, RoomTemplate template) {
-        ctx.register(ResourceKey.create(RoomTemplate.REGISTRY_KEY, CompactMachines.modRL(name)), template);
+        ctx.register(ResourceKey.create(RoomTemplate.REGISTRY_KEY, CompactMachines.identifier(name)), template);
     }
 }

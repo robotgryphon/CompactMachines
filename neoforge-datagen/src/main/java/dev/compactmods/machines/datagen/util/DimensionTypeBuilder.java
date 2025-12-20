@@ -1,12 +1,16 @@
 package dev.compactmods.machines.datagen.util;
 
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.core.HolderSet;
+import net.minecraft.resources.Identifier;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.TagKey;
+import net.minecraft.util.valueproviders.IntProvider;
 import net.minecraft.util.valueproviders.UniformInt;
+import net.minecraft.world.attribute.EnvironmentAttributeMap;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.dimension.BuiltinDimensionTypes;
 import net.minecraft.world.level.dimension.DimensionType;
+import net.minecraft.world.timeline.Timelines;
 
 import java.util.Optional;
 import java.util.OptionalLong;
@@ -31,7 +35,7 @@ public class DimensionTypeBuilder {
     private int height = 256;
     private int logicalHeight = 256;
     private TagKey<Block> infiniburn = BlockTags.INFINIBURN_OVERWORLD;
-    private ResourceLocation effectsLocation = BuiltinDimensionTypes.OVERWORLD_EFFECTS;
+    private Identifier effectsLocation = BuiltinDimensionTypes.OVERWORLD.identifier();
     private float ambientLight = 0;
 
     public DimensionTypeBuilder() {
@@ -116,7 +120,7 @@ public class DimensionTypeBuilder {
         return this;
     }
 
-    public DimensionTypeBuilder effects(ResourceLocation effects) {
+    public DimensionTypeBuilder effects(Identifier effects) {
         this.effectsLocation = effects;
         return this;
     }
@@ -128,8 +132,12 @@ public class DimensionTypeBuilder {
 
     public DimensionType build() {
         // TODO: Add MonsterSettings here, right now it copies overworld
-        return new DimensionType(fixedTime, hasSkylight, hasCeiling, ultraWarm, natural, coordinateScale, bedWorks,
-                respawnAnchorWorks, minY, height, logicalHeight, infiniburn, effectsLocation, ambientLight, Optional.empty(),
-                new DimensionType.MonsterSettings(piglinSafe, hasRaids, UniformInt.of(0, 7), 0));
+        return new DimensionType(true, hasSkylight, hasCeiling, coordinateScale,
+                minY, height, logicalHeight, infiniburn, ambientLight,
+                new DimensionType.MonsterSettings(UniformInt.of(0, 7), 0),
+                DimensionType.Skybox.NONE,
+                DimensionType.CardinalLightType.DEFAULT,
+                EnvironmentAttributeMap.EMPTY,
+                HolderSet.empty());
     }
 }

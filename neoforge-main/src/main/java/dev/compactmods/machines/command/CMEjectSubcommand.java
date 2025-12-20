@@ -14,37 +14,37 @@ import net.minecraft.server.level.ServerPlayer;
 import java.util.Collection;
 
 public class CMEjectSubcommand {
-	public static ArgumentBuilder<CommandSourceStack, ?> make() {
-		return Commands.literal("eject")
-			.executes(CMEjectSubcommand::execExecutingPlayer)
-			.then(Commands.argument("player", EntityArgument.player())
-				.requires(cs -> cs.hasPermission(Commands.LEVEL_GAMEMASTERS))
-				.executes(CMEjectSubcommand::execSpecificPlayer));
-	}
+    public static ArgumentBuilder<CommandSourceStack, ?> make() {
+        return Commands.literal("eject")
+                .executes(CMEjectSubcommand::execExecutingPlayer)
+                .then(Commands.argument("player", EntityArgument.player())
+                        .requires(Commands.hasPermission(Commands.LEVEL_GAMEMASTERS))
+                        .executes(CMEjectSubcommand::execSpecificPlayer));
+    }
 
-	private static int execSpecificPlayer(CommandContext<CommandSourceStack> ctx) throws CommandSyntaxException {
-		Collection<ServerPlayer> ent = EntityArgument.getPlayers(ctx, "player");
-		ent.forEach(player -> {
-			CompactMachines.playerHistoryApi()
-				.entryPoints()
-				.clearHistory(player);
+    private static int execSpecificPlayer(CommandContext<CommandSourceStack> ctx) throws CommandSyntaxException {
+        Collection<ServerPlayer> ent = EntityArgument.getPlayers(ctx, "player");
+        ent.forEach(player -> {
+            CompactMachines.playerHistoryApi()
+                    .entryPoints()
+                    .clearHistory(player);
 
-			PlayerUtil.teleportPlayerToRespawnOrOverworld(ctx.getSource().getServer(), player);
-		});
+            PlayerUtil.teleportPlayerToRespawnOrOverworld(ctx.getSource().getServer(), player);
+        });
 
-		return 0;
-	}
+        return 0;
+    }
 
-	private static int execExecutingPlayer(CommandContext<CommandSourceStack> ctx) throws CommandSyntaxException {
-		final ServerPlayer player = ctx.getSource().getPlayerOrException();
-		final MinecraftServer server = ctx.getSource().getServer();
+    private static int execExecutingPlayer(CommandContext<CommandSourceStack> ctx) throws CommandSyntaxException {
+        final ServerPlayer player = ctx.getSource().getPlayerOrException();
+        final MinecraftServer server = ctx.getSource().getServer();
 
-		server.submitAsync(() -> {
-			CompactMachines.playerHistoryApi().entryPoints().clearHistory(player);
-		});
+        server.submitAsync(() -> {
+            CompactMachines.playerHistoryApi().entryPoints().clearHistory(player);
+        });
 
-		PlayerUtil.teleportPlayerToRespawnOrOverworld(ctx.getSource().getServer(), player);
+        PlayerUtil.teleportPlayerToRespawnOrOverworld(ctx.getSource().getServer(), player);
 
-		return 0;
-	}
+        return 0;
+    }
 }

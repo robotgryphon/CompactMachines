@@ -3,7 +3,7 @@ package dev.compactmods.machines.player;
 import dev.compactmods.machines.api.attachment.CMDataAttachments;
 import dev.compactmods.machines.network.room.SyncRoomMetadataPacket;
 import dev.compactmods.machines.room.Rooms;
-import net.minecraft.Util;
+import net.minecraft.util.Util;
 import net.minecraft.server.level.ServerPlayer;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;

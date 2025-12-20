@@ -11,19 +11,19 @@ import org.jetbrains.annotations.NotNull;
 public class KeyHelper {
 
   public static ResourceKey<Block> blockResKey(String id) {
-	 return ResourceKey.create(Registries.BLOCK, CompactMachines.modRL(id));
+	 return ResourceKey.create(Registries.BLOCK, CompactMachines.identifier(id));
   }
 
   @NotNull
   public static TagKey<Item> itemTagKey(String id) {
-	 return TagKey.create(Registries.ITEM, CompactMachines.modRL(id));
+	 return TagKey.create(Registries.ITEM, CompactMachines.identifier(id));
   }
 
   public static TagKey<Block> blockTag(String id) {
-	 return TagKey.create(Registries.BLOCK, CompactMachines.modRL(id));
+	 return TagKey.create(Registries.BLOCK, CompactMachines.identifier(id));
   }
 
   public static ResourceKey<Item> itemResKey(String id) {
-	 return ResourceKey.create(Registries.ITEM, CompactMachines.modRL(id));
+	 return ResourceKey.create(Registries.ITEM, CompactMachines.identifier(id));
   }
 }

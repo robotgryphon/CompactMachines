@@ -21,7 +21,7 @@ import dev.compactmods.machines.api.server.ServerServiceProvider;
 import dev.compactmods.machines.api.server.service.RoomSpawnManagersProvider;
 import dev.compactmods.machines.api.util.BlockSpaceUtil;
 import net.minecraft.core.Direction;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.phys.AABB;
@@ -115,15 +115,15 @@ public class CompactMachines {
 	}
 
 	public static String id(String path) {
-		return ResourceLocation.isValidPath(path) ? (MOD_ID + ":" + path) : MOD_ID + ":invalid";
+		return Identifier.isValidPath(path) ? (MOD_ID + ":" + path) : MOD_ID + ":invalid";
 	}
 
 	public static String dotPrefix(String path) {
 		return MOD_ID + "." + path;
 	}
 
-	public static ResourceLocation modRL(String path) {
-		return ResourceLocation.fromNamespaceAndPath(MOD_ID, path);
+	public static Identifier identifier(String path) {
+		return Identifier.fromNamespaceAndPath(MOD_ID, path);
 	}
 
 	public static DeferredRegister<RoomUpgradeComponentType<?>> roomUpgradeDR(String namespace) {

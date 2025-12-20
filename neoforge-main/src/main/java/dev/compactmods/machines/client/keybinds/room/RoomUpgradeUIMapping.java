@@ -8,7 +8,7 @@ import dev.compactmods.machines.client.room.RoomKeyMappings;
 import dev.compactmods.machines.feature.CMFeatureFlags;
 import dev.compactmods.machines.network.room.PlayerRequestedUpgradeUIPacket;
 import dev.compactmods.machines.room.Rooms;
-import net.minecraft.Util;
+import net.minecraft.util.Util;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
@@ -18,7 +18,7 @@ import net.neoforged.neoforge.network.PacketDistributor;
 
 public class RoomUpgradeUIMapping {
 
-   public static final String NAME = Util.makeDescriptionId("key.mapping", CompactMachines.modRL("open_upgrade_screen"));
+   public static final String NAME = Util.makeDescriptionId("key.mapping", CompactMachines.identifier("open_upgrade_screen"));
 
    public static final IKeyConflictContext CONFLICT_CONTEXT = new IKeyConflictContext() {
 	  @Override

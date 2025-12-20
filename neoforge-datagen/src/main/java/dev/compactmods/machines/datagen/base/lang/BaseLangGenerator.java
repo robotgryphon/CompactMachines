@@ -1,16 +1,12 @@
 package dev.compactmods.machines.datagen.base.lang;
 
 import dev.compactmods.machines.api.CompactMachines;
-import net.minecraft.Util;
-import net.minecraft.core.Direction;
+import net.minecraft.util.Util;
 import net.minecraft.core.Holder;
-import net.minecraft.data.DataGenerator;
 import net.minecraft.data.PackOutput;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.entity.npc.VillagerProfession;
-import net.minecraft.world.level.GameRules;
+import net.minecraft.resources.Identifier;
+import net.minecraft.world.entity.npc.villager.VillagerProfession;
 import net.neoforged.neoforge.common.data.LanguageProvider;
-import org.apache.commons.lang3.StringUtils;
 
 public abstract class BaseLangGenerator extends LanguageProvider {
 
@@ -26,20 +22,20 @@ public abstract class BaseLangGenerator extends LanguageProvider {
     protected void addTranslations() {}
 
     protected void addVillagerProfession(Holder<VillagerProfession> profession, String name) {
-        final var rl = profession.getKey().location();
+        final var rl = profession.getKey().identifier();
         add("entity." + rl.getNamespace() + ".villager." + rl.getPath(), name);
     }
 
-    protected void addGamerule(String key, String title, String description) {
-        add("gamerule." + key, title);
-        add("gamerule." + key + ".description", description);
+    protected void addGamerule(Identifier key, String title, String description) {
+        add(key.toLanguageKey("gamerule"), title);
+        add(key.toLanguageKey("gamerule", "description"), description);
     }
 
-    protected void addCreativeTab(ResourceLocation id, String translation) {
+    protected void addCreativeTab(Identifier id, String translation) {
         add(Util.makeDescriptionId("itemGroup", id), translation);
     }
 
-    protected void advancement(ResourceLocation adv, String title, String desc) {
+    protected void advancement(Identifier adv, String title, String desc) {
         add(Util.makeDescriptionId("advancement", adv), title);
         add(Util.makeDescriptionId("advancement", adv) + ".desc", desc != null ? desc : "");
     }

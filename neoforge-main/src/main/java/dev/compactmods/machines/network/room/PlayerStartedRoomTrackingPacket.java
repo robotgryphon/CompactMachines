@@ -18,7 +18,7 @@ import java.util.concurrent.TimeoutException;
 
 public record PlayerStartedRoomTrackingPacket(String roomCode) implements CustomPacketPayload {
 
-    public static final Type<PlayerStartedRoomTrackingPacket> TYPE = new Type<>(CompactMachines.modRL("player_started_tracking_room"));
+    public static final Type<PlayerStartedRoomTrackingPacket> TYPE = new Type<>(CompactMachines.identifier("player_started_tracking_room"));
 
     public static final StreamCodec<FriendlyByteBuf, PlayerStartedRoomTrackingPacket> STREAM_CODEC = StreamCodec.composite(
             ByteBufCodecs.STRING_UTF8, PlayerStartedRoomTrackingPacket::roomCode,

@@ -2,7 +2,7 @@ package dev.compactmods.machines.machine.capability;
 
 import dev.compactmods.machines.api.room.RoomInstance;
 import net.minecraft.core.GlobalPos;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.neoforged.neoforge.capabilities.BaseCapability;
 import net.neoforged.neoforge.capabilities.CapabilityRegistry;
 import net.neoforged.neoforge.capabilities.ICapabilityProvider;
@@ -18,23 +18,23 @@ public class MachineCapability<T, C> extends BaseCapability<T, C> {
     private static final CapabilityRegistry<MachineCapability<?,?>> registry = new CapabilityRegistry<>(MachineCapability::new);
     final Map<String, List<ICapabilityProvider<RoomInstance, C, T>>> providers = new IdentityHashMap<>();
 
-    protected MachineCapability(ResourceLocation name, Class<T> typeClass, Class<C> contextClass) {
+    protected MachineCapability(Identifier name, Class<T> typeClass, Class<C> contextClass) {
         super(name, typeClass, contextClass);
     }
 
-    private static <T, C> MachineCapability<T, C> create(ResourceLocation name, Class<T> typeClass, Class<C> contextClass) {
+    private static <T, C> MachineCapability<T, C> create(Identifier name, Class<T> typeClass, Class<C> contextClass) {
         return (MachineCapability<T, C>) registry.create(name, typeClass, contextClass);
     }
 
-    public static <T> MachineCapability<T, Void> createVoid(ResourceLocation name, Class<T> typeClass) {
+    public static <T> MachineCapability<T, Void> createVoid(Identifier name, Class<T> typeClass) {
         return create(name, typeClass, void.class);
     }
 
-    public static <T> MachineCapability<T, GlobalPos> createMachineUnsided(ResourceLocation name, Class<T> typeClass) {
+    public static <T> MachineCapability<T, GlobalPos> createMachineUnsided(Identifier name, Class<T> typeClass) {
         return create(name, typeClass, GlobalPos.class);
     }
 
-    public static <T> MachineCapability<T, GlobalPos> createMachineSided(ResourceLocation name, Class<T> typeClass) {
+    public static <T> MachineCapability<T, GlobalPos> createMachineSided(Identifier name, Class<T> typeClass) {
         return create(name, typeClass, GlobalPos.class);
     }
 

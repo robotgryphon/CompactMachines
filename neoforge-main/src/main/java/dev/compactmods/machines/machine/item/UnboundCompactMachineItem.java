@@ -5,10 +5,10 @@ import dev.compactmods.machines.i18n.MachineTranslations;
 import dev.compactmods.machines.api.room.template.RoomTemplate;
 import dev.compactmods.machines.machine.MachineColors;
 import dev.compactmods.machines.machine.Machines;
-import net.minecraft.Util;
+import net.minecraft.util.Util;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
@@ -45,7 +45,7 @@ public class UnboundCompactMachineItem extends BlockItem {
         return stack;
     }
 
-    private ResourceLocation getTemplateId(ItemStack stack) {
+    private Identifier getTemplateId(ItemStack stack) {
         return stack.get(CMDataComponents.ROOM_TEMPLATE_ID);
     }
 

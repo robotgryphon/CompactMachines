@@ -45,6 +45,8 @@ public class CompactMachinesCommon {
         RoomUpgrades.prepare();
         Dimension.prepare();
         Commands.prepare();
+        CMGameRules.prepare();
+        
         Villagers.prepare();
 
         CMDataComponents.prepare();
@@ -71,7 +73,6 @@ public class CompactMachinesCommon {
     }
 
     private static void commonSetup(FMLCommonSetupEvent evt) {
-        evt.enqueueWork(CMGameRules::register);
         evt.enqueueWork(RoomUpgradeEventHandlers::collectUpgradeEvents);
     }
 }

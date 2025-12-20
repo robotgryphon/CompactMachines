@@ -8,7 +8,7 @@ import dev.compactmods.machines.shrinking.PersonalShrinkingDevice;
 import dev.compactmods.machines.shrinking.Shrinking;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.data.PackOutput;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.tags.TagKey;
 import net.neoforged.neoforge.common.data.ItemTagsProvider;
 
@@ -28,7 +28,7 @@ public class ItemTagGenerator extends ItemTagsProvider {
     }
 
     private void curiosTags(PersonalShrinkingDevice psd) {
-        final var curiosPsdTag = tag(TagKey.create(CMRegistries.ITEMS.getRegistryKey(), ResourceLocation.fromNamespaceAndPath("curios", "psd")));
+        final var curiosPsdTag = tag(TagKey.create(CMRegistries.ITEMS.getRegistryKey(), Identifier.fromNamespaceAndPath("curios", "psd")));
         curiosPsdTag.add(psd);
     }
 

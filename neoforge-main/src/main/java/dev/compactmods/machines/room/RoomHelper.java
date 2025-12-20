@@ -15,7 +15,7 @@ import dev.compactmods.machines.network.room.SyncRoomMetadataPacket;
 import dev.compactmods.machines.shrinking.Shrinking;
 import dev.compactmods.machines.util.PlayerUtil;
 import net.minecraft.ChatFormatting;
-import net.minecraft.Util;
+import net.minecraft.util.Util;
 import net.minecraft.core.GlobalPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.MinecraftServer;

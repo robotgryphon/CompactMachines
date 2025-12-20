@@ -12,7 +12,7 @@ import net.neoforged.neoforge.network.handling.IPayloadHandler;
 
 public record PlayerRequestedUpgradeUIPacket(String roomCode, boolean isIsolated) implements CustomPacketPayload {
 
-   public static final Type<PlayerRequestedUpgradeUIPacket> TYPE = new Type<>(CompactMachines.modRL("player_wants_to_open_room_upgrade_menu"));
+   public static final Type<PlayerRequestedUpgradeUIPacket> TYPE = new Type<>(CompactMachines.identifier("player_wants_to_open_room_upgrade_menu"));
 
    public static final IPayloadHandler<PlayerRequestedUpgradeUIPacket> HANDLER = (pkt, ctx) -> {
 	  final var player = ctx.player();

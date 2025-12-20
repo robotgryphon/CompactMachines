@@ -12,7 +12,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.navigation.ScreenRectangle;
 import net.minecraft.client.renderer.GameRenderer;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 import net.minecraft.util.profiling.Profiler;
 import net.minecraft.util.profiling.ProfilerFiller;
@@ -20,11 +20,11 @@ import org.joml.Matrix3x2f;
 import org.joml.Matrix4f;
 import org.joml.Matrix4x3f;
 
-public record NineSliceRenderer(ResourceLocation texture, ScreenRectangle area, int sliceWidth, int sliceHeight,
+public record NineSliceRenderer(Identifier texture, ScreenRectangle area, int sliceWidth, int sliceHeight,
                                 int uWidth, int vHeight, int uOffset, int vOffset, int textureWidth, int textureHeight, int cornerWidth,
                                 int cornerHeight, int edgeWidth, int edgeHeight) {
 
-    public static Builder builder(ResourceLocation texture) {
+    public static Builder builder(Identifier texture) {
         return new Builder(texture);
     }
 
@@ -120,7 +120,7 @@ public record NineSliceRenderer(ResourceLocation texture, ScreenRectangle area, 
     }
 
     public static class Builder {
-        private final ResourceLocation texture;
+        private final Identifier texture;
 
         private ScreenRectangle area;
 
@@ -133,7 +133,7 @@ public record NineSliceRenderer(ResourceLocation texture, ScreenRectangle area, 
         private int textureWidth;
         private int textureHeight;
 
-        public Builder(ResourceLocation texture) {
+        public Builder(Identifier texture) {
             this.texture = texture;
             this.area = ScreenRectangle.empty();
         }

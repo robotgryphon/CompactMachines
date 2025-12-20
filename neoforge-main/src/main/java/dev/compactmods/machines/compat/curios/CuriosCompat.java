@@ -3,7 +3,7 @@
 //import dev.compactmods.machines.api.CompactMachines;
 //import dev.compactmods.machines.api.shrinking.PSDTags;
 //import dev.compactmods.machines.shrinking.Shrinking;
-//import net.minecraft.resources.ResourceLocation;
+//import net.minecraft.resources.Identifier;
 //import net.minecraft.world.entity.LivingEntity;
 //import top.theillusivec4.curios.api.CuriosApi;
 //
@@ -11,7 +11,7 @@
 //
 //public class CuriosCompat {
 //
-//    public static final ResourceLocation PSD_VALIDATOR = CompactMachines.modRL("has_shrinking_config");
+//    public static final Identifier PSD_VALIDATOR = CompactMachines.modRL("has_shrinking_config");
 //
 //    public static void register() {
 //

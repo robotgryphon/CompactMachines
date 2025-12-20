@@ -15,7 +15,7 @@ public class SpawnSubcommand {
         final var spawnRoot = Commands.literal("spawn");
 
         final var resetSpawn = Commands.literal("reset")
-                .requires(cs -> cs.hasPermission(Commands.LEVEL_GAMEMASTERS))
+                .requires(Commands.hasPermission(Commands.LEVEL_GAMEMASTERS))
                 .then(Commands.argument("room", StringArgumentType.string())
                         .executes(SpawnSubcommand::resetRoomSpawn));
 

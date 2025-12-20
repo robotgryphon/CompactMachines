@@ -26,7 +26,7 @@ import java.util.function.Consumer;
 
 public class PersonalShrinkingDevice extends Item {
 
-    public static final ResourceKey<Item> RESOURCE_KEY = ResourceKey.create(Registries.ITEM, CompactMachines.modRL("personal_shrinking_device"));
+    public static final ResourceKey<Item> RESOURCE_KEY = ResourceKey.create(Registries.ITEM, CompactMachines.identifier("personal_shrinking_device"));
 
     public PersonalShrinkingDevice(Properties props) {
         super(props);
@@ -69,7 +69,7 @@ public class PersonalShrinkingDevice extends Item {
                 final var server = world.getServer();
                 RoomHelper.teleportPlayerOutOfRoom(server, serverPlayer).thenAccept(result -> {
                     // Check Result - If successful, maybe attempt to damage the PSD item
-                    if (result.successful() && server.getGameRules().getBoolean(CMGameRules.DAMAGE_PSD_ITEMS_ON_ROOM_EXIT)) {
+                    if (result.successful() && serverPlayer.level().getGameRules().get(CMGameRules.DAMAGE_PSD_ITEMS_ON_ROOM_EXIT.get())) {
                         handleSuccessfulAtomicShift(stack, serverPlayer, config);
                     }
                 });

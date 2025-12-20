@@ -57,10 +57,10 @@ public class MachineRoomScreen extends Screen {
         super.init();
 
         final var psdBtnSprites = new WidgetSprites(
-                CompactMachines.modRL("personal_shrinking_device"),
-                CompactMachines.modRL("personal_shrinking_device_disabled"),
-                CompactMachines.modRL("personal_shrinking_device_highlighted"),
-                CompactMachines.modRL("personal_shrinking_device_disabled"));
+                CompactMachines.identifier("personal_shrinking_device"),
+                CompactMachines.identifier("personal_shrinking_device_disabled"),
+                CompactMachines.identifier("personal_shrinking_device_highlighted"),
+                CompactMachines.identifier("personal_shrinking_device_disabled"));
 
         this.screenArea = new ScreenRectangle((width / 2) - 130, (height / 2) - 120,
                 260, 260);
@@ -168,8 +168,8 @@ public class MachineRoomScreen extends Screen {
         if (this.minecraft == null || this.minecraft.getConnection() == null) return;
         if (CMFeatureFlags.ROOM_UPGRADES.isSubsetOf(minecraft.getConnection().enabledFeatures())) {
             final var upgradeBtnSprites = new WidgetSprites(
-                    CompactMachines.modRL("upgrade_btn"),
-                    CompactMachines.modRL("upgrade_btn")
+                    CompactMachines.identifier("upgrade_btn"),
+                    CompactMachines.identifier("upgrade_btn")
             );
 
             var upgradeScreenBtn = ImageButtonBuilder.button(upgradeBtnSprites)

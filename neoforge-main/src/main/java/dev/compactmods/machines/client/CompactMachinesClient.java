@@ -35,6 +35,6 @@ public class CompactMachinesClient {
    }
 
    public static void registerSpecialModels(RegisterSpecialModelRendererEvent evt) {
-        evt.register(CompactMachines.modRL("room_core"), RoomCoreModel.Unbaked.MAP_CODEC);
+        evt.register(CompactMachines.identifier("room_core"), RoomCoreModel.Unbaked.MAP_CODEC);
    }
 }

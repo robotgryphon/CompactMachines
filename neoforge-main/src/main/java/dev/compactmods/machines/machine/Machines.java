@@ -46,8 +46,8 @@ public interface Machines {
     Supplier<Item.Properties> MACHINE_ITEM_PROPS = Item.Properties::new;
 
     interface Blocks {
-        ResourceKey<Block> UNBOUND_KEY = ResourceKey.create(Registries.BLOCK, CompactMachines.modRL("new_machine"));
-        ResourceKey<Block> BOUND_KEY = ResourceKey.create(Registries.BLOCK, CompactMachines.modRL("new_machine"));
+        ResourceKey<Block> UNBOUND_KEY = ResourceKey.create(Registries.BLOCK, CompactMachines.identifier("new_machine"));
+        ResourceKey<Block> BOUND_KEY = ResourceKey.create(Registries.BLOCK, CompactMachines.identifier("new_machine"));
 
         DeferredBlock<UnboundCompactMachineBlock> UNBOUND_MACHINE = CMRegistries.BLOCKS.register("new_machine", () ->
                 new UnboundCompactMachineBlock(MACHINE_BLOCK_PROPS.setId(UNBOUND_KEY)));
@@ -62,12 +62,12 @@ public interface Machines {
     interface Items {
         DeferredItem<BoundCompactMachineItem> BOUND_MACHINE = CMRegistries.ITEMS.register("machine",
                 () -> new BoundCompactMachineItem(MACHINE_ITEM_PROPS.get()
-                        .setId(ResourceKey.create(Registries.ITEM, CompactMachines.modRL("machine")))
+                        .setId(ResourceKey.create(Registries.ITEM, CompactMachines.identifier("machine")))
                         .overrideDescription(BoundCompactMachineItem.FALLBACK_ID)));
 
         DeferredItem<UnboundCompactMachineItem> UNBOUND_MACHINE = CMRegistries.ITEMS.register("new_machine",
                 () -> new UnboundCompactMachineItem(MACHINE_ITEM_PROPS.get()
-                        .setId(ResourceKey.create(Registries.ITEM, CompactMachines.modRL("new_machine")))));
+                        .setId(ResourceKey.create(Registries.ITEM, CompactMachines.identifier("new_machine")))));
 
         static void prepare() {
         }
@@ -101,7 +101,7 @@ public interface Machines {
             var template = templateHolder.value();
 
             final var stack = UNBOUND_MACHINE.toStack();
-            stack.set(CMDataComponents.ROOM_TEMPLATE_ID, templateHolder.key().location());
+            stack.set(CMDataComponents.ROOM_TEMPLATE_ID, templateHolder.key().identifier());
             stack.set(CMDataComponents.MACHINE_COLOR, template.defaultMachineColor());
             return stack;
         }

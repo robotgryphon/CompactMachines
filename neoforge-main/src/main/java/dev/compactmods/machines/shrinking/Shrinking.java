@@ -21,10 +21,10 @@ public class Shrinking {
                     .stacksTo(1)));
 
     public static final DeferredItem<Item> SHRINKING_MODULE = CMRegistries.ITEMS.register("shrinking_module", () ->
-            CMRegistries.basicItem(props -> props.setId(ResourceKey.create(Registries.ITEM, CompactMachines.modRL("shrinking_module")))));
+            CMRegistries.basicItem(props -> props.setId(ResourceKey.create(Registries.ITEM, CompactMachines.identifier("shrinking_module")))));
 
     public static final DeferredItem<Item> ENLARGING_MODULE = CMRegistries.ITEMS.register("enlarging_module", () ->
-            CMRegistries.basicItem(props -> props.setId(ResourceKey.create(Registries.ITEM, CompactMachines.modRL("enlarging_module")))));
+            CMRegistries.basicItem(props -> props.setId(ResourceKey.create(Registries.ITEM, CompactMachines.identifier("enlarging_module")))));
 
     // public static final DeferredItem<Item> RESIZING_MODULE = Registries.ITEMS.register("resizing_module", Registries::basicItem);
 

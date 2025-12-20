@@ -12,7 +12,7 @@ import dev.compactmods.machines.command.argument.Suggestors;
 import dev.compactmods.machines.feature.CMFeatureFlags;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
-import net.minecraft.commands.arguments.ResourceLocationArgument;
+import net.minecraft.commands.arguments.IdentifierArgument;
 import net.minecraft.network.chat.Component;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.Nullable;
@@ -27,12 +27,12 @@ public class RoomUpgradesSubcommand {
 
     public static LiteralArgumentBuilder<CommandSourceStack> make() {
         final var subRoot = Commands.literal("upgrades")
-                .requires(cs -> CMFeatureFlags.ROOM_UPGRADES.isSubsetOf(cs.enabledFeatures())
-                        && cs.hasPermission(Commands.LEVEL_GAMEMASTERS));
+                .requires(cs -> CMFeatureFlags.ROOM_UPGRADES.isSubsetOf(cs.enabledFeatures()))
+                .requires(Commands.hasPermission(Commands.LEVEL_GAMEMASTERS));
 
         // /cm upgrades add [id]
         subRoot.then(Commands.literal("add")
-                .then(Commands.argument("upgrade", ResourceLocationArgument.id())
+                .then(Commands.argument("upgrade", IdentifierArgument.id())
                         .suggests(Suggestors.ROOM_UPGRADE_TYPES)
                         .executes(RoomUpgradesSubcommand::applyUpgrade)));
 
@@ -48,7 +48,7 @@ public class RoomUpgradesSubcommand {
     private static Optional<RoomUpgradeComponentType<?>> getTargetedUpgradeType(CommandContext<CommandSourceStack> ctx) {
         final var src = ctx.getSource();
 
-        final var upgradeType = ResourceLocationArgument.getId(ctx, "upgrade");
+        final var upgradeType = IdentifierArgument.getId(ctx, "upgrade");
         return src.getServer()
                 .registryAccess()
                 .lookupOrThrow(RoomUpgradeComponentType.REGISTRY_KEY)

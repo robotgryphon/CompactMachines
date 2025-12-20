@@ -11,7 +11,7 @@ import net.neoforged.neoforge.network.handling.IPayloadHandler;
 
 public record InitialRoomBlockDataPacket(StructureTemplate blocks) implements CustomPacketPayload {
 
-    public static final CustomPacketPayload.Type<InitialRoomBlockDataPacket> TYPE = new CustomPacketPayload.Type<>(CompactMachines.modRL("initial_room_block_data"));
+    public static final CustomPacketPayload.Type<InitialRoomBlockDataPacket> TYPE = new CustomPacketPayload.Type<>(CompactMachines.identifier("initial_room_block_data"));
 
     public static final StreamCodec<FriendlyByteBuf, InitialRoomBlockDataPacket> STREAM_CODEC = StreamCodec.composite(
             VanillaCodecs.STRUCTURE_TEMPLATE_STREAM_CODEC, InitialRoomBlockDataPacket::blocks,

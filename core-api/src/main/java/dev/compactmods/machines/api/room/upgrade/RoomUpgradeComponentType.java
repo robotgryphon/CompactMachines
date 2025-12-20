@@ -23,7 +23,7 @@ public record RoomUpgradeComponentType<T extends RoomUpgradeComponent>(
         Predicate<ItemStack> itemstackFilter
 ) implements FeatureElement {
 
-    public static final ResourceKey<Registry<RoomUpgradeComponentType<?>>> REGISTRY_KEY = ResourceKey.createRegistryKey(CompactMachines.modRL("room_upgrades"));
+    public static final ResourceKey<Registry<RoomUpgradeComponentType<?>>> REGISTRY_KEY = ResourceKey.createRegistryKey(CompactMachines.identifier("room_upgrades"));
 
     public static <T extends RoomUpgradeComponent> Builder<T> builder(Supplier<T> constructor, MapCodec<T> codec) {
         return new Builder<>(constructor, codec);

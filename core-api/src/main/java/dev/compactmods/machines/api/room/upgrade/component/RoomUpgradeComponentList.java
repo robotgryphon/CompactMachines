@@ -14,7 +14,6 @@ import net.minecraft.util.CommonColors;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.component.TooltipProvider;
-import org.checkerframework.checker.units.qual.C;
 
 import java.util.List;
 import java.util.function.Consumer;

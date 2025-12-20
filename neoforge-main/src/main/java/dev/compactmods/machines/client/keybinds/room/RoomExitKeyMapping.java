@@ -5,7 +5,7 @@ import dev.compactmods.machines.api.CompactMachines;
 import dev.compactmods.machines.api.dimension.CompactDimension;
 import dev.compactmods.machines.client.room.RoomKeyMappings;
 import dev.compactmods.machines.network.room.PlayerRequestedLeavePacket;
-import net.minecraft.Util;
+import net.minecraft.util.Util;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.neoforged.neoforge.client.network.ClientPacketDistributor;
@@ -16,7 +16,7 @@ import net.neoforged.neoforge.registries.NeoForgeRegistries;
 public class RoomExitKeyMapping {
 
    public interface I18n {
-	  String NAME = Util.makeDescriptionId("key.mapping", CompactMachines.modRL("exit_room"));
+	  String NAME = Util.makeDescriptionId("key.mapping", CompactMachines.identifier("exit_room"));
    }
 
    public static final IKeyConflictContext CONFLICT_CONTEXT = new IKeyConflictContext() {

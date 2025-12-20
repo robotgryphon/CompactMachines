@@ -17,7 +17,7 @@ import dev.compactmods.machines.client.keybinds.room.RoomUpgradeUIMapping;
 import dev.compactmods.machines.room.Rooms;
 import dev.compactmods.machines.shrinking.Shrinking;
 import dev.compactmods.machines.villager.Villagers;
-import net.minecraft.Util;
+import net.minecraft.util.Util;
 import net.minecraft.core.Direction;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.data.PackOutput;
@@ -102,7 +102,7 @@ public class EnglishLangGenerator extends dev.compactmods.machines.datagen.base.
         addItem(Shrinking.PERSONAL_SHRINKING_DEVICE, "Personal Shrinking Device");
         addItem(Shrinking.SHRINKING_MODULE, "Atom Shrinking Module");
         addItem(Shrinking.ENLARGING_MODULE, "Atom Enlarging Module");
-        add(Util.makeDescriptionId("block", CompactMachines.modRL("bound_machine_fallback")), machineTranslation);
+        add(Util.makeDescriptionId("block", CompactMachines.identifier("bound_machine_fallback")), machineTranslation);
     }
 
     protected void advancements() {

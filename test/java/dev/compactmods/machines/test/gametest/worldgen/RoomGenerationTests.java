@@ -12,7 +12,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestGenerator;
 import net.minecraft.gametest.framework.TestFunction;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.CommonColors;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.Rotation;
@@ -44,7 +44,7 @@ public class RoomGenerationTests {
         return funcs;
     }
 
-    private static void makeAndAddRoomTemplateTest(List<TestFunction> funcs, ResourceLocation id, RoomTemplate template) {
+    private static void makeAndAddRoomTemplateTest(List<TestFunction> funcs, Identifier id, RoomTemplate template) {
         funcs.add(new TestFunction(
             "room_generation",
             "builtin_roomgen_" + id.getPath(),

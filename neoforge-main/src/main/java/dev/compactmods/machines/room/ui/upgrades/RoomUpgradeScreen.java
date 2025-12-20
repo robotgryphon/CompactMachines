@@ -8,27 +8,25 @@ import dev.compactmods.machines.network.room.PlayerRequestedRoomUIPacket;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.WidgetSprites;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
-import net.minecraft.client.renderer.RenderType;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.ARGB;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.client.network.ClientPacketDistributor;
-import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class RoomUpgradeScreen extends AbstractContainerScreen<RoomUpgradeMenu> {
     private final Inventory inventory;
 
-    private static ResourceLocation CONTAINER_BACKGROUND = CompactMachines.modRL("textures/gui/psd_screen_9slice.png");
+    private static Identifier CONTAINER_BACKGROUND = CompactMachines.identifier("textures/gui/psd_screen_9slice.png");
 
     WidgetSprites BACK_BTN_SPRITES = new WidgetSprites(
-        ResourceLocation.withDefaultNamespace("recipe_book/page_backward"),
-        ResourceLocation.withDefaultNamespace("recipe_book/page_backward_highlighted")
+        Identifier.withDefaultNamespace("recipe_book/page_backward"),
+        Identifier.withDefaultNamespace("recipe_book/page_backward_highlighted")
     );
 
     private final NineSliceRenderer backgroundRenderer;
@@ -40,7 +38,7 @@ public class RoomUpgradeScreen extends AbstractContainerScreen<RoomUpgradeMenu> 
         this.inventoryLabelY = 26 + 32;
         this.imageHeight = 114 + 18 + 20;
 
-        this.backgroundRenderer = NineSliceRenderer.builder(CompactMachines.modRL("textures/gui/psd_screen_9slice.png"))
+        this.backgroundRenderer = NineSliceRenderer.builder(CompactMachines.identifier("textures/gui/psd_screen_9slice.png"))
                 .area(0, 0, imageWidth, imageHeight)
                 .uv(32, 32)
                 .sliceSize(4, 4)

@@ -8,7 +8,7 @@ import net.minecraft.core.UUIDUtil;
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.codec.ByteBufCodecs;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
@@ -45,10 +45,10 @@ public interface CMDataComponents {
     /**
      * Only on new room items - IUnboundMachineItem
      */
-    DeferredHolder<DataComponentType<?>, DataComponentType<ResourceLocation>> ROOM_TEMPLATE_ID = DATA_COMPONENTS
+    DeferredHolder<DataComponentType<?>, DataComponentType<Identifier>> ROOM_TEMPLATE_ID = DATA_COMPONENTS
             .registerComponentType(KEY_ROOM_TEMPLATE, (builder) -> builder
-                    .persistent(ResourceLocation.CODEC)
-                    .networkSynchronized(ResourceLocation.STREAM_CODEC));
+                    .persistent(Identifier.CODEC)
+                    .networkSynchronized(Identifier.STREAM_CODEC));
 
     DeferredHolder<DataComponentType<?>, DataComponentType<UUID>> UPGRADE_INSTANCE_ID = DATA_COMPONENTS
             .registerComponentType("upgrade_id", (builder) -> builder

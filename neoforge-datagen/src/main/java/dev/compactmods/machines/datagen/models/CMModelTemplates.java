@@ -6,7 +6,7 @@ import net.minecraft.client.data.models.model.ModelTemplates;
 import net.minecraft.client.data.models.model.TextureSlot;
 import net.minecraft.client.renderer.special.SpecialModelRenderer;
 import net.minecraft.client.renderer.special.SpecialModelRenderers;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 public class CMModelTemplates {
 
@@ -20,13 +20,13 @@ public class CMModelTemplates {
                     TINT_SLOT,
                     OVERLAY_SLOT)
             .extend()
-            .parent(ResourceLocation.withDefaultNamespace("block/block"))
+            .parent(Identifier.withDefaultNamespace("block/block"))
             .renderType("cutout")
             .element(border -> border.allFaces((dir, face) -> face.texture(BORDER_SLOT)
                     .uvs(0, 0, 16, 16)
                     .cullface(dir)))
             .element(tint -> tint.allFaces((dir, face) -> face.texture(TINT_SLOT)
-                    .emissivity(2, 0)
+                    //.emissivity(2, 0)
                     .uvs(0, 0, 16, 16)
                     .cullface(dir)
                     .tintindex(0)))

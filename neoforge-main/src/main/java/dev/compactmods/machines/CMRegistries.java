@@ -1,6 +1,5 @@
 package dev.compactmods.machines;
 
-import com.sun.jna.platform.unix.solaris.LibKstat;
 import dev.compactmods.machines.api.attachment.CMDataAttachments;
 import dev.compactmods.machines.api.component.CMDataComponents;
 import dev.compactmods.machines.api.room.template.RoomTemplate;
@@ -10,14 +9,12 @@ import dev.compactmods.machines.villager.Villagers;
 import net.minecraft.commands.synchronization.ArgumentTypeInfo;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.entity.ai.village.poi.PoiType;
-import net.minecraft.world.entity.npc.VillagerProfession;
-import net.minecraft.world.entity.npc.VillagerTrades;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.entity.BlockEntityType;
-import net.minecraft.world.level.levelgen.structure.templatesystem.StructureProcessorType;
+import net.minecraft.world.level.gamerules.GameRule;
 import net.minecraft.world.level.storage.loot.functions.LootItemFunctionType;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent;
@@ -43,6 +40,8 @@ public interface CMRegistries {
 	// Commands
 	DeferredRegister<ArgumentTypeInfo<?, ?>> COMMAND_ARGUMENT_TYPES = DeferredRegister.create(BuiltInRegistries.COMMAND_ARGUMENT_TYPE, CompactMachines.MOD_ID);
 
+	DeferredRegister<GameRule<?>> GAME_RULES = DeferredRegister.create(BuiltInRegistries.GAME_RULE, CompactMachines.MOD_ID);
+
 	// LootFunctions
 	DeferredRegister<LootItemFunctionType<?>> LOOT_FUNCTIONS = DeferredRegister.create(BuiltInRegistries.LOOT_FUNCTION_TYPE, CompactMachines.MOD_ID);
 
@@ -53,7 +52,7 @@ public interface CMRegistries {
 	}
 
 	static void setup(IEventBus modBus) {
-		Stream.of(BLOCKS, ITEMS, BLOCK_ENTITIES, CONTAINERS, COMMAND_ARGUMENT_TYPES, LOOT_FUNCTIONS,
+		Stream.of(BLOCKS, ITEMS, BLOCK_ENTITIES, CONTAINERS, COMMAND_ARGUMENT_TYPES, GAME_RULES, LOOT_FUNCTIONS,
                 POINTS_OF_INTEREST, Villagers.VILLAGERS, Villagers.TRADES, TABS,
 				CMDataAttachments.ATTACHMENT_TYPES,
 				CMDataComponents.DATA_COMPONENTS

@@ -36,6 +36,6 @@ public record GlobalPosWithRotation(ResourceKey<Level> dimension, Vec3 position,
 
     @Override
     public String toString() {
-        return "GlobalPosWRot {%s; pos = %s, rot = %s".formatted(dimension.location(), position, rotation);
+        return "GlobalPosWRot {%s; pos = %s, rot = %s".formatted(dimension.identifier(), position, rotation);
     }
 }

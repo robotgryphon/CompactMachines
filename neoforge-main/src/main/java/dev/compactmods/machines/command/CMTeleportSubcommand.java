@@ -24,7 +24,7 @@ public class CMTeleportSubcommand {
 
     public static LiteralArgumentBuilder<CommandSourceStack> make() {
         final var subRoot = Commands.literal("tp")
-                .requires(cs -> cs.hasPermission(Commands.LEVEL_GAMEMASTERS));
+                .requires(Commands.hasPermission(Commands.LEVEL_GAMEMASTERS));
 
         subRoot.then(Commands.argument("room", StringArgumentType.string())
                 .suggests(Suggestors.ROOM_CODES)

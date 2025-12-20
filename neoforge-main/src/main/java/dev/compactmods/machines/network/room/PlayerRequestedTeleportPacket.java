@@ -12,7 +12,7 @@ import net.neoforged.neoforge.network.handling.IPayloadHandler;
 
 public record PlayerRequestedTeleportPacket(GlobalPos machine, String room) implements CustomPacketPayload {
 
-  public static final Type<PlayerRequestedTeleportPacket> TYPE = new Type<>(CompactMachines.modRL("player_teleport"));
+  public static final Type<PlayerRequestedTeleportPacket> TYPE = new Type<>(CompactMachines.identifier("player_teleport"));
 
   public static final StreamCodec<FriendlyByteBuf, PlayerRequestedTeleportPacket> STREAM_CODEC = StreamCodec.composite(
 		GlobalPos.STREAM_CODEC, PlayerRequestedTeleportPacket::machine,

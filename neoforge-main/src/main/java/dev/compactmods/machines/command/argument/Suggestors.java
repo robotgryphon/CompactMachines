@@ -9,7 +9,7 @@ import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.SharedSuggestionProvider;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 import java.util.Set;
 
@@ -37,7 +37,7 @@ public class Suggestors {
 	public static final SuggestionProvider<CommandSourceStack> ROOM_UPGRADE_TYPES = (ctx, builder) ->
 			SharedSuggestionProvider.suggestResource(getRegistryValues(ctx, RoomUpgradeComponentType.REGISTRY_KEY), builder);
 
-	private static <T> Set<ResourceLocation> getRegistryValues(CommandContext<CommandSourceStack> ctx, ResourceKey<Registry<T>> keyType) {
+	private static <T> Set<Identifier> getRegistryValues(CommandContext<CommandSourceStack> ctx, ResourceKey<Registry<T>> keyType) {
 	  return ctx.getSource().registryAccess()
 		  .lookupOrThrow(keyType)
 		  .keySet();

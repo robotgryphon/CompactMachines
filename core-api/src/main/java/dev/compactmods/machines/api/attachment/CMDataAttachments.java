@@ -5,7 +5,7 @@ import com.mojang.serialization.Codec;
 import dev.compactmods.machines.api.CompactMachines;
 import dev.compactmods.machines.api.room.history.RoomEntryPoint;
 import dev.compactmods.machines.api.room.upgrade.inventory.RoomUpgradeInventory;
-import net.minecraft.Util;
+import net.minecraft.util.Util;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.GlobalPos;
 import net.minecraft.core.UUIDUtil;

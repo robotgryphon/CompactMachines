@@ -13,7 +13,7 @@ import java.util.UUID;
 
 public record SyncRoomMetadataPacket(String roomCode, UUID owner) implements CustomPacketPayload {
 
-  public static final Type<SyncRoomMetadataPacket> TYPE = new Type<>(CompactMachines.modRL("sync_room_metadata"));
+  public static final Type<SyncRoomMetadataPacket> TYPE = new Type<>(CompactMachines.identifier("sync_room_metadata"));
 
   public static final StreamCodec<FriendlyByteBuf, SyncRoomMetadataPacket> STREAM_CODEC = StreamCodec.composite(
 		ByteBufCodecs.STRING_UTF8, SyncRoomMetadataPacket::roomCode,

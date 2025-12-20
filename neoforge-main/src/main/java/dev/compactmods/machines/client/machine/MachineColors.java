@@ -11,7 +11,7 @@ import dev.compactmods.machines.machine.Machines;
 import net.minecraft.client.color.block.BlockColor;
 import net.minecraft.client.color.item.ItemTintSource;
 import net.minecraft.client.multiplayer.ClientLevel;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.client.event.RegisterColorHandlersEvent;
@@ -20,7 +20,7 @@ import org.jetbrains.annotations.Nullable;
 
 public class MachineColors {
 
-    public static final ResourceLocation ITEM_PROVIDER_ID = CompactMachines.modRL("machine_color");
+    public static final Identifier ITEM_PROVIDER_ID = CompactMachines.identifier("machine_color");
 
     private static final int DEFAULT = 0xFFFFFFFF;
 

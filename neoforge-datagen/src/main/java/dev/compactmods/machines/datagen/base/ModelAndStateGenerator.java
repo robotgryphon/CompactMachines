@@ -29,15 +29,15 @@ public class ModelAndStateGenerator extends CMModelProvider {
         blockModels.createTrivialBlock(Rooms.Blocks.BREAKABLE_WALL.get(), TexturedModel.CUBE);
 
         blockModels.createAirLikeBlock(Dimension.BLOCK_MACHINE_VOID_AIR.get(),
-                CompactMachines.modRL("none"));
+                CompactMachines.identifier("none"));
 
         blockModels.createCompactMachine(Machines.Blocks.BOUND_MACHINE);
         blockModels.createCompactMachine(Machines.Blocks.UNBOUND_MACHINE);
 
-        blockModels.registerSimpleTintedItemModel(Machines.Blocks.UNBOUND_MACHINE.get(), CompactMachines.modRL("block/machine"),
+        blockModels.registerSimpleTintedItemModel(Machines.Blocks.UNBOUND_MACHINE.get(), CompactMachines.identifier("block/machine"),
                 new MachineColors.MachineColorComponentItemTintSource());
 
-        blockModels.registerSimpleTintedItemModel(Machines.Blocks.BOUND_MACHINE.get(), CompactMachines.modRL("block/machine"),
+        blockModels.registerSimpleTintedItemModel(Machines.Blocks.BOUND_MACHINE.get(), CompactMachines.identifier("block/machine"),
                 new MachineColors.MachineColorComponentItemTintSource());
 
 

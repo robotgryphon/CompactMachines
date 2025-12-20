@@ -17,7 +17,7 @@ public class CMUnbindSubcommand {
 
     public static LiteralArgumentBuilder<CommandSourceStack> make() {
         final var subRoot = Commands.literal("unbind")
-                .requires(cs -> cs.hasPermission(Commands.LEVEL_GAMEMASTERS));
+                .requires(Commands.hasPermission(Commands.LEVEL_GAMEMASTERS));
 
         subRoot.then(Commands.argument("pos", BlockPosArgument.blockPos())
                 .executes(CMUnbindSubcommand::doUnbind));

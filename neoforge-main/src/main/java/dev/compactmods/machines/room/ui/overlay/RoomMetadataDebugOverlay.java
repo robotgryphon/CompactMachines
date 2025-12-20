@@ -46,7 +46,7 @@ public class RoomMetadataDebugOverlay implements GuiLayer {
     @Override
     public void render(GuiGraphics graphics, DeltaTracker deltaTracker) {
         final var mc = Minecraft.getInstance();
-        if (!mc.debugEntries.isF3Visible())
+        if (!mc.debugEntries.isOverlayVisible())
             return;
 
         if (mc.player == null)

@@ -14,7 +14,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.component.TooltipProvider;
@@ -40,9 +40,9 @@ public record RoomTemplate(RoomDimensions internalDimensions, MachineColor defau
                            List<RoomStructureInfo> structures, Optional<BlockState> optionalFloor)
         implements TooltipProvider {
 
-    public static final ResourceKey<Registry<RoomTemplate>> REGISTRY_KEY = ResourceKey.createRegistryKey(CompactMachines.modRL("room_templates"));
+    public static final ResourceKey<Registry<RoomTemplate>> REGISTRY_KEY = ResourceKey.createRegistryKey(CompactMachines.identifier("room_templates"));
 
-    public static final ResourceLocation NO_TEMPLATE = CompactMachines.modRL("empty");
+    public static final Identifier NO_TEMPLATE = CompactMachines.identifier("empty");
 
     public static final RoomTemplate INVALID_TEMPLATE = new RoomTemplate(0, 0);
 

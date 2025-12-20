@@ -1,6 +1,6 @@
 package dev.compactmods.machines.api.room.capability;
 
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.MinecraftServer;
 import net.neoforged.neoforge.capabilities.BaseCapability;
 import net.neoforged.neoforge.capabilities.CapabilityRegistry;
@@ -16,16 +16,16 @@ public class CompactRoomCapability<T, Ctx extends @Nullable Object> extends Base
     private static final CapabilityRegistry<CompactRoomCapability<?, ?>> registry = new CapabilityRegistry<>(CompactRoomCapability::new);
     final Set<IRoomCapabilityProvider<T, Ctx>> providers = new HashSet<>();
 
-    private CompactRoomCapability(ResourceLocation resourceLocation, Class<T> aClass, Class<Ctx> ctxClass) {
-        super(resourceLocation, aClass, ctxClass);
+    private CompactRoomCapability(Identifier identifier, Class<T> aClass, Class<Ctx> ctxClass) {
+        super(identifier, aClass, ctxClass);
     }
 
-    public static <T, C> CompactRoomCapability<T, C> create(ResourceLocation name, Class<T> typeClass, Class<C> contextClass) {
+    public static <T, C> CompactRoomCapability<T, C> create(Identifier name, Class<T> typeClass, Class<C> contextClass) {
         //noinspection unchecked,rawtypes
         return (CompactRoomCapability) registry.create(name, typeClass, contextClass);
     }
 
-    public static <T> CompactRoomCapability<T, Void> createVoid(ResourceLocation name, Class<T> typeClass) {
+    public static <T> CompactRoomCapability<T, Void> createVoid(Identifier name, Class<T> typeClass) {
         return create(name, typeClass, void.class);
     }
 

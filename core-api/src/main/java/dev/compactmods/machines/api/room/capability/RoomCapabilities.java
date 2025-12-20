@@ -8,9 +8,9 @@ import java.util.UUID;
 
 public interface RoomCapabilities {
 
-    CompactRoomCapability<IAttachmentHolder, Void> ROOM_DATA_ATTACHMENTS = CompactRoomCapability.createVoid(CompactMachines.modRL("data_attachments"), IAttachmentHolder.class);
+    CompactRoomCapability<IAttachmentHolder, Void> ROOM_DATA_ATTACHMENTS = CompactRoomCapability.createVoid(CompactMachines.identifier("data_attachments"), IAttachmentHolder.class);
 
-    CompactRoomCapability<IAttachmentHolder, UUID> UPGRADE_DATA_ATTACHMENTS = CompactRoomCapability.create(CompactMachines.modRL("upgrade_data_attachments"), IAttachmentHolder.class, UUID.class);
+    CompactRoomCapability<IAttachmentHolder, UUID> UPGRADE_DATA_ATTACHMENTS = CompactRoomCapability.create(CompactMachines.identifier("upgrade_data_attachments"), IAttachmentHolder.class, UUID.class);
 
-    CompactRoomCapability<IRoomUpgradeAccessor, Void> UPGRADES = CompactRoomCapability.createVoid(CompactMachines.modRL("components"), IRoomUpgradeAccessor.class);
+    CompactRoomCapability<IRoomUpgradeAccessor, Void> UPGRADES = CompactRoomCapability.createVoid(CompactMachines.identifier("components"), IRoomUpgradeAccessor.class);
 }

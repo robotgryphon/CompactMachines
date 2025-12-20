@@ -4,7 +4,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.gametest.framework.GameTestInfo;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Player;
@@ -26,7 +26,7 @@ public final class CompactGameTestHelper extends GameTestHelper {
         return bounds.move(BlockPos.ZERO.subtract(absolutePos(BlockPos.ZERO)));
     }
 
-    public void loadStructureIntoTestArea(ResourceLocation structure, BlockPos relLocation) {
+    public void loadStructureIntoTestArea(Identifier structure, BlockPos relLocation) {
         final var structures = this.getLevel().getStructureManager();
         final var template = structures.get(structure);
         if(template.isEmpty())

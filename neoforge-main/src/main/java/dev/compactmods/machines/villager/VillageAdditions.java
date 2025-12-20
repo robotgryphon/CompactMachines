@@ -6,7 +6,7 @@ import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.levelgen.structure.pools.SinglePoolElement;
 import net.minecraft.world.level.levelgen.structure.pools.StructureTemplatePool;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureProcessorList;
@@ -24,17 +24,17 @@ public class VillageAdditions {
                 .lookupOrThrow(Registries.PROCESSOR_LIST);
 
         addBuildingToPool(templatePools, processorLists,
-                ResourceLocation.withDefaultNamespace("village/plains/houses"),
-                CompactMachines.modRL("village/plains/tinkerer_area"), 5);
+                Identifier.withDefaultNamespace("village/plains/houses"),
+                CompactMachines.identifier("village/plains/tinkerer_area"), 5);
     }
 
     private static final ResourceKey<StructureProcessorList> EMPTY_PROCESSOR_LIST_KEY = ResourceKey.create(
-            Registries.PROCESSOR_LIST, ResourceLocation.withDefaultNamespace("empty"));
+            Registries.PROCESSOR_LIST, Identifier.withDefaultNamespace("empty"));
 
     private static void addBuildingToPool(Registry<StructureTemplatePool> templatePoolRegistry,
                                           Registry<StructureProcessorList> processorListRegistry,
-                                          ResourceLocation poolRL,
-                                          ResourceLocation nbtPieceRL,
+                                          Identifier poolRL,
+                                          Identifier nbtPieceRL,
                                           int weight) {
 
         // Grabs the processor list we want to use along with our piece.

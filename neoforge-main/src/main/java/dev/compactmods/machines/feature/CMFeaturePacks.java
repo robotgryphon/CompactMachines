@@ -2,7 +2,7 @@ package dev.compactmods.machines.feature;
 
 import dev.compactmods.machines.api.CompactMachines;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.packs.PackType;
 import net.minecraft.server.packs.repository.Pack;
 import net.minecraft.server.packs.repository.PackSource;
@@ -13,13 +13,13 @@ public class CMFeaturePacks {
     private static final PackSource OPTIONAL_ROOM_TEMPLATES = new RoomTemplatePackSource("basic_templates");
 
     public static void addFeaturePacks(final AddPackFindersEvent event) {
-        addOptionalRoomTemplateDataPack(event, CompactMachines.modRL("basic_templates"), Component.literal("Compact Machines: Basic Room Templates"));
-        addOptionalFeaturePack(event, CompactMachines.modRL("room_upgrades"), Component.literal("Compact Machines: Room Upgrades"));
+        addOptionalRoomTemplateDataPack(event, CompactMachines.identifier("basic_templates"), Component.literal("Compact Machines: Basic Room Templates"));
+        addOptionalFeaturePack(event, CompactMachines.identifier("room_upgrades"), Component.literal("Compact Machines: Room Upgrades"));
     }
 
-    private static void addOptionalFeaturePack(AddPackFindersEvent event, ResourceLocation packName, Component displayName) {
+    private static void addOptionalFeaturePack(AddPackFindersEvent event, Identifier packName, Component displayName) {
         event.addPackFinders(
-                CompactMachines.modRL("data/" + packName.getNamespace() + "/datapacks/" + packName.getPath()),
+                CompactMachines.identifier("data/" + packName.getNamespace() + "/datapacks/" + packName.getPath()),
                 PackType.SERVER_DATA,
                 displayName,
                 PackSource.FEATURE,
@@ -28,9 +28,9 @@ public class CMFeaturePacks {
         );
     }
 
-    private static void addOptionalRoomTemplateDataPack(AddPackFindersEvent event, ResourceLocation packName, Component displayName) {
+    private static void addOptionalRoomTemplateDataPack(AddPackFindersEvent event, Identifier packName, Component displayName) {
         event.addPackFinders(
-                CompactMachines.modRL("data/" + packName.getNamespace() + "/datapacks/" + packName.getPath()),
+                CompactMachines.identifier("data/" + packName.getNamespace() + "/datapacks/" + packName.getPath()),
                 PackType.SERVER_DATA,
                 displayName,
                 OPTIONAL_ROOM_TEMPLATES,

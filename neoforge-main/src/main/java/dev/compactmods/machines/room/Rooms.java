@@ -27,8 +27,8 @@ import java.util.function.Supplier;
 public interface Rooms {
 
     interface Blocks {
-        ResourceKey<Block> SOLID_WALL_KEY = ResourceKey.create(Registries.BLOCK, CompactMachines.modRL("solid_wall"));
-        ResourceKey<Block> WALL_KEY = ResourceKey.create(Registries.BLOCK, CompactMachines.modRL("wall"));
+        ResourceKey<Block> SOLID_WALL_KEY = ResourceKey.create(Registries.BLOCK, CompactMachines.identifier("solid_wall"));
+        ResourceKey<Block> WALL_KEY = ResourceKey.create(Registries.BLOCK, CompactMachines.identifier("wall"));
 
         DeferredBlock<SolidWallBlock> SOLID_WALL = CMRegistries.BLOCKS.register("solid_wall", () ->
                 new SolidWallBlock(BlockBehaviour.Properties.of()
@@ -53,16 +53,16 @@ public interface Rooms {
 
         DeferredItem<Item> ROOM_CORE = CMRegistries.ITEMS.register("room_core", () ->
                 new Item(new Item.Properties()
-                        .setId(ResourceKey.create(Registries.ITEM, CompactMachines.modRL("room_core")))
+                        .setId(ResourceKey.create(Registries.ITEM, CompactMachines.identifier("room_core")))
                         .stacksTo(1)));
 
         DeferredItem<ItemBlockWall> ITEM_SOLID_WALL = CMRegistries.ITEMS.register("solid_wall", () ->
                 new ItemBlockWall(Blocks.SOLID_WALL.get(), WALL_ITEM_PROPS.get()
-                        .setId(ResourceKey.create(Registries.ITEM, CompactMachines.modRL("solid_wall")))));
+                        .setId(ResourceKey.create(Registries.ITEM, CompactMachines.identifier("solid_wall")))));
 
         DeferredItem<ItemBlockWall> BREAKABLE_WALL = CMRegistries.ITEMS.register("wall", () ->
                 new ItemBlockWall(Blocks.BREAKABLE_WALL.get(), WALL_ITEM_PROPS.get()
-                        .setId(ResourceKey.create(Registries.ITEM, CompactMachines.modRL("wall")))));
+                        .setId(ResourceKey.create(Registries.ITEM, CompactMachines.identifier("wall")))));
 
         static void prepare() {
         }

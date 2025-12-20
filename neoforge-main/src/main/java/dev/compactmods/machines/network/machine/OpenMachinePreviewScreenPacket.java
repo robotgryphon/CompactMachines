@@ -14,7 +14,7 @@ import net.neoforged.neoforge.network.handling.IPayloadHandler;
 
 public record OpenMachinePreviewScreenPacket(GlobalPos machinePos, String roomCode, StructureTemplate internalBlocks) implements CustomPacketPayload {
 
-    public static final Type<OpenMachinePreviewScreenPacket> TYPE = new Type<>(CompactMachines.modRL("open_machine_preview_screen"));
+    public static final Type<OpenMachinePreviewScreenPacket> TYPE = new Type<>(CompactMachines.identifier("open_machine_preview_screen"));
 
     public static final StreamCodec<FriendlyByteBuf, OpenMachinePreviewScreenPacket> STREAM_CODEC = StreamCodec.composite(
             GlobalPos.STREAM_CODEC, OpenMachinePreviewScreenPacket::machinePos,

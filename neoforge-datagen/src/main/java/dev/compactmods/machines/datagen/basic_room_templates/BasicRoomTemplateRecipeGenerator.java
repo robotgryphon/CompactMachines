@@ -14,7 +14,7 @@ import net.minecraft.data.recipes.RecipeCategory;
 import net.minecraft.data.recipes.RecipeOutput;
 import net.minecraft.data.recipes.ShapedRecipeBuilder;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
@@ -32,25 +32,25 @@ public class BasicRoomTemplateRecipeGenerator extends RecipeGenerator {
 
     @Override
     protected void buildRecipes() {
-        addMachineRecipe(CompactMachines.modRL("tiny"), Tags.Items.INGOTS_COPPER);
-        addMachineRecipe(CompactMachines.modRL("small"), Tags.Items.INGOTS_IRON);
-        addMachineRecipe(CompactMachines.modRL("normal"), Tags.Items.INGOTS_GOLD);
-        addMachineRecipe(CompactMachines.modRL("large"), Tags.Items.GEMS_DIAMOND);
-        addMachineRecipe(CompactMachines.modRL("giant"), Tags.Items.OBSIDIANS);
-        addMachineRecipe(CompactMachines.modRL("colossal"), Tags.Items.INGOTS_NETHERITE);
+        addMachineRecipe(CompactMachines.identifier("tiny"), Tags.Items.INGOTS_COPPER);
+        addMachineRecipe(CompactMachines.identifier("small"), Tags.Items.INGOTS_IRON);
+        addMachineRecipe(CompactMachines.identifier("normal"), Tags.Items.INGOTS_GOLD);
+        addMachineRecipe(CompactMachines.identifier("large"), Tags.Items.GEMS_DIAMOND);
+        addMachineRecipe(CompactMachines.identifier("giant"), Tags.Items.OBSIDIANS);
+        addMachineRecipe(CompactMachines.identifier("colossal"), Tags.Items.INGOTS_NETHERITE);
 
-        addMachineRecipe(CompactMachines.modRL("soaryn"), Tags.Items.NETHER_STARS);
-        addMachineRecipe(CompactMachines.modRL("farming"), Items.DIAMOND_HOE);
+        addMachineRecipe(CompactMachines.identifier("soaryn"), Tags.Items.NETHER_STARS);
+        addMachineRecipe(CompactMachines.identifier("farming"), Items.DIAMOND_HOE);
     }
 
-    private void addMachineRecipe(ResourceLocation id, TagKey<Item> catalyst) {
+    private void addMachineRecipe(Identifier id, TagKey<Item> catalyst) {
         final var templateRef = this.registries.lookupOrThrow(RoomTemplate.REGISTRY_KEY)
                 .getOrThrow(ResourceKey.create(RoomTemplate.REGISTRY_KEY, id));
 
         machineRecipeBuilder(this.output, templateRef, builder -> builder.define('P', catalyst));
     }
 
-    private void addMachineRecipe(ResourceLocation id, ItemLike catalyst) {
+    private void addMachineRecipe(Identifier id, ItemLike catalyst) {
         final var templateRef = this.registries.lookupOrThrow(RoomTemplate.REGISTRY_KEY)
                 .getOrThrow(ResourceKey.create(RoomTemplate.REGISTRY_KEY, id));
 

@@ -4,7 +4,7 @@ import dev.compactmods.machines.api.CompactMachines;
 import dev.compactmods.machines.api.component.CMDataComponents;
 import dev.compactmods.machines.i18n.MachineTranslations;
 import dev.compactmods.machines.machine.Machines;
-import net.minecraft.Util;
+import net.minecraft.util.Util;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
@@ -15,7 +15,7 @@ import java.util.function.Consumer;
 
 public class BoundCompactMachineItem extends BlockItem {
 
-    public static final String FALLBACK_ID = Util.makeDescriptionId("block", CompactMachines.modRL("bound_machine_fallback"));
+    public static final String FALLBACK_ID = Util.makeDescriptionId("block", CompactMachines.identifier("bound_machine_fallback"));
 
     public BoundCompactMachineItem(Properties builder) {
         super(Machines.Blocks.BOUND_MACHINE.get(), builder);

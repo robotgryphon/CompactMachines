@@ -2,7 +2,7 @@ package dev.compactmods.machines.i18n;
 
 import dev.compactmods.machines.api.CompactMachines;
 import net.minecraft.ChatFormatting;
-import net.minecraft.Util;
+import net.minecraft.util.Util;
 import net.minecraft.network.chat.Component;
 
 import java.util.function.Supplier;
@@ -22,9 +22,9 @@ public interface Translations {
             .withStyle(ChatFormatting.ITALIC);
 
     interface IDs {
-        String TELEPORT_OUT_OF_BOUNDS = Util.makeDescriptionId("messages", CompactMachines.modRL("teleport_oob"));
-        String HOW_DID_YOU_GET_HERE = Util.makeDescriptionId("messages", CompactMachines.modRL("how_did_you_get_here"));
-        String HINT_HOLD_SHIFT = Util.makeDescriptionId("messages", CompactMachines.modRL("hint.hold_shift"));
-        String UNBREAKABLE_BLOCK = Util.makeDescriptionId("messages", CompactMachines.modRL("solid_wall"));
+        String TELEPORT_OUT_OF_BOUNDS = Util.makeDescriptionId("messages", CompactMachines.identifier("teleport_oob"));
+        String HOW_DID_YOU_GET_HERE = Util.makeDescriptionId("messages", CompactMachines.identifier("how_did_you_get_here"));
+        String HINT_HOLD_SHIFT = Util.makeDescriptionId("messages", CompactMachines.identifier("hint.hold_shift"));
+        String UNBREAKABLE_BLOCK = Util.makeDescriptionId("messages", CompactMachines.identifier("solid_wall"));
     }
 }

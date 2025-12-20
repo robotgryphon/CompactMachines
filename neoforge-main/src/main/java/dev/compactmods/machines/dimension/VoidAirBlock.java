@@ -26,7 +26,7 @@ import net.minecraft.world.level.block.state.BlockState;
 public class VoidAirBlock extends AirBlock {
     // FIXME final public static DamageSource DAMAGE_SOURCE = new DamageSource(MOD_ID + "_voidair");
 
-    public static final ResourceKey<Block> RESOURCE_KEY = ResourceKey.create(Registries.BLOCK, CompactMachines.modRL("void_air"));
+    public static final ResourceKey<Block> RESOURCE_KEY = ResourceKey.create(Registries.BLOCK, CompactMachines.identifier("void_air"));
 
     public VoidAirBlock() {
         super(BlockBehaviour.Properties.of()
@@ -55,9 +55,9 @@ public class VoidAirBlock extends AirBlock {
 
         if (entity instanceof ServerPlayer player) {
             // If players are allowed outside of machine bounds, early exit -- but damage them if configured
-            final var rules = level.getServer().getGameRules();
+            final var rules = player.level().getGameRules();
 
-            if (rules.getBoolean(CMGameRules.DAMAGE_OOB_PLAYERS))
+            if (rules.get(CMGameRules.DAMAGE_OOB_PLAYERS.get()))
                 tryDamagingAdventurousPlayer(level, player);
 
             // FIXME - Achievement
@@ -65,9 +65,9 @@ public class VoidAirBlock extends AirBlock {
 
             boolean allowedOutOfBounds = switch (player.gameMode.getGameModeForPlayer()) {
                 case GameType.ADVENTURE, GameType.SURVIVAL ->
-                        rules.getBoolean(CMGameRules.ALLOW_SURVIVAL_OUT_OF_BOUNDS);
-                case GameType.CREATIVE -> rules.getBoolean(CMGameRules.ALLOW_CREATIVE_OUT_OF_BOUNDS);
-                case GameType.SPECTATOR -> rules.getBoolean(CMGameRules.ALLOW_SPECTATORS_OUT_OF_BOUNDS);
+                        rules.get(CMGameRules.ALLOW_SURVIVAL_OUT_OF_BOUNDS.get());
+                case GameType.CREATIVE -> rules.get(CMGameRules.ALLOW_CREATIVE_OUT_OF_BOUNDS.get());
+                case GameType.SPECTATOR -> rules.get(CMGameRules.ALLOW_SPECTATORS_OUT_OF_BOUNDS.get());
             };
 
             if (!allowedOutOfBounds)

@@ -30,7 +30,7 @@ public class CompactMachinesServer {
 
     private static @Nullable MinecraftServer CURRENT_SERVER;
 
-    public static TicketController CHUNK_TICKET_CONTROLLER = new TicketController(CompactMachines.modRL("chunkloader_upgrade"), RoomUpgradeHelper::verifyChunkloaderUpgrades);
+    public static TicketController CHUNK_TICKET_CONTROLLER = new TicketController(CompactMachines.identifier("chunkloader_upgrade"), RoomUpgradeHelper::verifyChunkloaderUpgrades);
 
     public CompactMachinesServer(IEventBus modBus) {
         NeoForge.EVENT_BUS.addListener(EventPriority.LOW, CompactMachinesServer::serverAboutToStart);

@@ -14,8 +14,8 @@ import dev.compactmods.machines.machine.Machines;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.arguments.EntityArgument;
-import net.minecraft.commands.arguments.ResourceLocationArgument;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.commands.arguments.IdentifierArgument;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.ItemStack;
 import org.apache.logging.log4j.Logger;
@@ -26,12 +26,12 @@ public class CMGiveMachineSubcommand {
 
     public static LiteralArgumentBuilder<CommandSourceStack> make() {
         final var subRoot = Commands.literal("give")
-                .requires(cs -> cs.hasPermission(Commands.LEVEL_GAMEMASTERS));
+                .requires(Commands.hasPermission(Commands.LEVEL_GAMEMASTERS));
 
 
         // /cm give new [template]
         subRoot.then(Commands.literal("new")
-                .then(Commands.argument("template", ResourceLocationArgument.id())
+                .then(Commands.argument("template", IdentifierArgument.id())
                         .suggests(Suggestors.ROOM_TEMPLATES)
                         .executes(CMGiveMachineSubcommand::giveNewMachineExecutor)));
 
@@ -46,7 +46,7 @@ public class CMGiveMachineSubcommand {
 
         // /cm give [player] new [template]
         giveSpecificPlayer.then(Commands.literal("new")
-                        .then(Commands.argument("template", ResourceLocationArgument.id())
+                        .then(Commands.argument("template", IdentifierArgument.id())
                             .suggests(Suggestors.ROOM_TEMPLATES)
                             .executes(CMGiveMachineSubcommand::giveNewMachineSpecificPlayer)));
 
@@ -68,7 +68,7 @@ public class CMGiveMachineSubcommand {
     private static int giveNewMachineExecutor(CommandContext<CommandSourceStack> ctx) throws CommandSyntaxException {
         final var src = ctx.getSource();
         final var player = src.getPlayerOrException();
-        final var templateId = ResourceLocationArgument.getId(ctx, "template");
+        final var templateId = IdentifierArgument.getId(ctx, "template");
 
         createAndGiveNewMachine(src, templateId, player);
 
@@ -78,7 +78,7 @@ public class CMGiveMachineSubcommand {
     private static int giveNewMachineSpecificPlayer(CommandContext<CommandSourceStack> ctx) throws CommandSyntaxException {
         final var src = ctx.getSource();
         final var player = EntityArgument.getPlayer(ctx, "player");
-        final var templateId = ResourceLocationArgument.getId(ctx, "template");
+        final var templateId = IdentifierArgument.getId(ctx, "template");
 
         createAndGiveNewMachine(src, templateId, player);
 
@@ -105,7 +105,7 @@ public class CMGiveMachineSubcommand {
         return 0;
     }
 
-    private static void createAndGiveNewMachine(CommandSourceStack src, ResourceLocation templateId, ServerPlayer player) {
+    private static void createAndGiveNewMachine(CommandSourceStack src, Identifier templateId, ServerPlayer player) {
 
         final var template = RoomTemplateHelper.getTemplateHolder(src.getServer().registryAccess(), templateId);
         if(template.isBound()) {

@@ -8,7 +8,7 @@ import net.neoforged.neoforge.network.handling.IPayloadHandler;
 
 public record PlayerRequestedLeavePacket() implements CustomPacketPayload {
 
-    public static final Type<PlayerRequestedLeavePacket> TYPE = new Type<>(CompactMachines.modRL("player_requested_to_leave_room"));
+    public static final Type<PlayerRequestedLeavePacket> TYPE = new Type<>(CompactMachines.identifier("player_requested_to_leave_room"));
 
     public static final IPayloadHandler<PlayerRequestedLeavePacket> HANDLER = (pkt, ctx) -> {
         final var player = ctx.player();

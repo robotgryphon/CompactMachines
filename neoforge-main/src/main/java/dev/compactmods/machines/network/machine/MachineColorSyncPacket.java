@@ -12,7 +12,7 @@ import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.neoforged.neoforge.network.handling.IPayloadHandler;
 
 public record MachineColorSyncPacket(GlobalPos position, MachineColor color) implements CustomPacketPayload {
-    public static final Type<MachineColorSyncPacket> TYPE = new Type<>(CompactMachines.modRL("update_machine_color"));
+    public static final Type<MachineColorSyncPacket> TYPE = new Type<>(CompactMachines.identifier("update_machine_color"));
 
     public static final Codec<MachineColorSyncPacket> CODEC = RecordCodecBuilder.create(inst -> inst.group(
             GlobalPos.CODEC.fieldOf("position").forGetter(MachineColorSyncPacket::position),

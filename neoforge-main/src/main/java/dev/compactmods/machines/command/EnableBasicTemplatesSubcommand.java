@@ -11,6 +11,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.server.commands.ReloadCommand;
 import net.minecraft.server.packs.repository.Pack;
 import net.minecraft.server.packs.repository.PackRepository;
+import net.minecraft.server.permissions.Permission;
 
 import java.util.List;
 
@@ -20,8 +21,8 @@ public class EnableBasicTemplatesSubcommand {
 
     public static LiteralArgumentBuilder<CommandSourceStack> make() {
         return Commands.literal("enable_basic_templates")
-                .requires(cs -> cs.hasPermission(Commands.LEVEL_GAMEMASTERS) &&
-                        RoomTemplateHelper.getTemplates(cs.registryAccess()).findAny().isEmpty())
+                .requires(Commands.hasPermission(Commands.LEVEL_GAMEMASTERS))
+                .requires(cs -> RoomTemplateHelper.getTemplates(cs.registryAccess()).findAny().isEmpty())
                 .executes(EnableBasicTemplatesSubcommand::exec);
     }
 

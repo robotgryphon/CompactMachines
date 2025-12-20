@@ -34,6 +34,6 @@ public class RoomClientEvents {
 
     public static void onOverlayRegistration(final RegisterGuiLayersEvent layers) {
         // FIXME: Register a debug thing correctly
-        layers.registerAbove(VanillaGuiLayers.PLAYER_HEALTH, CompactMachines.modRL("room_meta_debug"), new RoomMetadataDebugOverlay());
+        layers.registerAbove(VanillaGuiLayers.PLAYER_HEALTH, CompactMachines.identifier("room_meta_debug"), new RoomMetadataDebugOverlay());
     }
 }
