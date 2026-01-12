@@ -2,7 +2,10 @@ package dev.compactmods.machines.incubating;
 
 import dev.compactmods.machines.api.CompactMachines;
 import dev.compactmods.machines.api.dimension.CompactDimension;
+import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.ChunkPos;
@@ -20,6 +23,7 @@ public class ResourceTunnelItem<TResource extends Resource> extends Item {
         if(level.isClientSide() || !CompactDimension.isLevelCompact(level))
             return InteractionResult.PASS;
 
+        final var maybeUser = context.getPlayer();
         final var pos = context.getClickedPos();
         final var targetDir = context.getClickedFace().getOpposite();
 
@@ -29,7 +33,9 @@ public class ResourceTunnelItem<TResource extends Resource> extends Item {
                 .flatMap(CompactMachines::room);
 
         room.ifPresentOrElse(instance -> {
-
+            if(maybeUser instanceof ServerPlayer player) {
+                player.displayClientMessage(Component.literal(instance.code()), true);
+            }
         }, () -> {
 
         });

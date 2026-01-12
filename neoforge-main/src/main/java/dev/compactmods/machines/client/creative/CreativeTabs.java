@@ -1,6 +1,5 @@
 package dev.compactmods.machines.client.creative;
 
-import dev.compactmods.machines.api.room.template.RoomTemplate;
 import dev.compactmods.machines.api.CompactMachines;
 import dev.compactmods.machines.machine.Machines;
 import dev.compactmods.machines.room.Rooms;
@@ -17,7 +16,7 @@ public interface CreativeTabs {
 
     static void prepare() {
         TABS.register(MAIN_RL.getPath(), () -> CreativeModeTab.builder()
-            .icon(Machines.Items::unbound)
+            .icon(() -> Machines.Items.MACHINE.toStack(1))
             .title(Component.translatableWithFallback("itemGroup.compactmachines.main", "Compact Machines"))
             .displayItems(CreativeTabs::fillItems)
             .build());
@@ -30,11 +29,12 @@ public interface CreativeTabs {
         output.accept(Shrinking.ENLARGING_MODULE.get(), CreativeModeTab.TabVisibility.PARENT_AND_SEARCH_TABS);
         // output.accept(Shrinking.RESIZING_MODULE.get(), CreativeModeTab.TabVisibility.PARENT_AND_SEARCH_TABS);
 
-        final var lookup = params.holders().lookupOrThrow(RoomTemplate.REGISTRY_KEY);
-        final var machines = lookup.listElements()
-            .map(Machines.Items::forNewRoom)
-            .toList();
-
-        output.acceptAll(machines, CreativeModeTab.TabVisibility.PARENT_AND_SEARCH_TABS);
+        // TODO: Items with a room mapping (paper room cores?)
+//        final var lookup = params.holders().lookupOrThrow(RoomTemplate.REGISTRY_KEY);
+//        final var machines = lookup.listElements()
+//            .map(Machines.Items::forNewRoom)
+//            .toList();
+//
+//        output.acceptAll(machines, CreativeModeTab.TabVisibility.PARENT_AND_SEARCH_TABS);
     }
 }

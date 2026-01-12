@@ -1,20 +1,13 @@
 package dev.compactmods.machines.server.event;
 
-import dev.compactmods.machines.api.CompactMachines;
-import dev.compactmods.machines.api.room.template.RoomTemplate;
 import dev.compactmods.machines.api.room.template.RoomTemplateHelper;
-import dev.compactmods.machines.player.PlayerEventHandler;
-import dev.compactmods.machines.room.Rooms;
 import net.minecraft.network.chat.ClickEvent;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.Style;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.CommonColors;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
-import net.neoforged.neoforge.event.level.LevelEvent;
-import net.neoforged.neoforge.event.server.ServerStartedEvent;
 
 public class RoomTemplatesCheckEventHandler {
 

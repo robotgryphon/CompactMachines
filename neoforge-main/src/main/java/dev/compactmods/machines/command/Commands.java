@@ -21,10 +21,8 @@ public class Commands {
     public static void onCommandsRegister(final RegisterCommandsEvent event) {
         Commands.CM_COMMAND_ROOT.then(CMTeleportSubcommand.make());
         Commands.CM_COMMAND_ROOT.then(CMEjectSubcommand.make());
-        Commands.CM_COMMAND_ROOT.then(CMRebindSubcommand.make());
-        Commands.CM_COMMAND_ROOT.then(CMUnbindSubcommand.make());
         Commands.CM_COMMAND_ROOT.then(CMRoomsSubcommand.make());
-        Commands.CM_COMMAND_ROOT.then(CMGiveMachineSubcommand.make());
+        Commands.CM_COMMAND_ROOT.then(CMGiveCoreSubcommand.make());
         Commands.CM_COMMAND_ROOT.then(SpawnSubcommand.make());
         Commands.CM_COMMAND_ROOT.then(RoomUpgradesSubcommand.make());
         Commands.CM_COMMAND_ROOT.then(EnableBasicTemplatesSubcommand.make());

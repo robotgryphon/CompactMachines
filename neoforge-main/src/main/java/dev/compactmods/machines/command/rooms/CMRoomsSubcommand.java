@@ -8,8 +8,6 @@ import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.network.chat.Component;
 
-import java.util.stream.LongStream;
-
 public class CMRoomsSubcommand {
 
     public static LiteralArgumentBuilder<CommandSourceStack> make() {
@@ -24,6 +22,7 @@ public class CMRoomsSubcommand {
 
         subRoot.then(summary);
         subRoot.then(CMFindRoomSubcommand.create());
+        subRoot.then(GenerateRoomCommand.make());
         return subRoot;
     }
 

@@ -9,17 +9,14 @@ import dev.compactmods.machines.api.dimension.CompactDimension;
 import dev.compactmods.machines.api.machine.MachineConstants;
 import dev.compactmods.machines.i18n.MachineTranslations;
 import dev.compactmods.machines.i18n.RoomTranslations;
-import dev.compactmods.machines.machine.block.BoundCompactMachineBlockEntity;
+import dev.compactmods.machines.machine.block.CompactMachineBlockEntity;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.arguments.EntityArgument;
 import net.minecraft.commands.arguments.coordinates.BlockPosArgument;
 import net.minecraft.commands.arguments.coordinates.ColumnPosArgument;
-import net.minecraft.core.UUIDUtil;
 import net.minecraft.network.chat.Component;
 import org.jetbrains.annotations.NotNull;
-
-import java.util.UUID;
 
 public class CMFindRoomSubcommand {
     static @NotNull LiteralArgumentBuilder<CommandSourceStack> create() {
@@ -79,11 +76,12 @@ public class CMFindRoomSubcommand {
             return -1;
         }
 
-        if (level.getBlockEntity(block) instanceof BoundCompactMachineBlockEntity be) {
-            final var roomCode = be.connectedRoom();
-            CompactMachines.room(roomCode).ifPresent(roomInfo -> {
-                ctx.getSource().sendSuccess(() -> RoomTranslations.MACHINE_ROOM_INFO.apply(block, roomInfo), false);
-            });
+        if (level.getBlockEntity(block) instanceof CompactMachineBlockEntity be) {
+            be.connectedRoom()
+                .flatMap(CompactMachines::room)
+                .ifPresent(roomInfo -> {
+                    ctx.getSource().sendSuccess(() -> RoomTranslations.MACHINE_ROOM_INFO.apply(block, roomInfo), false);
+                });
         } else {
             // FIXME Translations
             ctx.getSource().sendFailure(Component.literal("Does not appear to be a bound machine block."));

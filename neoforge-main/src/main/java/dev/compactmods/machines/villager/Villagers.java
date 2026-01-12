@@ -57,7 +57,7 @@ public class Villagers {
             ));
 
     public static final DeferredHolder<VillagerTrades.ItemListing, BasicItemListing> TEST_TRADE = TRADES.register("test",
-            () -> new BasicItemListing(1, Machines.Blocks.UNBOUND_MACHINE.toStack(1), 5, 100));
+            () -> new BasicItemListing(25, Machines.Blocks.MACHINE.toStack(1), 5, 100));
 
     public static final DeferredHolder<VillagerTrades.ItemListing, BasicItemListing> TEST_TRADE2 = TRADES.register("shrinking_device",
             () -> new BasicItemListing(5, Shrinking.PERSONAL_SHRINKING_DEVICE.toStack(1), 1, 300));

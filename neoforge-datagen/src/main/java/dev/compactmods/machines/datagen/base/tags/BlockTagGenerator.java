@@ -9,8 +9,6 @@ import dev.compactmods.machines.villager.Villagers;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.data.PackOutput;
 import net.minecraft.tags.BlockTags;
-import net.minecraft.tags.PoiTypeTags;
-import net.minecraft.world.level.block.Block;
 import net.neoforged.neoforge.common.Tags;
 import net.neoforged.neoforge.common.data.BlockTagsProvider;
 
@@ -26,27 +24,23 @@ public class BlockTagGenerator extends BlockTagsProvider {
     protected void addTags(HolderLookup.Provider provider) {
         final var breakableWall = Rooms.Blocks.BREAKABLE_WALL.get();
         final var solidWall = Rooms.Blocks.SOLID_WALL.get();
-        final var boundMachine = Machines.Blocks.BOUND_MACHINE.get();
-        final var unboundMachine = Machines.Blocks.UNBOUND_MACHINE.get();
+        final var machineBlock = Machines.Blocks.MACHINE.get();
         final var voidAir = Dimension.BLOCK_MACHINE_VOID_AIR.get();
         final var spatialWorkbench = Villagers.SPATIAL_WORKBENCH.get();
 
         tag(MachineConstants.MACHINE_BLOCK)
-                .add(boundMachine, unboundMachine);
-
-        tag(MachineConstants.UNBOUND_MACHINE_BLOCK)
-                .add(unboundMachine);
+                .add(machineBlock);
 
         tag(BlockTags.MINEABLE_WITH_PICKAXE)
                 .add(breakableWall)
-                .add(boundMachine, unboundMachine);
+                .add(machineBlock);
 
         tag(BlockTags.NEEDS_IRON_TOOL)
                 .add(breakableWall)
-                .add(boundMachine, unboundMachine);
+                .add(machineBlock);
 
         tag(Tags.Blocks.RELOCATION_NOT_SUPPORTED)
-                .add(boundMachine)
+                .add(machineBlock)
                 .add(solidWall)
                 .add(voidAir);
 

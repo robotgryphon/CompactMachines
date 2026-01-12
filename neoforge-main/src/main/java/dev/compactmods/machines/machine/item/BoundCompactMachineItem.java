@@ -18,7 +18,7 @@ public class BoundCompactMachineItem extends BlockItem {
     public static final String FALLBACK_ID = Util.makeDescriptionId("block", CompactMachines.identifier("bound_machine_fallback"));
 
     public BoundCompactMachineItem(Properties builder) {
-        super(Machines.Blocks.BOUND_MACHINE.get(), builder);
+        super(Machines.Blocks.MACHINE.get(), builder);
     }
 
     @Override

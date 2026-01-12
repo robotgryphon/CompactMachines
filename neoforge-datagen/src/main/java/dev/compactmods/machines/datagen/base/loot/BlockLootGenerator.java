@@ -28,8 +28,7 @@ public class BlockLootGenerator extends BlockLootSubProvider {
     @Override
     protected Iterable<Block> getKnownBlocks() {
         return Set.of(Rooms.Blocks.BREAKABLE_WALL.get(),
-            Machines.Blocks.BOUND_MACHINE.get(),
-            Machines.Blocks.UNBOUND_MACHINE.get());
+            Machines.Blocks.MACHINE.get());
     }
 
     @Override
@@ -41,22 +40,13 @@ public class BlockLootGenerator extends BlockLootSubProvider {
                 .when(ExplosionCondition.survivesExplosion())
                 .add(LootItem.lootTableItem(Rooms.Items.BREAKABLE_WALL.get()))));
 
-        this.add(Machines.Blocks.UNBOUND_MACHINE.get(), LootTable.lootTable().withPool(LootPool.lootPool()
-            .setRolls(ConstantValue.exactly(1))
-            .when(ExplosionCondition.survivesExplosion())
-            .apply(CopyComponentsFunction.copyComponentsFromBlockEntity(LootContextParams.BLOCK_ENTITY)
-                .include(DataComponents.CUSTOM_NAME)
-                .include(CMDataComponents.MACHINE_COLOR.get())
-                .include(CMDataComponents.ROOM_TEMPLATE_ID.get()))
-            .add(LootItem.lootTableItem(Machines.Items.UNBOUND_MACHINE.get()))));
-
-        this.add(Machines.Blocks.BOUND_MACHINE.get(), LootTable.lootTable().withPool(LootPool.lootPool()
+        this.add(Machines.Blocks.MACHINE.get(), LootTable.lootTable().withPool(LootPool.lootPool()
             .setRolls(ConstantValue.exactly(1))
             .when(ExplosionCondition.survivesExplosion())
             .apply(CopyComponentsFunction.copyComponentsFromBlockEntity(LootContextParams.BLOCK_ENTITY)
                 .include(DataComponents.CUSTOM_NAME)
                 .include(CMDataComponents.MACHINE_COLOR.get())
                 .include(CMDataComponents.BOUND_ROOM_CODE.get()))
-            .add(LootItem.lootTableItem(Machines.Items.BOUND_MACHINE.get()))));
+            .add(LootItem.lootTableItem(Machines.Items.MACHINE.get()))));
     }
 }

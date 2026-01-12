@@ -10,7 +10,6 @@ import dev.compactmods.machines.machine.Machines;
 import dev.compactmods.machines.room.Rooms;
 import dev.compactmods.machines.shrinking.Shrinking;
 import dev.compactmods.machines.villager.Villagers;
-import net.minecraft.client.data.models.ItemModelGenerators;
 import net.minecraft.client.data.models.model.ModelTemplates;
 import net.minecraft.client.data.models.model.TextureMapping;
 import net.minecraft.client.data.models.model.TextureSlot;
@@ -31,13 +30,9 @@ public class ModelAndStateGenerator extends CMModelProvider {
         blockModels.createAirLikeBlock(Dimension.BLOCK_MACHINE_VOID_AIR.get(),
                 CompactMachines.identifier("none"));
 
-        blockModels.createCompactMachine(Machines.Blocks.BOUND_MACHINE);
-        blockModels.createCompactMachine(Machines.Blocks.UNBOUND_MACHINE);
+        blockModels.createCompactMachine(Machines.Blocks.MACHINE);
 
-        blockModels.registerSimpleTintedItemModel(Machines.Blocks.UNBOUND_MACHINE.get(), CompactMachines.identifier("block/machine"),
-                new MachineColors.MachineColorComponentItemTintSource());
-
-        blockModels.registerSimpleTintedItemModel(Machines.Blocks.BOUND_MACHINE.get(), CompactMachines.identifier("block/machine"),
+        blockModels.registerSimpleTintedItemModel(Machines.Blocks.MACHINE.get(), CompactMachines.identifier("block/machine"),
                 new MachineColors.MachineColorComponentItemTintSource());
 
 

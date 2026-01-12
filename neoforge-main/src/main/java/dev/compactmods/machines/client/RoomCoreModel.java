@@ -35,8 +35,8 @@ public class RoomCoreModel implements SpecialModelRenderer<RoomTemplate> {
         poseStack.scale(.25f, .25f, .25f);
         poseStack.translate(3.50D, 0.0D, 0.0D);
 
-        nodeCollector.submitBlock(poseStack, Machines.Blocks.UNBOUND_MACHINE.get().defaultBlockState(),
-                packedLight, packedOverlay, outlineColor);
+//        nodeCollector.submitBlock(poseStack, Machines.Blocks.UNBOUND_MACHINE.get().defaultBlockState(),
+//                packedLight, packedOverlay, outlineColor);
 
         poseStack.pushPose();
         poseStack.translate(-2.0D, 0.0D, 0.0D);

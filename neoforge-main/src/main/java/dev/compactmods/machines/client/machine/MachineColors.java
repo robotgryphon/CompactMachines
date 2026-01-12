@@ -2,9 +2,7 @@ package dev.compactmods.machines.client.machine;
 
 import com.mojang.serialization.MapCodec;
 import dev.compactmods.machines.api.CompactMachines;
-import dev.compactmods.machines.api.attachment.CMDataAttachments;
 import dev.compactmods.machines.api.component.CMDataComponents;
-import dev.compactmods.machines.api.machine.MachineColor;
 import dev.compactmods.machines.api.machine.MachineConstants;
 import dev.compactmods.machines.api.machine.block.ICompactMachineBlockEntity;
 import dev.compactmods.machines.machine.Machines;
@@ -55,6 +53,6 @@ public class MachineColors {
     }
 
     public static void onBlockColors(final RegisterColorHandlersEvent.Block colors) {
-        colors.register(MachineColors.BLOCK, Machines.Blocks.BOUND_MACHINE.get(), Machines.Blocks.UNBOUND_MACHINE.get());
+        colors.register(MachineColors.BLOCK, Machines.Blocks.MACHINE.get());
     }
 }

@@ -1,21 +1,14 @@
 package dev.compactmods.machines.machine;
 
-import dev.compactmods.machines.CompactMachinesCommon;
 import dev.compactmods.machines.api.CompactMachines;
-import dev.compactmods.machines.api.attachment.CMDataAttachments;
 import dev.compactmods.machines.api.component.CMDataComponents;
-import dev.compactmods.machines.api.machine.MachineColor;
 import dev.compactmods.machines.api.machine.MachineConstants;
 import dev.compactmods.machines.api.room.template.RoomTemplate;
 import dev.compactmods.machines.CMRegistries;
-import dev.compactmods.machines.machine.block.BoundCompactMachineBlock;
-import dev.compactmods.machines.machine.block.BoundCompactMachineBlockEntity;
-import dev.compactmods.machines.machine.block.UnboundCompactMachineBlock;
-import dev.compactmods.machines.machine.block.UnboundCompactMachineEntity;
+import dev.compactmods.machines.machine.block.CompactMachineBlock;
+import dev.compactmods.machines.machine.block.CompactMachineBlockEntity;
 import dev.compactmods.machines.machine.item.BoundCompactMachineItem;
-import dev.compactmods.machines.machine.item.UnboundCompactMachineItem;
 import net.minecraft.core.Holder;
-import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.item.Item;
@@ -27,16 +20,15 @@ import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.properties.NoteBlockInstrument;
 import net.minecraft.world.level.material.PushReaction;
 import net.neoforged.bus.api.IEventBus;
-import net.neoforged.neoforge.attachment.AttachmentType;
 import net.neoforged.neoforge.registries.DeferredBlock;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredItem;
 
 import java.util.function.Supplier;
+import java.util.function.UnaryOperator;
 
 public interface Machines {
-    BlockBehaviour.Properties MACHINE_BLOCK_PROPS = BlockBehaviour.Properties
-            .of()
+    UnaryOperator<BlockBehaviour.Properties> MACHINE_BLOCK_PROPS = props -> props
             .instrument(NoteBlockInstrument.COW_BELL)
             .pushReaction(PushReaction.IGNORE)
             .sound(SoundType.METAL)
@@ -46,61 +38,34 @@ public interface Machines {
     Supplier<Item.Properties> MACHINE_ITEM_PROPS = Item.Properties::new;
 
     interface Blocks {
-        ResourceKey<Block> UNBOUND_KEY = ResourceKey.create(Registries.BLOCK, CompactMachines.identifier("new_machine"));
-        ResourceKey<Block> BOUND_KEY = ResourceKey.create(Registries.BLOCK, CompactMachines.identifier("new_machine"));
+        ResourceKey<Block> MACHINE_KEY = ResourceKey.create(Registries.BLOCK, CompactMachines.identifier("machine"));
 
-        DeferredBlock<UnboundCompactMachineBlock> UNBOUND_MACHINE = CMRegistries.BLOCKS.register("new_machine", () ->
-                new UnboundCompactMachineBlock(MACHINE_BLOCK_PROPS.setId(UNBOUND_KEY)));
-
-        DeferredBlock<BoundCompactMachineBlock> BOUND_MACHINE = CMRegistries.BLOCKS.register("machine", () ->
-                new BoundCompactMachineBlock(MACHINE_BLOCK_PROPS.setId(BOUND_KEY)));
+        DeferredBlock<CompactMachineBlock> MACHINE = CMRegistries.BLOCKS.registerBlock("machine", props ->
+                new CompactMachineBlock(MACHINE_BLOCK_PROPS.apply(props).setId(MACHINE_KEY)));
 
         static void prepare() {
         }
     }
 
     interface Items {
-        DeferredItem<BoundCompactMachineItem> BOUND_MACHINE = CMRegistries.ITEMS.register("machine",
+        DeferredItem<BoundCompactMachineItem> MACHINE = CMRegistries.ITEMS.register("machine",
                 () -> new BoundCompactMachineItem(MACHINE_ITEM_PROPS.get()
                         .setId(ResourceKey.create(Registries.ITEM, CompactMachines.identifier("machine")))
                         .overrideDescription(BoundCompactMachineItem.FALLBACK_ID)));
 
-        DeferredItem<UnboundCompactMachineItem> UNBOUND_MACHINE = CMRegistries.ITEMS.register("new_machine",
-                () -> new UnboundCompactMachineItem(MACHINE_ITEM_PROPS.get()
-                        .setId(ResourceKey.create(Registries.ITEM, CompactMachines.identifier("new_machine")))));
-
         static void prepare() {
         }
 
-        static ItemStack unbound() {
-            return unboundColored(0xFFFFFFFF);
-        }
-
-        static ItemStack unboundColored(int color) {
-            final var stack = UNBOUND_MACHINE.toStack();
-            stack.set(CMDataComponents.MACHINE_COLOR, MachineColor.fromARGB(color));
-            return stack;
-        }
-
         static ItemStack boundToRoom(String roomCode) {
-            return boundToRoom(roomCode, 0xFFFFFFFF);
-        }
-
-        static ItemStack boundToRoom(String roomCode, int color) {
-            return boundToRoom(roomCode, MachineColor.fromARGB(color));
-        }
-
-        static ItemStack boundToRoom(String roomCode, MachineColor color) {
-            ItemStack stack = BOUND_MACHINE.toStack();
+            ItemStack stack = new ItemStack(net.minecraft.world.item.Items.PAPER);
             stack.set(CMDataComponents.BOUND_ROOM_CODE, roomCode);
-            stack.set(CMDataComponents.MACHINE_COLOR, color);
             return stack;
         }
 
         static ItemStack forNewRoom(Holder.Reference<RoomTemplate> templateHolder) {
             var template = templateHolder.value();
 
-            final var stack = UNBOUND_MACHINE.toStack();
+            final var stack = new ItemStack(net.minecraft.world.item.Items.PAPER);
             stack.set(CMDataComponents.ROOM_TEMPLATE_ID, templateHolder.key().identifier());
             stack.set(CMDataComponents.MACHINE_COLOR, template.defaultMachineColor());
             return stack;
@@ -108,12 +73,9 @@ public interface Machines {
     }
 
     interface BlockEntities {
-
-        DeferredHolder<BlockEntityType<?>, BlockEntityType<UnboundCompactMachineEntity>> UNBOUND_MACHINE = CMRegistries.BLOCK_ENTITIES.register(MachineConstants.UNBOUND_MACHINE_ENTITY.getPath(), () ->
-                new BlockEntityType<>(UnboundCompactMachineEntity::new, Blocks.UNBOUND_MACHINE.get()));
-
-        DeferredHolder<BlockEntityType<?>, BlockEntityType<BoundCompactMachineBlockEntity>> MACHINE = CMRegistries.BLOCK_ENTITIES.register(MachineConstants.BOUND_MACHINE_ENTITY.getPath(), () ->
-                new BlockEntityType<>(BoundCompactMachineBlockEntity::new, Blocks.BOUND_MACHINE.get()));
+        DeferredHolder<BlockEntityType<?>, BlockEntityType<CompactMachineBlockEntity>> MACHINE = CMRegistries.BLOCK_ENTITIES
+                .register(MachineConstants.MACHINE_IDENTIFIER.getPath(),
+                        () -> new BlockEntityType<>(CompactMachineBlockEntity::new, Blocks.MACHINE.get()));
 
         static void prepare() {
         }

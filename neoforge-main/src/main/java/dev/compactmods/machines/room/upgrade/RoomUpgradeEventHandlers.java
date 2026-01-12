@@ -20,6 +20,7 @@ import net.minecraft.util.CommonColors;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.component.TooltipDisplay;
 import net.neoforged.bus.api.Event;
 import net.neoforged.neoforge.event.entity.player.ItemTooltipEvent;
 import net.neoforged.neoforge.event.level.LevelEvent;
@@ -141,11 +142,25 @@ public class RoomUpgradeEventHandlers {
 
         ItemStack stack = evt.getItemStack();
 
+        if(stack.has(CMDataComponents.ROOM_TEMPLATE_ID)) {
+            final var template = stack.get(CMDataComponents.ROOM_TEMPLATE_ID);
+            tooltips.accept(Component.literal(template.toString()));
+        }
+
+        if(stack.has(CMDataComponents.BOUND_ROOM_CODE)) {
+            final var roomCode = stack.get(CMDataComponents.BOUND_ROOM_CODE);
+            tooltips.accept(Component.literal(roomCode));
+        }
+
         if (stack.has(CMDataComponents.UPGRADE_INSTANCE_ID)) {
             var id = stack.get(CMDataComponents.UPGRADE_INSTANCE_ID);
             tooltips.accept(Component.literal("ID: " + id).withColor(CommonColors.GRAY));
         }
 
-        stack.addToTooltip(CMDataComponents.UPGRADE_LIST_COMPONENT, ctx, tooltips, flags);
+        stack.addToTooltip(CMDataComponents.UPGRADE_LIST_COMPONENT,
+                ctx,
+                TooltipDisplay.DEFAULT,
+                tooltips,
+                flags);
     }
 }
