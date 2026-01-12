@@ -104,7 +104,7 @@ public class CompactRoomGenerator {
             if(placementBounds != null) {
                 final var pos = AABBHelper.minCorner(placementBounds);
                 BlockPos placeAt = BlockPos.containing(pos.x(), pos.y(), pos.z());
-                tem.placeInWorld(level, placeAt, placeAt, placementSettings, level.random, Block.UPDATE_ALL);
+                tem.placeInWorld(level, placeAt, placeAt, placementSettings, level.getRandom(), Block.UPDATE_ALL);
             }
         });
     }

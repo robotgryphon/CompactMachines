@@ -12,8 +12,8 @@ import java.util.stream.Stream;
 public class MathUtil {
 
     public static Stream<ChunkPos> getChunksFromAABB(AABB bounds) {
-        ChunkPos min = new ChunkPos(BlockPos.containing(bounds.minX, bounds.minY, bounds.minZ));
-        ChunkPos max = new ChunkPos(BlockPos.containing(bounds.maxX, bounds.maxY, bounds.maxZ));
+        ChunkPos min = ChunkPos.containing(BlockPos.containing(bounds.minX, bounds.minY, bounds.minZ));
+        ChunkPos max = ChunkPos.containing(BlockPos.containing(bounds.maxX, bounds.maxY, bounds.maxZ));
         
         return ChunkPos.rangeClosed(min, max);
     }

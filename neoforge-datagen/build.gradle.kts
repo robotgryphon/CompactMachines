@@ -15,8 +15,8 @@ project.evaluationDependsOn(coreApi.path)
 project.evaluationDependsOn(mainProject.path)
 
 java {
-    toolchain.vendor.set(JvmVendorSpec.JETBRAINS)
-    toolchain.languageVersion.set(JavaLanguageVersion.of(21))
+//    toolchain.vendor.set(JvmVendorSpec.JETBRAINS)
+    toolchain.languageVersion.set(JavaLanguageVersion.of(25))
 }
 
 neoForge {
@@ -29,7 +29,7 @@ neoForge {
     }
 
     runs {
-        this.create("data") {
+        this.register("data") {
             this.clientData()
 
             this.gameDirectory.set(file("runs/data"))

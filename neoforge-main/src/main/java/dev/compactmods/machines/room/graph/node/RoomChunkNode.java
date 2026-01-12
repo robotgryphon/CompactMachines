@@ -12,7 +12,7 @@ public record RoomChunkNode(UUID id, Data data) implements Node<RoomChunkNode.Da
 
     public record Data(ChunkPos chunk) {
         public static final Codec<Data> CODEC = RecordCodecBuilder.create(i -> i.group(
-                CodecExtensions.CHUNKPOS.fieldOf("chunk").forGetter(Data::chunk)
+                ChunkPos.CODEC.fieldOf("chunk").forGetter(Data::chunk)
         ).apply(i, Data::new));
     }
 }

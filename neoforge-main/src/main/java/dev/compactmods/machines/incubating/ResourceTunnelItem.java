@@ -29,7 +29,7 @@ public class ResourceTunnelItem<TResource extends Resource> extends Item {
 
         // Get machines bound to room
         final var room = CompactMachines.chunkManager()
-                .findRoomByChunk(new ChunkPos(pos))
+                .findRoomByChunk(ChunkPos.containing(pos))
                 .flatMap(CompactMachines::room);
 
         room.ifPresentOrElse(instance -> {

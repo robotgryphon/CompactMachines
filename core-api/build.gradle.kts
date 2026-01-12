@@ -24,8 +24,8 @@ base {
 }
 
 java {
-    toolchain.vendor.set(JvmVendorSpec.JETBRAINS)
-    toolchain.languageVersion.set(JavaLanguageVersion.of(21))
+//    toolchain.vendor.set(JvmVendorSpec.JETBRAINS)
+    toolchain.languageVersion.set(JavaLanguageVersion.of(25))
     withJavadocJar()
     withSourcesJar()
 }

@@ -29,8 +29,8 @@ base {
 }
 
 java {
-    toolchain.vendor.set(JvmVendorSpec.JETBRAINS)
-    toolchain.languageVersion.set(JavaLanguageVersion.of(21))
+//    toolchain.vendor.set(JvmVendorSpec.JETBRAINS)
+    toolchain.languageVersion.set(JavaLanguageVersion.of(25))
 }
 
 sourceSets.main {
@@ -71,12 +71,6 @@ neoForge {
         testedMod = mods.named(modId)
     }
 
-    parchment {
-        enabled = true
-        mappingsVersion = libs.versions.parchment
-        minecraftVersion = libs.versions.parchmentMC
-    }
-
     runs {
         // applies to all the run configs below
         configureEach {
@@ -95,7 +89,7 @@ neoForge {
 //            additional.dependencies.add(libs.jnanoid.get())
         }
         
-        create("client") {
+        register("client") {
             client()
             gameDirectory.set(file("runs/client"))
 
@@ -107,7 +101,7 @@ neoForge {
             programArguments.addAll("--height", "1080")
         }
 
-        create("client2") {
+        register("client2") {
             client()
             gameDirectory.set(file("runs/client"))
 
@@ -119,13 +113,13 @@ neoForge {
             programArguments.addAll("--height", "1080")
         }
 
-        create("server") {
+        register("server") {
             server()
             gameDirectory.set(file("runs/server"))
             programArgument("nogui")
         }
 
-        create("gameTestServer") {
+        register("gameTestServer") {
             type = "gameTestServer"
             gameDirectory.set(file("runs/gametest"))
 

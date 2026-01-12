@@ -23,7 +23,7 @@ public class RoomBlocks {
 
         final var chunkLoading = CompactMachines.roomChunks(room.code())
                 .stream()
-                .map(cp -> chunkSource.getChunkFuture(cp.x, cp.z, ChunkStatus.FULL, true))
+                .map(cp -> chunkSource.getChunkFuture(cp.x(), cp.z(), ChunkStatus.FULL, true))
                 .toList();
 
         final var awaitAllChunks = CompletableFuture.allOf(chunkLoading.toArray(new CompletableFuture[chunkLoading.size()]));

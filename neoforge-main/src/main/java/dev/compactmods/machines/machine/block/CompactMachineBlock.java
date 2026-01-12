@@ -79,7 +79,7 @@ public class CompactMachineBlock extends Block implements EntityBlock {
             cmbe.setMachineColor(newColor);
 
             PacketDistributor.sendToPlayersTrackingChunk(
-                    level, new ChunkPos(pos), new MachineColorSyncPacket(GlobalPos.of(level.dimension(), pos), newColor));
+                    level, ChunkPos.containing(pos), new MachineColorSyncPacket(GlobalPos.of(level.dimension(), pos), newColor));
 
             if (!player.isCreative())
                 mainItem.shrink(1);

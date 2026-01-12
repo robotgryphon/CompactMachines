@@ -15,7 +15,6 @@ import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.gamerules.GameRule;
-import net.minecraft.world.level.storage.loot.functions.LootItemFunctionType;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent;
 import net.neoforged.neoforge.registries.DataPackRegistryEvent;
@@ -42,9 +41,6 @@ public interface CMRegistries {
 
 	DeferredRegister<GameRule<?>> GAME_RULES = DeferredRegister.create(BuiltInRegistries.GAME_RULE, CompactMachines.MOD_ID);
 
-	// LootFunctions
-	DeferredRegister<LootItemFunctionType<?>> LOOT_FUNCTIONS = DeferredRegister.create(BuiltInRegistries.LOOT_FUNCTION_TYPE, CompactMachines.MOD_ID);
-
     DeferredRegister<PoiType> POINTS_OF_INTEREST = DeferredRegister.create(BuiltInRegistries.POINT_OF_INTEREST_TYPE, CompactMachines.MOD_ID);
 
     static Item basicItem(UnaryOperator<Item.Properties> moreProps) {
@@ -52,15 +48,11 @@ public interface CMRegistries {
 	}
 
 	static void setup(IEventBus modBus) {
-		Stream.of(BLOCKS, ITEMS, BLOCK_ENTITIES, CONTAINERS, COMMAND_ARGUMENT_TYPES, GAME_RULES, LOOT_FUNCTIONS,
-                POINTS_OF_INTEREST, Villagers.VILLAGERS, Villagers.TRADES, TABS,
+		Stream.of(BLOCKS, ITEMS, BLOCK_ENTITIES, CONTAINERS, COMMAND_ARGUMENT_TYPES, GAME_RULES,
+                POINTS_OF_INTEREST, Villagers.VILLAGERS, TABS,
 				CMDataAttachments.ATTACHMENT_TYPES,
 				CMDataComponents.DATA_COMPONENTS
 		).forEach(r -> r.register(modBus));
-
-        Villagers.TRADES.makeRegistry(builder -> {
-            builder.sync(true);
-        });
 
 		modBus.addListener((DataPackRegistryEvent.NewRegistry newRegistries) -> {
 			newRegistries.dataPackRegistry(RoomTemplate.REGISTRY_KEY, RoomTemplate.CODEC, RoomTemplate.CODEC);

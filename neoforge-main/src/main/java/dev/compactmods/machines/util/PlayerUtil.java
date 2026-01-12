@@ -58,7 +58,7 @@ public abstract class PlayerUtil {
                     stack.getOrDefault(DataComponents.BREAK_SOUND, SoundEvents.ITEM_BREAK),
                     player.getSoundSource(),
                     1.0F,
-                    0.8F + l.random.nextFloat() * 0.4F,
+                    0.8F + l.getRandom().nextFloat() * 0.4F,
                     player.getRandom().nextLong()
             );
         }

@@ -3,9 +3,8 @@ package dev.compactmods.machines.villager;
 import com.google.common.collect.ImmutableSet;
 import dev.compactmods.machines.api.CompactMachines;
 import dev.compactmods.machines.CMRegistries;
-import dev.compactmods.machines.machine.Machines;
-import dev.compactmods.machines.shrinking.Shrinking;
-import net.minecraft.util.Util;
+import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
@@ -14,19 +13,14 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.entity.ai.village.poi.PoiType;
 import net.minecraft.world.entity.npc.villager.VillagerProfession;
-import net.minecraft.world.entity.npc.villager.VillagerTrades;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.material.MapColor;
-import net.neoforged.neoforge.common.BasicItemListing;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.registries.DeferredBlock;
-import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredItem;
 import net.neoforged.neoforge.registries.DeferredRegister;
-
-import java.util.function.Supplier;
 
 public class Villagers {
     public static final Identifier TINKERER_ID = CompactMachines.identifier("tinkerer");
@@ -36,9 +30,6 @@ public class Villagers {
 
     public static final DeferredRegister<VillagerProfession> VILLAGERS = DeferredRegister
             .create(BuiltInRegistries.VILLAGER_PROFESSION, CompactMachines.MOD_ID);
-
-    public static final DeferredRegister<VillagerTrades.ItemListing> TRADES = DeferredRegister
-            .create(CompactMachines.identifier("tinkerer_trades"), CompactMachines.MOD_ID);
 
     public static final DeferredBlock<Block> SPATIAL_WORKBENCH = CMRegistries.BLOCKS.registerSimpleBlock("spatial_workbench", () -> BlockBehaviour
             .Properties.of()
@@ -53,20 +44,24 @@ public class Villagers {
                     holder -> holder.is(TINKERER_WORKBENCH_KEY), //acquirable jobSite
                     ImmutableSet.of(),
                     ImmutableSet.of(),
-                    SoundEvents.VILLAGER_WORK_TOOLSMITH
+                    SoundEvents.VILLAGER_WORK_TOOLSMITH,
+                    Int2ObjectMap.ofEntries(
+                        Int2ObjectMap.entry(1, ResourceKey.create(Registries.TRADE_SET, CompactMachines.identifier("tinkerer")))
+                    )
             ));
 
-    public static final DeferredHolder<VillagerTrades.ItemListing, BasicItemListing> TEST_TRADE = TRADES.register("test",
-            () -> new BasicItemListing(25, Machines.Blocks.MACHINE.toStack(1), 5, 100));
-
-    public static final DeferredHolder<VillagerTrades.ItemListing, BasicItemListing> TEST_TRADE2 = TRADES.register("shrinking_device",
-            () -> new BasicItemListing(5, Shrinking.PERSONAL_SHRINKING_DEVICE.toStack(1), 1, 300));
-
-    public static final DeferredHolder<VillagerTrades.ItemListing, BasicItemListing> SHRINKING = TRADES.register("shrinking_modules",
-            () -> new BasicItemListing(3, Shrinking.SHRINKING_MODULE.toStack(4), 5, 100));
-
-    public static final DeferredHolder<VillagerTrades.ItemListing, BasicItemListing> ENLARGING = TRADES.register("enlarging_modules",
-            () -> new BasicItemListing(3, Shrinking.ENLARGING_MODULE.toStack(4), 5, 100));
+    // TODO 26.1 - Tinkerer Trades
+//    public static final DeferredHolder<VillagerTrades.ItemListing, BasicItemListing> TEST_TRADE = TRADES.register("test",
+//            () -> new BasicItemListing(25, Machines.Blocks.MACHINE.toStack(1), 5, 100));
+//
+//    public static final DeferredHolder<VillagerTrades.ItemListing, BasicItemListing> TEST_TRADE2 = TRADES.register("shrinking_device",
+//            () -> new BasicItemListing(5, Shrinking.PERSONAL_SHRINKING_DEVICE.toStack(1), 1, 300));
+//
+//    public static final DeferredHolder<VillagerTrades.ItemListing, BasicItemListing> SHRINKING = TRADES.register("shrinking_modules",
+//            () -> new BasicItemListing(3, Shrinking.SHRINKING_MODULE.toStack(4), 5, 100));
+//
+//    public static final DeferredHolder<VillagerTrades.ItemListing, BasicItemListing> ENLARGING = TRADES.register("enlarging_modules",
+//            () -> new BasicItemListing(3, Shrinking.ENLARGING_MODULE.toStack(4), 5, 100));
 
     static {
         CMRegistries.POINTS_OF_INTEREST.register("tinkerer", () -> new PoiType(
@@ -79,7 +74,6 @@ public class Villagers {
     }
 
     public static void registerEvents() {
-        NeoForge.EVENT_BUS.addListener(CMVillagerTrades::addSpatialTinkererTrades);
         NeoForge.EVENT_BUS.addListener(VillageAdditions::injectVillageBuildings);
     }
 }

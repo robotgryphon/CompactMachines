@@ -20,10 +20,6 @@ public abstract class CodecExtensions {
                             (res) -> new Vec2(res.get(0), res.get(1))),
                     (vec) -> List.of(vec.x, vec.y));
 
-    public static final Codec<ChunkPos> CHUNKPOS = Codec.INT_STREAM
-            .comapFlatMap(i -> Util.fixedSize(i, 2)
-                    .map(arr -> new ChunkPos(arr[0], arr[1])), pos -> IntStream.of(pos.x, pos.z));
-
     public static <T extends Enum<T> & StringRepresentable> StreamCodec<ByteBuf, T> stringRepresentableStreamCodec(T[] values) {
         final var lookup = StringRepresentable.createNameLookup(values, StringRepresentable::getSerializedName);
         return ByteBufCodecs.STRING_UTF8.map(lookup, T::getSerializedName);

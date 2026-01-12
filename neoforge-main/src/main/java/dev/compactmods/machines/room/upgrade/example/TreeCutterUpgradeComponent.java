@@ -94,7 +94,7 @@ public class TreeCutterUpgradeComponent implements RoomUpgradeComponent {
         final var level = room.level();
         final var everythingLoaded = room.boundaries()
                 .innerChunkPositions()
-                .allMatch(cp -> level.shouldTickBlocksAt(cp.toLong()));
+                .allMatch(cp -> level.shouldTickBlocksAt(cp.pack()));
 
         if (!everythingLoaded) {
             data.cooldown = 200;

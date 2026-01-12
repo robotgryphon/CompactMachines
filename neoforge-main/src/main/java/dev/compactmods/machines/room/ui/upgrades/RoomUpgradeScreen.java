@@ -32,11 +32,10 @@ public class RoomUpgradeScreen extends AbstractContainerScreen<RoomUpgradeMenu> 
     private final NineSliceRenderer backgroundRenderer;
 
     public RoomUpgradeScreen(RoomUpgradeMenu menu, Inventory playerInv, Component title) {
-        super(menu, playerInv, title);
+        super(menu, playerInv, title, 256, 152);
         this.inventory = playerInv;
         this.titleLabelY = 6;
         this.inventoryLabelY = 26 + 32;
-        this.imageHeight = 114 + 18 + 20;
 
         this.backgroundRenderer = NineSliceRenderer.builder(CompactMachines.identifier("textures/gui/psd_screen_9slice.png"))
                 .area(0, 0, imageWidth, imageHeight)

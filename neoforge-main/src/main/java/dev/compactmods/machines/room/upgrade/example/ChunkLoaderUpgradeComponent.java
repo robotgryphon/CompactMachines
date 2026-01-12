@@ -84,7 +84,7 @@ public class ChunkLoaderUpgradeComponent implements RoomUpgradeComponent, NeoFor
             roomInstance.boundaries().innerChunkPositions().forEach(chunkPos -> {
                 CompactMachinesServer.CHUNK_TICKET_CONTROLLER
                         .forceChunk(instance.roomInstance().level(), instance.upgradeID(),
-                                chunkPos.x, chunkPos.z, true, true);
+                                chunkPos.x(), chunkPos.z(), true, true);
             });
         }
     }
@@ -97,7 +97,7 @@ public class ChunkLoaderUpgradeComponent implements RoomUpgradeComponent, NeoFor
             roomInstance.boundaries().innerChunkPositions().forEach(chunkPos -> {
                 CompactMachinesServer.CHUNK_TICKET_CONTROLLER
                         .forceChunk(instance.roomInstance().level(), instance.upgradeID(),
-                                chunkPos.x, chunkPos.z, false, true);
+                                chunkPos.x(), chunkPos.z(), false, true);
             });
         }
     }
