@@ -8,9 +8,12 @@ import dev.compactmods.machines.CMRegistries;
 import dev.compactmods.machines.machine.block.CompactMachineBlock;
 import dev.compactmods.machines.machine.block.CompactMachineBlockEntity;
 import dev.compactmods.machines.machine.item.BoundCompactMachineItem;
+import dev.compactmods.machines.machine.ui.MachineUIMenu;
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
@@ -20,6 +23,7 @@ import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.properties.NoteBlockInstrument;
 import net.minecraft.world.level.material.PushReaction;
 import net.neoforged.bus.api.IEventBus;
+import net.neoforged.neoforge.common.extensions.IMenuTypeExtension;
 import net.neoforged.neoforge.registries.DeferredBlock;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredItem;
@@ -80,6 +84,9 @@ public interface Machines {
         static void prepare() {
         }
     }
+
+    DeferredHolder<MenuType<?>, MenuType<MachineUIMenu>> MACHINE_UI_MENU = CMRegistries.MENUS.register("machine_ui",
+            () -> IMenuTypeExtension.create(MachineUIMenu::new));
 
     static void prepare() {
         Blocks.prepare();

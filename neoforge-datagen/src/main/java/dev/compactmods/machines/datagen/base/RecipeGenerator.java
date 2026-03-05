@@ -70,7 +70,7 @@ public class RecipeGenerator extends RecipeProvider {
 			.define('7', Tags.Items.INGOTS_COPPER)
 			.unlockedBy("picked_up_ender_eye", has(Items.ENDER_EYE))
 			.save(this.output);
-
+		
 		shaped(RecipeCategory.MISC, Shrinking.ENLARGING_MODULE)
 			.pattern("BPB")
 			.pattern("BEB")

@@ -43,7 +43,9 @@ public interface CMRegistries {
 
     DeferredRegister<PoiType> POINTS_OF_INTEREST = DeferredRegister.create(BuiltInRegistries.POINT_OF_INTEREST_TYPE, CompactMachines.MOD_ID);
 
-    static Item basicItem(UnaryOperator<Item.Properties> moreProps) {
+	DeferredRegister<MenuType<?>> MENUS = DeferredRegister.create(BuiltInRegistries.MENU, CompactMachines.MOD_ID);
+
+	static Item basicItem(UnaryOperator<Item.Properties> moreProps) {
 		return new Item(moreProps.apply(new Item.Properties()));
 	}
 
@@ -51,7 +53,8 @@ public interface CMRegistries {
 		Stream.of(BLOCKS, ITEMS, BLOCK_ENTITIES, CONTAINERS, COMMAND_ARGUMENT_TYPES, GAME_RULES,
                 POINTS_OF_INTEREST, Villagers.VILLAGERS, TABS,
 				CMDataAttachments.ATTACHMENT_TYPES,
-				CMDataComponents.DATA_COMPONENTS
+				CMDataComponents.DATA_COMPONENTS,
+				MENUS
 		).forEach(r -> r.register(modBus));
 
 		modBus.addListener((DataPackRegistryEvent.NewRegistry newRegistries) -> {

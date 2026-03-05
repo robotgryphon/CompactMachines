@@ -1,5 +1,6 @@
 package dev.compactmods.machines.datagen.util;
 
+import dev.compactmods.machines.dimension.Dimension;
 import net.minecraft.core.HolderSet;
 import net.minecraft.resources.Identifier;
 import net.minecraft.tags.BlockTags;
@@ -26,6 +27,7 @@ public class DimensionTypeBuilder {
     private boolean hasCeiling = false;
     private boolean ultraWarm = false;
     private boolean natural = true;
+    private boolean hasDragonFight = false;
     private double coordinateScale = 1.0D;
     private boolean piglinSafe = false;
     private boolean bedWorks = true;
@@ -59,6 +61,11 @@ public class DimensionTypeBuilder {
 
     public DimensionTypeBuilder ultraWarm(boolean ultraWarm) {
         this.ultraWarm = ultraWarm;
+        return this;
+    }
+
+    public DimensionTypeBuilder hasDragonFight(boolean hasDragonFight) {
+        this.hasDragonFight = hasDragonFight;
         return this;
     }
 
@@ -132,12 +139,14 @@ public class DimensionTypeBuilder {
 
     public DimensionType build() {
         // TODO: Add MonsterSettings here, right now it copies overworld
-        return new DimensionType(true, hasSkylight, hasCeiling, coordinateScale,
+        return new DimensionType(true, hasSkylight, hasCeiling,
+                hasDragonFight, coordinateScale,
                 minY, height, logicalHeight, infiniburn, ambientLight,
                 new DimensionType.MonsterSettings(UniformInt.of(0, 7), 0),
                 DimensionType.Skybox.NONE,
                 DimensionType.CardinalLightType.DEFAULT,
                 EnvironmentAttributeMap.EMPTY,
-                HolderSet.empty());
+                HolderSet.empty(),
+                Optional.empty());
     }
 }

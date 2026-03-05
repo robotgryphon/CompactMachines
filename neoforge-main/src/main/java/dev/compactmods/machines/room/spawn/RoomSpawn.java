@@ -10,7 +10,7 @@ import net.minecraft.world.phys.Vec3;
 public record RoomSpawn(Vec3 position, Vec2 rotation) implements IRoomSpawn {
     public static final Codec<RoomSpawn> CODEC = RecordCodecBuilder.create(i -> i.group(
             Vec3.CODEC.fieldOf("position").forGetter(RoomSpawn::position),
-            CodecExtensions.VEC2.fieldOf("rotation").forGetter(RoomSpawn::rotation)
+            Vec2.CODEC.fieldOf("rotation").forGetter(RoomSpawn::rotation)
     ).apply(i, RoomSpawn::new));
 
 }

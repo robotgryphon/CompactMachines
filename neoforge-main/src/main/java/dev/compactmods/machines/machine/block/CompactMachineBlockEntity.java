@@ -23,6 +23,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.TagValueOutput;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
+import net.neoforged.neoforge.transfer.ResourceHandler;
 import net.neoforged.neoforge.transfer.ResourceHandlerUtil;
 import net.neoforged.neoforge.transfer.item.ItemResource;
 import net.neoforged.neoforge.transfer.item.ItemStackResourceHandler;
@@ -151,12 +152,16 @@ public class CompactMachineBlockEntity extends BlockEntity implements IBoundComp
     public ItemStack popCore(@org.jspecify.annotations.Nullable Player player) {
         try (var tx = Transaction.openRoot()) {
             final var resource = coreItemHandler.getResource(0);
-            if (coreItemHandler.extract(resource, 1, tx) == 1) {
+            if (!resource.isEmpty() && coreItemHandler.extract(resource, 1, tx) == 1) {
                 tx.commit();
                 return resource.toStack(1);
             }
         }
 
         return ItemStack.EMPTY;
+    }
+
+    public ItemStacksResourceHandler coreHandler() {
+        return coreItemHandler;
     }
 }

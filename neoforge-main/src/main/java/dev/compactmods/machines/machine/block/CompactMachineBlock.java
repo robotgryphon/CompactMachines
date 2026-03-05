@@ -5,8 +5,10 @@ import dev.compactmods.machines.api.CompactMachines;
 import dev.compactmods.machines.api.attachment.CMDataAttachments;
 import dev.compactmods.machines.api.component.CMDataComponents;
 import dev.compactmods.machines.api.machine.MachineColor;
+import dev.compactmods.machines.api.machine.block.IBoundCompactMachineBlockEntity;
 import dev.compactmods.machines.api.machine.block.ICompactMachineBlockEntity;
 import dev.compactmods.machines.machine.Machines;
+import dev.compactmods.machines.machine.ui.MachineUIMenu;
 import dev.compactmods.machines.network.machine.MachineColorSyncPacket;
 import dev.compactmods.machines.network.machine.OpenMachinePreviewScreenPacket;
 import dev.compactmods.machines.room.RoomBlocks;
@@ -17,11 +19,18 @@ import dev.compactmods.machines.shrinking.Shrinking;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.GlobalPos;
 import net.minecraft.core.component.DataComponents;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.MenuProvider;
+import net.minecraft.world.SimpleMenuProvider;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.DyeItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ChunkPos;
@@ -32,6 +41,7 @@ import net.minecraft.world.level.block.EntityBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
+import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.common.util.FakePlayer;
 import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.NotNull;
@@ -70,12 +80,11 @@ public class CompactMachineBlock extends Block implements EntityBlock {
     }
 
     @NotNull
-    protected static InteractionResult tryDyingMachine(ServerLevel level, @NotNull BlockPos pos, Player player, DyeItem dye, ItemStack mainItem) {
-        // TODO Support IColorable once https://github.com/neoforged/NeoForge/pull/1094 is merged
-        var color = dye.getDyeColor();
+    protected static InteractionResult tryDyingMachine(ServerLevel level, @NotNull BlockPos pos, Player player, ItemStack mainItem) {
+        final var dye = mainItem.get(DataComponents.DYE);
         final var blockEntity = level.getBlockEntity(pos);
         if (blockEntity instanceof ICompactMachineBlockEntity cmbe) {
-            final var newColor = MachineColor.fromDyeColor(color);
+            final var newColor = MachineColor.fromDyeColor(dye);
             cmbe.setMachineColor(newColor);
 
             PacketDistributor.sendToPlayersTrackingChunk(
@@ -102,8 +111,11 @@ public class CompactMachineBlock extends Block implements EntityBlock {
         if (level.isClientSide() || !(player instanceof ServerPlayer serverPlayer) || !(level instanceof ServerLevel sl))
             return InteractionResult.SUCCESS;
 
-        if (mainItem.getItem() instanceof DyeItem dye) {
-            return tryDyingMachine(sl, pos, player, dye, mainItem);
+        if(mainItem.isEmpty())
+            return InteractionResult.TRY_WITH_EMPTY_HAND;
+
+        if (mainItem.has(DataComponents.DYE)) {
+            return tryDyingMachine(sl, pos, player, mainItem);
         }
 
         final var tile = level.getBlockEntity(pos, Machines.BlockEntities.MACHINE.get())
@@ -112,7 +124,7 @@ public class CompactMachineBlock extends Block implements EntityBlock {
         if (tile == null)
             return InteractionResult.FAIL;
 
-        if(mainItem.has(CMDataComponents.BOUND_ROOM_CODE)) {
+        if (mainItem.has(CMDataComponents.BOUND_ROOM_CODE)) {
             boolean yay = tile.setCore(serverPlayer, mainItem);
             return yay ? InteractionResult.SUCCESS : InteractionResult.FAIL;
         }
@@ -137,29 +149,39 @@ public class CompactMachineBlock extends Block implements EntityBlock {
     @Override
     protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hitResult) {
         // All other items, open preview screen
-        if (!level.isClientSide() && !(player instanceof FakePlayer)) {
-            level.getBlockEntity(pos, Machines.BlockEntities.MACHINE.get())
-                    .ifPresent(machine -> {
-
-                        if(player.isShiftKeyDown() && player.getMainHandItem().isEmpty()) {
-                            final var coreItem = machine.popCore(player);
-                        } else {
-                            machine.connectedRoom()
-                                    .ifPresent(roomCode -> {
-                                        CompactMachines.room(roomCode).ifPresent(inst -> {
-                                            if (player instanceof ServerPlayer sp) {
-                                                sp.setData(CMDataAttachments.OPEN_MACHINE_POS, GlobalPos.of(level.dimension(), pos));
-
-                                                PacketDistributor.sendToPlayer(sp,
-                                                        new OpenMachinePreviewScreenPacket(GlobalPos.of(level.dimension(), pos), roomCode)
-                                                );
-                                            }
-                                        });
-                                    });
-                        }
-                    });
+        if (level.isClientSide() || player instanceof FakePlayer) {
+            return level.isClientSide() ? InteractionResult.SUCCESS : InteractionResult.SUCCESS_SERVER;
         }
 
-        return level.isClientSide() ? InteractionResult.SUCCESS : InteractionResult.SUCCESS_SERVER;
+        if (player.isShiftKeyDown() && player.getMainHandItem().isEmpty()) {
+            InteractionResult.Success successServer = tryRemoveCore(level, pos, player);
+            if (successServer != null) return successServer;
+        }
+
+        if (player instanceof ServerPlayer sp) {
+            final var machinePos = GlobalPos.of(level.dimension(), pos);
+            sp.setData(CMDataAttachments.OPEN_MACHINE_POS, machinePos);
+
+            sp.openMenu(new SimpleMenuProvider(
+                    (int i, Inventory _, Player p) -> new MachineUIMenu(i, p, machinePos),
+                    Component.empty()
+            ), buffer -> {
+                buffer.writeGlobalPos(machinePos);
+            });
+//                                                PacketDistributor.sendToPlayer(sp,
+//                                                        new OpenMachinePreviewScreenPacket(GlobalPos.of(level.dimension(), pos), roomCode)
+//                                                );
+        }
+
+        return InteractionResult.SUCCESS;
+    }
+
+    private static InteractionResult.@org.jspecify.annotations.Nullable Success tryRemoveCore(Level level, BlockPos pos, Player player) {
+        if (level.getBlockEntity(pos) instanceof IBoundCompactMachineBlockEntity bound) {
+            final var core = bound.popCore(player);
+            player.setItemSlot(EquipmentSlot.MAINHAND, core);
+            return InteractionResult.SUCCESS_SERVER;
+        }
+        return null;
     }
 }

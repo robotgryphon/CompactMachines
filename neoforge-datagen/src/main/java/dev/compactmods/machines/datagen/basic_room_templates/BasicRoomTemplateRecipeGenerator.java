@@ -58,7 +58,8 @@ public class BasicRoomTemplateRecipeGenerator extends RecipeGenerator {
     }
 
     protected void machineRecipeBuilder(RecipeOutput consumer, Holder.Reference<RoomTemplate> templateRef, UnaryOperator<ShapedRecipeBuilder> configure) {
-        final var builder = ShapedRecipeBuilder.shaped(this.registries.lookupOrThrow(Registries.ITEM), RecipeCategory.MISC, Machines.Items.forNewRoom(templateRef))
+        final var builder = ShapedRecipeBuilder.shaped(this.registries.lookupOrThrow(Registries.ITEM),
+                        RecipeCategory.MISC, Machines.Items.forNewRoom(templateRef).getItem())
                 .pattern("WWW")
                 .pattern("EPS")
                 .pattern("WWW")

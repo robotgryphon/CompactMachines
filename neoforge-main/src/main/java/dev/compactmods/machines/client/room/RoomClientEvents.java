@@ -3,6 +3,8 @@ package dev.compactmods.machines.client.room;
 import dev.compactmods.machines.api.CompactMachines;
 import dev.compactmods.machines.client.keybinds.room.RoomExitKeyMapping;
 import dev.compactmods.machines.client.keybinds.room.RoomUpgradeUIMapping;
+import dev.compactmods.machines.client.machine.MachineUI;
+import dev.compactmods.machines.machine.Machines;
 import dev.compactmods.machines.room.Rooms;
 import dev.compactmods.machines.room.ui.overlay.RoomMetadataDebugOverlay;
 import dev.compactmods.machines.room.ui.upgrades.RoomUpgradeScreen;
@@ -16,6 +18,7 @@ public class RoomClientEvents {
 
     public static void registerMenuScreens(final RegisterMenuScreensEvent evt) {
         evt.register(Rooms.Menus.ROOM_UPGRADES.get(), RoomUpgradeScreen::new);
+        evt.register(Machines.MACHINE_UI_MENU.get(), MachineUI::new);
     }
 
     public static void onKeybindRegistration(final RegisterKeyMappingsEvent evt) {
