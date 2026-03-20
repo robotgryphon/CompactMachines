@@ -103,7 +103,7 @@ public class RoomEventHandler {
     private static void doEntityTeleportHandle(EntityTeleportEvent evt, Vec3 target, Entity ent) {
         if (!positionInsideRoom(ent, target)) {
             if (ent instanceof ServerPlayer sp) {
-                sp.displayClientMessage(Translations.TELEPORT_OUT_OF_BOUNDS.get(), true);
+                sp.sendOverlayMessage(Translations.TELEPORT_OUT_OF_BOUNDS.get());
             }
 
             evt.setCanceled(true);

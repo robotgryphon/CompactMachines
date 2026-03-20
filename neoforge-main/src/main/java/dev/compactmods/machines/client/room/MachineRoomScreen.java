@@ -10,7 +10,7 @@ import dev.compactmods.machines.network.room.PlayerRequestedUpgradeUIPacket;
 import dev.compactmods.machines.network.room.PlayerStartedRoomTrackingPacket;
 import dev.compactmods.machines.shrinking.Shrinking;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.ImageButton;
 import net.minecraft.client.gui.components.Renderable;
 import net.minecraft.client.gui.components.WidgetSprites;
@@ -184,9 +184,9 @@ public class MachineRoomScreen extends Screen {
     }
 
     @Override
-    public void renderBackground(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
+    public void extractBackground(GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY, float partialTick) {
 
-        super.renderBackground(guiGraphics, mouseX, mouseY, partialTick);
+        super.extractBackground(guiGraphics, mouseX, mouseY, partialTick);
 
         guiGraphics.fill(screenArea.left() - 1, screenArea.top() - 1,
                 screenArea.right() + 1, screenArea.bottom() + 1,
@@ -198,12 +198,12 @@ public class MachineRoomScreen extends Screen {
     }
 
     @Override
-    public void render(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
-        this.renderBackground(graphics, mouseX, mouseY, partialTick);
+    public void extractRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTick) {
+        this.extractBackground(graphics, mouseX, mouseY, partialTick);
 
         {
             var rt = Component.literal(roomCode);
-            graphics.drawCenteredString(font, rt, this.width / 2,
+            graphics.centeredText(font, rt, this.width / 2,
                     screenArea.top() - font.lineHeight - 2, 0xFFDEDEDE);
         }
 
@@ -212,20 +212,20 @@ public class MachineRoomScreen extends Screen {
             final var loadingMsg = Component
                     .translatableWithFallback("compactmachines.preview.loading", "Loading room preview...");
 
-            graphics.drawCenteredString(font, loadingMsg,
+            graphics.centeredText(font, loadingMsg,
                     this.width / 2,
                     (height / 2) - (font.lineHeight / 2), 0xFFDEDEDE);
         }
 
         if(!roomPreviewEnabled) {
             final var loadingMsg = Component.translatableWithFallback("compactmachines.preview.disabled", "Room Preview Disabled");
-            graphics.drawCenteredString(font, loadingMsg,
+            graphics.centeredText(font, loadingMsg,
                     this.width / 2,
                     (height / 2) - (font.lineHeight / 2), 0xFFDEDEDE);
         }
 
         for (Renderable renderable : this.renderables) {
-            renderable.render(graphics, mouseX, mouseY, partialTick);
+            renderable.extractRenderState(graphics, mouseX, mouseY, partialTick);
         }
     }
 

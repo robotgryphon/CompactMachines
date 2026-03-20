@@ -34,7 +34,7 @@ public class ResourceTunnelItem<TResource extends Resource> extends Item {
 
         room.ifPresentOrElse(instance -> {
             if(maybeUser instanceof ServerPlayer player) {
-                player.displayClientMessage(Component.literal(instance.code()), true);
+                player.sendOverlayMessage(Component.literal(instance.code()));
             }
         }, () -> {
 

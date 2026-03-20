@@ -54,9 +54,9 @@ public abstract class RoomHelper {
         final var result = history.enterRoom(player, room.code(), entryPoint);
 
         if(result == RoomEntryResult.FAILED_TOO_FAR_DOWN) {
-            player.displayClientMessage(Component.translatableWithFallback("compactmachines.errors.too_far_down", "An otherworldly force prevents you from shrinking more.")
+            player.sendOverlayMessage(Component.translatableWithFallback("compactmachines.errors.too_far_down", "An otherworldly force prevents you from shrinking more.")
                     .withStyle(ChatFormatting.DARK_RED)
-                    .withStyle(ChatFormatting.ITALIC), true);
+                    .withStyle(ChatFormatting.ITALIC));
 
             return CompletableFuture.completedFuture(result);
         }

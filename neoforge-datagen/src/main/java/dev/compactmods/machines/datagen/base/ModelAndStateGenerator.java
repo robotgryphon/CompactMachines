@@ -14,6 +14,7 @@ import net.minecraft.client.data.models.model.ModelTemplates;
 import net.minecraft.client.data.models.model.TextureMapping;
 import net.minecraft.client.data.models.model.TextureSlot;
 import net.minecraft.client.data.models.model.TexturedModel;
+import net.minecraft.client.resources.model.sprite.Material;
 import net.minecraft.data.PackOutput;
 
 public class ModelAndStateGenerator extends CMModelProvider {
@@ -28,7 +29,7 @@ public class ModelAndStateGenerator extends CMModelProvider {
         blockModels.createTrivialBlock(Rooms.Blocks.BREAKABLE_WALL.get(), TexturedModel.CUBE);
 
         blockModels.createAirLikeBlock(Dimension.BLOCK_MACHINE_VOID_AIR.get(),
-                CompactMachines.identifier("none"));
+                new Material(CompactMachines.identifier("none")));
 
         blockModels.createCompactMachine(Machines.Blocks.MACHINE);
 
@@ -37,16 +38,14 @@ public class ModelAndStateGenerator extends CMModelProvider {
 
 
         blockModels.createSimpleWithTextures(Villagers.SPATIAL_WORKBENCH, ModelTemplates.CUBE_TOP, new TextureMapping()
-                .put(TextureSlot.PARTICLE, modLocation("block/workbench/side"))
-                .put(TextureSlot.TOP, modLocation("block/workbench/top"))
-                .put(TextureSlot.SIDE, modLocation("block/workbench/side")));
+                .put(TextureSlot.PARTICLE, new Material(modLocation("block/workbench/side")))
+                .put(TextureSlot.TOP, new Material(modLocation("block/workbench/top")))
+                .put(TextureSlot.SIDE, new Material(modLocation("block/workbench/side"))));
 
         itemModels.generateFlatItem(Shrinking.PERSONAL_SHRINKING_DEVICE.asItem(), ModelTemplates.FLAT_HANDHELD_ITEM);
 
         itemModels.generateFlatItem(Shrinking.SHRINKING_MODULE.asItem(), ModelTemplates.FLAT_ITEM);
         itemModels.generateFlatItem(Shrinking.ENLARGING_MODULE.asItem(), ModelTemplates.FLAT_ITEM);
-
-        itemModels.generateRoomCoreItem(Rooms.Items.ROOM_CORE);
     }
 
 }

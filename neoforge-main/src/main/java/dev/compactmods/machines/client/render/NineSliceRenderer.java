@@ -1,6 +1,5 @@
 package dev.compactmods.machines.client.render;
 
-import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.BufferBuilder;
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.PoseStack;
@@ -8,17 +7,12 @@ import com.mojang.blaze3d.vertex.Tesselator;
 import com.mojang.blaze3d.vertex.VertexFormat;
 import com.mojang.math.Divisor;
 import it.unimi.dsi.fastutil.ints.IntIterator;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.navigation.ScreenRectangle;
-import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 import net.minecraft.util.profiling.Profiler;
 import net.minecraft.util.profiling.ProfilerFiller;
-import org.joml.Matrix3x2f;
-import org.joml.Matrix4f;
-import org.joml.Matrix4x3f;
 
 public record NineSliceRenderer(Identifier texture, ScreenRectangle area, int sliceWidth, int sliceHeight,
                                 int uWidth, int vHeight, int uOffset, int vOffset, int textureWidth, int textureHeight, int cornerWidth,
@@ -28,7 +22,7 @@ public record NineSliceRenderer(Identifier texture, ScreenRectangle area, int sl
         return new Builder(texture);
     }
 
-    public void render(GuiGraphics graphics) {
+    public void render(GuiGraphicsExtractor graphics) {
         ProfilerFiller profiler = Profiler.get();
         profiler.push("blit setup");
 //        RenderSystem.setShaderTexture(0, texture);

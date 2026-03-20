@@ -61,7 +61,7 @@ public class PersonalShrinkingDevice extends Item {
                 final var spawnManager = CompactMachines.spawnManagers().get(roomCode);
                 spawnManager.setPlayerSpawn(serverPlayer);
 
-                player.displayClientMessage(RoomTranslations.ROOM_SPAWNPOINT_SET.apply(serverPlayer, roomCode), true);
+                player.sendOverlayMessage(RoomTranslations.ROOM_SPAWNPOINT_SET.apply(serverPlayer, roomCode));
             }
 
             // Player Not Sneaking - Teleport from Room

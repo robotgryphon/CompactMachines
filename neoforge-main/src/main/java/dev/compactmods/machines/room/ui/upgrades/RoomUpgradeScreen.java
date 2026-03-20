@@ -5,9 +5,10 @@ import dev.compactmods.machines.client.render.ConditionalGhostSlot;
 import dev.compactmods.machines.client.render.NineSliceRenderer;
 import dev.compactmods.machines.client.widget.ImageButtonBuilder;
 import dev.compactmods.machines.network.room.PlayerRequestedRoomUIPacket;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.WidgetSprites;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
+import net.minecraft.client.resources.metadata.gui.GuiSpriteScaling;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.ARGB;
@@ -64,14 +65,14 @@ public class RoomUpgradeScreen extends AbstractContainerScreen<RoomUpgradeMenu> 
     }
 
     @Override
-    protected void renderLabels(GuiGraphics pGuiGraphics, int pMouseX, int pMouseY) {
+    protected void extractLabels(GuiGraphicsExtractor graphics, int xm, int ym) {
         final int white = DyeColor.WHITE.getTextColor();
-        pGuiGraphics.drawString(this.font, Component.literal("Room Upgrades"), this.titleLabelX, this.titleLabelY, white, false);
-        pGuiGraphics.drawString(this.font, this.playerInventoryTitle, this.inventoryLabelX, this.inventoryLabelY, white, false);
+        graphics.text(this.font, Component.literal("Room Upgrades"), this.titleLabelX, this.titleLabelY, white, false);
+        graphics.text(this.font, this.playerInventoryTitle, this.inventoryLabelX, this.inventoryLabelY, white, false);
     }
 
     @Override
-    protected void renderBg(GuiGraphics graphics, float partialTick, int mouseX, int mouseY) {
+    public void extractBackground(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTick) {
         final var pose = graphics.pose();
 
         pose.pushMatrix();
@@ -88,13 +89,13 @@ public class RoomUpgradeScreen extends AbstractContainerScreen<RoomUpgradeMenu> 
     }
 
     @Override
-    public void render(@NotNull GuiGraphics graphics, int pMouseX, int pMouseY, float pPartialTick) {
-        super.render(graphics, pMouseX, pMouseY, pPartialTick);
-        renderTooltip(graphics, pMouseX, pMouseY);
+    public void extractRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float a) {
+        super.extractRenderState(graphics, mouseX, mouseY, a);
+        extractTooltip(graphics, mouseX, mouseY);
     }
 
     @Override
-    protected void renderSlotContents(GuiGraphics guiGraphics, ItemStack itemstack, Slot slot, @Nullable String countString) {
+    protected void renderSlotContents(GuiGraphicsExtractor guiGraphics, ItemStack itemstack, Slot slot, @Nullable String countString) {
         if (slot instanceof ConditionalGhostSlot cgs && cgs.matched(itemstack)) {
             renderGhostSlot(guiGraphics, itemstack, slot, countString);
             return;
@@ -103,14 +104,14 @@ public class RoomUpgradeScreen extends AbstractContainerScreen<RoomUpgradeMenu> 
         super.renderSlotContents(guiGraphics, itemstack, slot, countString);
     }
 
-    private void renderGhostSlot(@NotNull GuiGraphics graphics, @NotNull ItemStack itemstack, @NotNull Slot slot, @Nullable String countString) {
-        graphics.renderItem(slot.getItem(), slot.x, slot.y);
+    private void renderGhostSlot(@NotNull GuiGraphicsExtractor graphics, @NotNull ItemStack itemstack, @NotNull Slot slot, @Nullable String countString) {
+        graphics.item(slot.getItem(), slot.x, slot.y);
         graphics.fill(slot.x, slot.y, slot.x + 16, slot.y + 16, ARGB.color(150, 30, 70, 210));
 
         if (!itemstack.isEmpty()) {
             if (itemstack.getCount() != 1 || countString != null) {
                 String s = countString == null ? String.valueOf(itemstack.getCount()) : countString;
-                graphics.drawString(this.font, s, slot.x + 19 - 2 - this.font.width(s), slot.y + 6 + 3,
+                graphics.text(this.font, s, slot.x + 19 - 2 - this.font.width(s), slot.y + 6 + 3,
                         ARGB.color(120, 255, 255, 255), false);
             }
         }

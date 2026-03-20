@@ -29,12 +29,6 @@ public class CompactMachinesClient {
 	  MachinesClient.registerEvents(modBus);
 	  RoomsClient.registerEvents(modBus);
 
-      modBus.addListener(CompactMachinesClient::registerSpecialModels);
-
 	  NeoForge.EVENT_BUS.addListener(CMClientCommands::registerClientCommands);
-   }
-
-   public static void registerSpecialModels(RegisterSpecialModelRendererEvent evt) {
-        evt.register(CompactMachines.identifier("room_core"), RoomCoreModel.Unbaked.MAP_CODEC);
    }
 }

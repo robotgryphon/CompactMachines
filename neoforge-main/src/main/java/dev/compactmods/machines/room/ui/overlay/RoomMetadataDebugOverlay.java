@@ -9,7 +9,7 @@ import dev.compactmods.machines.util.PlayerUtil;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.debug.DebugEntryCategory;
 import net.minecraft.client.gui.components.debug.DebugScreenDisplayer;
 import net.minecraft.client.gui.components.debug.DebugScreenEntry;
@@ -25,26 +25,26 @@ import java.util.UUID;
 
 public class RoomMetadataDebugOverlay implements GuiLayer {
 
-    private static void drawRoomCode(GuiGraphics graphics, Minecraft mc, Player player) {
+    private static void drawRoomCode(GuiGraphicsExtractor graphics, Minecraft mc, Player player) {
         player.getExistingData(CMDataAttachments.CURRENT_ROOM_CODE).ifPresent(code -> {
-            graphics.drawCenteredString(mc.font, Component.literal("Current Room: " + code), 0, 0, CommonColors.LIGHT_GRAY);
+            graphics.text(mc.font, Component.literal("Current Room: " + code), 0, 0, CommonColors.LIGHT_GRAY);
         });
     }
 
-    private static void drawRoomOwnerInfo(GuiGraphics graphics, Font font, UUID owner) {
+    private static void drawRoomOwnerInfo(GuiGraphicsExtractor graphics, Font font, UUID owner) {
         Minecraft mc = Minecraft.getInstance();
         PlayerUtil.getProfileByUUID(mc.level, owner).ifPresent(ownerInfo -> {
 
             CMPlayerFaceRenderer.render(ownerInfo, graphics, -6, -14, 12);
 
             final var text = Component.translatable(MachineTranslations.IDs.OWNER, ownerInfo.name());
-            graphics.drawString(font, text,
+            graphics.text(font, text,
                     -(font.width(text) / 2), 0, CommonColors.WHITE);
         });
     }
 
     @Override
-    public void render(GuiGraphics graphics, DeltaTracker deltaTracker) {
+    public void render(GuiGraphicsExtractor graphics, DeltaTracker deltaTracker) {
         final var mc = Minecraft.getInstance();
         if (!mc.debugEntries.isOverlayVisible())
             return;

@@ -21,7 +21,6 @@ public class CMModelTemplates {
                     OVERLAY_SLOT)
             .extend()
             .parent(Identifier.withDefaultNamespace("block/block"))
-            .renderType("cutout")
             .element(border -> border.allFaces((dir, face) -> face.texture(BORDER_SLOT)
                     .uvs(0, 0, 16, 16)
                     .cullface(dir)))

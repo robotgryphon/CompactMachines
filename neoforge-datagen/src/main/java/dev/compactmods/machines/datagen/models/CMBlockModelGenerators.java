@@ -8,6 +8,7 @@ import net.minecraft.client.data.models.model.ModelInstance;
 import net.minecraft.client.data.models.model.ModelTemplate;
 import net.minecraft.client.data.models.model.TextureMapping;
 import net.minecraft.client.data.models.model.TextureSlot;
+import net.minecraft.client.resources.model.sprite.Material;
 import net.minecraft.core.Holder;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.block.Block;
@@ -34,10 +35,10 @@ public class CMBlockModelGenerators extends BlockModelGenerators {
 
     public Identifier createCompactMachine(Holder<Block> block) {
         final var textures = new TextureMapping()
-                .put(TextureSlot.PARTICLE, CompactMachines.identifier("block/machine/tiny"))
-                .put(CMModelTemplates.BORDER_SLOT, CompactMachines.identifier("block/machine/border"))
-                .put(CMModelTemplates.OVERLAY_SLOT, CompactMachines.identifier("block/machine/overlay"))
-                .put(CMModelTemplates.TINT_SLOT, CompactMachines.identifier("block/machine/tint"));
+                .put(TextureSlot.PARTICLE, new Material(CompactMachines.identifier("block/machine/tiny")))
+                .put(CMModelTemplates.BORDER_SLOT, new Material(CompactMachines.identifier("block/machine/border")))
+                .put(CMModelTemplates.OVERLAY_SLOT, new Material(CompactMachines.identifier("block/machine/overlay")))
+                .put(CMModelTemplates.TINT_SLOT, new Material(CompactMachines.identifier("block/machine/tint")));
 
         return createSimpleWithTextures(block, CMModelTemplates.MACHINE_TEMPLATE, textures);
     }
