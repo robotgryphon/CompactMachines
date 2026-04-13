@@ -33,9 +33,14 @@ plugins {
     id("org.gradle.toolchains.foojay-resolver-convention") version ("1.0.0")
 }
 
-include(":core-api")
-include(":neoforge-main")
-include(":neoforge-datagen")
+include(":core")
+include(":compactmachines")
+include(":compactmachines-api")
+include(":datagen")
+include(":shrinking")
+include(":dimension-api")
+include(":room-system")
+include(":room-upgrades")
 
 fun addVersionCatalog(dependencyResolutionManagement: DependencyResolutionManagement, name: String) {
     dependencyResolutionManagement.versionCatalogs.create(name) {
