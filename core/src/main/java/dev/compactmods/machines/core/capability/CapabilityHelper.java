@@ -1,7 +1,10 @@
 package dev.compactmods.machines.core.capability;
 
 import dev.compactmods.machines.core.CompactMachinesCore;
+import dev.compactmods.machines.core.attachment.IForwardingAttachmentHolder;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.util.Util;
+import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.attachment.AttachmentType;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import net.neoforged.neoforge.registries.NeoForgeRegistries;
@@ -23,7 +26,14 @@ public abstract class CapabilityHelper {
 
     public static <SC extends ServerCapability<T, Void>, T> ServerCapRegistration<SC, T>
     registerServerCap(SC construct) {
-        Supplier<AttachmentType<SC>> lookup = ATTACHMENT_TYPES.register(construct.name().toString(), () -> AttachmentType.builder(() -> construct).build());
+        var original = construct.name();
+        var sanitized = original.toString();
+        if(original.getNamespace().equals(CompactMachinesCore.MOD_ID))
+            sanitized = original.getPath().toString();
+        else
+            sanitized = original.toString().replace(':', '_');
+
+        Supplier<AttachmentType<SC>> lookup = ATTACHMENT_TYPES.register(sanitized, () -> AttachmentType.builder(() -> construct).build());
         final var reg = new ServerCapRegistration<SC,T>(construct, lookup);
         SERVER_CAPABILITY_SUPPLIER_MAP.putIfAbsent(construct, reg);
         return reg;
@@ -38,7 +48,11 @@ public abstract class CapabilityHelper {
             if (capability.typeClass().equals(a.typeClass()))
                 return capability.typeClass().cast(a);
         }
-
+        
         throw new RuntimeException(":(");
+    }
+
+    public static void registerAliases(IEventBus modBus) {
+        ATTACHMENT_TYPES.register(modBus);
     }
 }

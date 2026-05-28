@@ -32,7 +32,7 @@ public record ServerRoomInstance(
     }
 
     @Override
-    public Supplier<IAttachmentHolder> attachmentHolder() {
+    public Supplier<IAttachmentHolder> getAttachmentHolder() {
         return () -> getCapability(RoomCapabilities.ROOM_DATA_ATTACHMENTS);
     }
 }

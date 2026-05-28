@@ -12,6 +12,7 @@ import dev.compactmods.machines.core.machine.MachineConstants;
 import dev.compactmods.machines.i18n.MachineTranslations;
 import dev.compactmods.machines.room.RoomTranslations;
 import dev.compactmods.machines.machine.block.CompactMachineBlockEntity;
+import dev.compactmods.machines.room.Rooms;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.arguments.EntityArgument;
@@ -121,7 +122,7 @@ public class CMFindRoomSubcommand {
 
         final var registry = CapabilityHelper.server(ctx.getSource().getServer(), RoomCapabilities.REGISTRY);
         final var owned = registry.allRooms()
-                .filter(i -> i.getExistingData(CMDataAttachments.ROOM_OWNER).map(id -> id.equals(owner)).orElse(false))
+                .filter(i -> i.getExistingData(Rooms.DataAttachments.ROOM_OWNER).map(id -> id.equals(owner)).orElse(false))
                 .toList();
 
         // TODO Localization

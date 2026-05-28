@@ -10,45 +10,45 @@ import java.util.function.Supplier;
 
 public interface IForwardingAttachmentHolder extends IAttachmentHolder {
 
-    Supplier<IAttachmentHolder> attachmentHolder();
+    Supplier<IAttachmentHolder> getAttachmentHolder();
 
     @Override
     default boolean hasAttachments() {
-        return attachmentHolder().get().hasAttachments();
+        return getAttachmentHolder().get().hasAttachments();
     }
 
     @Override
     default boolean hasData(AttachmentType<?> attachmentType) {
-        return attachmentHolder().get().hasData(attachmentType);
+        return getAttachmentHolder().get().hasData(attachmentType);
     }
 
     @Override
     default <T> T getData(AttachmentType<T> attachmentType) {
-        return attachmentHolder().get().getData(attachmentType);
+        return getAttachmentHolder().get().getData(attachmentType);
     }
 
     @Override
     default <T> Optional<T> getExistingData(AttachmentType<T> attachmentType) {
-        return attachmentHolder().get().getExistingData(attachmentType);
+        return getAttachmentHolder().get().getExistingData(attachmentType);
     }
 
     @Override
     default <T> @Nullable T setData(AttachmentType<T> attachmentType, T t) {
-        return attachmentHolder().get().setData(attachmentType, t);
+        return getAttachmentHolder().get().setData(attachmentType, t);
     }
 
     @Override
     default <T> @Nullable T removeData(AttachmentType<T> attachmentType) {
-        return attachmentHolder().get().removeData(attachmentType);
+        return getAttachmentHolder().get().removeData(attachmentType);
     }
 
     @Override
     default <T> @Nullable T getExistingDataOrNull(Supplier<AttachmentType<T>> type) {
-        return attachmentHolder().get().getExistingDataOrNull(type);
+        return getAttachmentHolder().get().getExistingDataOrNull(type);
     }
 
     @Override
     default <T> @Nullable T getExistingDataOrNull(@NotNull AttachmentType<T> attachmentType) {
-        return attachmentHolder().get().getExistingDataOrNull(attachmentType);
+        return getAttachmentHolder().get().getExistingDataOrNull(attachmentType);
     }
 }

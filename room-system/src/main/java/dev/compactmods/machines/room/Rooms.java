@@ -1,7 +1,6 @@
 package dev.compactmods.machines.room;
 
 import com.google.common.base.Predicates;
-import com.mojang.serialization.Codec;
 import dev.compactmods.machines.core.CompactMachinesCore;
 import dev.compactmods.machines.room.block.BreakableWallBlock;
 import dev.compactmods.machines.room.block.ItemBlockWall;
@@ -72,16 +71,6 @@ public interface Rooms {
     }
 
     interface DataAttachments {
-
-        Supplier<AttachmentType<GlobalPos>> OPEN_MACHINE_POS = ATTACHMENT_TYPES.register("open_machine", () -> AttachmentType
-                .builder(() -> GlobalPos.of(Level.OVERWORLD, BlockPos.ZERO))
-                .serialize(GlobalPos.MAP_CODEC, Predicates.alwaysFalse())
-                .build());
-
-        Supplier<AttachmentType<String>> CURRENT_ROOM_CODE = ATTACHMENT_TYPES.register("current_room_code", () -> AttachmentType
-                .<String>builder(() -> null)
-                .serialize(Codec.STRING.fieldOf("code"))
-                .build());
 
         Supplier<AttachmentType<UUID>> ROOM_OWNER = ATTACHMENT_TYPES.register("room_owner", () -> AttachmentType
                 .builder(() -> Util.NIL_UUID)

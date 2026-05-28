@@ -1,11 +1,9 @@
-import java.text.SimpleDateFormat
-import java.util.*
-
 val versionMain: String = System.getenv("CORE_VERSION") ?: "9.9.9"
 
 plugins {
     id("java-library")
     id("maven-publish")
+    id("cm-module-conventions")
 }
 
 sourceSets {
@@ -30,6 +28,13 @@ java {
     withSourcesJar()
 }
 
+//neoForge{
+//    interfaceInjectionData {
+//        this.from(project.file("interfaces.json"))
+//        this.publish(project.file("interfaces.json"))
+//    }
+//}
+
 tasks.withType<JavaCompile> {
     options.encoding = "UTF-8"
     options.compilerArgs.add("-proc:none")
@@ -37,23 +42,12 @@ tasks.withType<JavaCompile> {
 }
 
 tasks.withType<Jar> {
-    val gitVersion = providers.exec {
-        commandLine("git", "rev-parse", "HEAD")
-    }.standardOutput.asText.get()
-
     manifest {
-        val now = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ").format(Date())
         attributes(
             mapOf(
                 "Automatic-Module-Name" to "compactmachines.core",
                 "Specification-Title" to "Compact Machines - Core",
-                "Specification-Version" to "1", // We are version 1 of ourselves
-                "Implementation-Title" to "Compact Machines - Core",
-                "Implementation-Timestamp" to now,
-                "FMLModType" to "GAMELIBRARY",
-                "Minecraft-Version" to mojang.versions.minecraft.get(),
-                "NeoForge-Version" to neoforged.versions.neoforge.get(),
-                "Main-Commit" to gitVersion
+                "Implementation-Title" to "Compact Machines - Core"
             )
         )
     }

@@ -1,6 +1,7 @@
 package dev.compactmods.machines.datagen;
 
 import dev.compactmods.machines.api.CompactMachines;
+import dev.compactmods.machines.core.CompactMachinesCore;
 import dev.compactmods.machines.datagen.base.BaseDatapack;
 import dev.compactmods.machines.datagen.basic_room_templates.BasicRoomTemplatesDatapack;
 import dev.compactmods.machines.feature.CMFeatureFlags;
@@ -12,7 +13,7 @@ import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.data.event.GatherDataEvent;
 
-@EventBusSubscriber(modid = CompactMachines.MOD_ID)
+@EventBusSubscriber(modid = CompactMachinesCore.MOD_ID)
 public class DataGeneration {
 
     @SubscribeEvent

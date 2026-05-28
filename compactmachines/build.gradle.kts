@@ -55,11 +55,23 @@ sourceSets.test {
     }
 }
 
+evaluationDependsOn(roomSystem.path)
+
 neoForge {
 //    version = neoforged.versions.neoforge.get()
 
     val cmMain = this.mods.create(modId) {
-        modSourceSets.add(sourceSets.main)
+        this.modSourceSets.add(sourceSets.main)
+        // room-system is consumed as a game-library jar (FMLModType=GAMELIBRARY,
+        // see cm-module-conventions.gradle.kts). Adding it as a modSourceSet
+        // here would re-export the same packages under the `compactmachines`
+        // module identity, conflicting with the named `rooms` module that JPMS
+        // derives from the gamelibrary jar and producing:
+        //   ResolutionException: Modules rooms and compactmachines export
+        //   package dev.compactmods.machines.room.spawn to module
+        //   compactmachines.core
+        // The classes are still on the runtime classpath via
+        // implementation(project(":room-system")) and jarJar(project(":room-system")).
 
         if(System.getenv().containsKey("CI")) {
             modSourceSets.add(sourceSets.test)
@@ -204,18 +216,15 @@ dependencies {
         jarJar(libs.jnanoid)
 
         implementation(project(":core"))
-        jarJar(project(":core"))
-
         implementation(project(":dimension-api"))
-        jarJar(project(":dimension-api"))
-
         implementation(project(":room-system"))
-        jarJar(project(":room-system"))
-
         implementation(project(":room-upgrades"))
-        jarJar(project(":room-upgrades"))
-
         implementation(project(":shrinking"))
+
+        jarJar(project(":core"))
+        jarJar(project(":dimension-api"))
+        jarJar(project(":room-system"))
+        jarJar(project(":room-upgrades"))
         jarJar(project(":shrinking"))
     }
 

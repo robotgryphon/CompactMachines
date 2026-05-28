@@ -32,7 +32,6 @@ public class CompactMachinesServer {
     public CompactMachinesServer(IEventBus modBus) {
 
         var roomReg = CapabilityHelper.registerServerCap(RoomCapabilities.REGISTRY);
-        var registry = CapabilityHelper.server(ServerLifecycleHooks.getCurrentServer(), RoomCapabilities.REGISTRY);
 
         NeoForge.EVENT_BUS.addListener(EventPriority.LOW, CompactMachinesServer::serverAboutToStart);
         NeoForge.EVENT_BUS.addListener(EventPriority.LOW, CompactMachinesServer::serverStarting);
@@ -40,6 +39,7 @@ public class CompactMachinesServer {
         NeoForge.EVENT_BUS.addListener(EventPriority.LOW, CompactMachinesServer::levelSaved);
 
         modBus.addListener(CompactMachinesServer::registerTicketController);
+        CapabilityHelper.registerAliases(modBus);
     }
 
     public static @NotNull IServerCapabilities caps(MinecraftServer server) {

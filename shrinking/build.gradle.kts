@@ -1,6 +1,3 @@
-import java.text.SimpleDateFormat
-import java.util.*
-
 val versionMain: String = System.getenv("SHRINKING_API_VERSION") ?: "9.9.9"
 
 plugins {
@@ -37,22 +34,11 @@ dependencies {
 }
 
 tasks.withType<Jar> {
-    val gitVersion = providers.exec {
-        commandLine("git", "rev-parse", "HEAD")
-    }.standardOutput.asText.get()
-
     manifest {
-        val now = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ").format(Date())
         attributes(
             mapOf(
                 "Automatic-Module-Name" to "compactmachines.api.shrinking",
-                "Specification-Title" to "Compact Machines - Shrinking API",
-                "Implementation-Timestamp" to now,
-                "Implementation-Version" to version,
-                "FMLModType" to "GAMELIBRARY",
-                "Minecraft-Version" to mojang.versions.minecraft.get(),
-                "NeoForge-Version" to neoforged.versions.neoforge.get(),
-                "Main-Commit" to gitVersion
+                "Specification-Title" to "Compact Machines - Shrinking API"
             )
         )
     }

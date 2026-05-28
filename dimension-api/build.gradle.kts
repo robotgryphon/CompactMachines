@@ -7,6 +7,7 @@ plugins {
     id("java-library")
     id("maven-publish")
     alias(neoforged.plugins.moddev)
+    id("cm-module-conventions")
 }
 
 sourceSets {
@@ -42,22 +43,12 @@ tasks.withType<JavaCompile> {
 }
 
 tasks.withType<Jar> {
-    val gitVersion = providers.exec {
-        commandLine("git", "rev-parse", "HEAD")
-    }.standardOutput.asText.get()
-
     manifest {
-        val now = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ").format(Date())
         attributes(
             mapOf(
                 "Automatic-Module-Name" to "compactmachines.api.dimension",
                 "Specification-Title" to "Compact Machines - Dimension API",
-                "Implementation-Timestamp" to now,
-                "Implementation-Version" to version,
-                "FMLModType" to "GAMELIBRARY",
-                "Minecraft-Version" to mojang.versions.minecraft.get(),
-                "NeoForge-Version" to neoforged.versions.neoforge.get(),
-                "Main-Commit" to gitVersion
+                "Implementation-Title" to "Compact Machines - Dimension API"
             )
         )
     }
