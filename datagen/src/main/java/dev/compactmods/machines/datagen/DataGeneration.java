@@ -4,7 +4,7 @@ import dev.compactmods.machines.api.CompactMachines;
 import dev.compactmods.machines.core.CompactMachinesCore;
 import dev.compactmods.machines.datagen.base.BaseDatapack;
 import dev.compactmods.machines.datagen.basic_room_templates.BasicRoomTemplatesDatapack;
-import dev.compactmods.machines.feature.CMFeatureFlags;
+import dev.compactmods.machines.room.CMFeatureFlags;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.data.metadata.PackMetadataGenerator;
 import net.minecraft.network.chat.Component;
@@ -31,7 +31,7 @@ public class DataGeneration {
         roomUpgrades.addProvider(output -> PackMetadataGenerator.forFeaturePack(
                 output,
                 Component.literal("Enables the room upgrade experimental features."),
-                FeatureFlagSet.of(CMFeatureFlags.ROOM_UPDATES_FLAG)
+                FeatureFlagSet.of(CMFeatureFlags.ROOM_UPGRADES_FLAG)
         ));
     }
 }

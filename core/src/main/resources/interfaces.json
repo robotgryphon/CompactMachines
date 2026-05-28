@@ -1,5 +1,0 @@
-{
-  "net/minecraft/server/MinecraftServer": [
-    "dev/compactmods/machines/core/attachment/IForwardingAttachmentHolder"
-  ]
-}

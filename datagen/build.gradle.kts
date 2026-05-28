@@ -20,12 +20,8 @@ java {
 }
 
 neoForge {
-//    version = neoforged.versions.neoforge.get()
-
     mods.create(modId) {
-        this.sourceSet(coreApi.sourceSets.main.get())
         this.sourceSet(sourceSets.main.get())
-        this.sourceSet(mainProject.sourceSets.main.get())
     }
 
     runs {
@@ -63,8 +59,11 @@ repositories {
 
 dependencies {
     compileOnly(coreApi)
-    compileOnly(mainProject)
-
+    implementation(mainProject)
+    compileOnly(project(":compactmachines-api"))  // dev.compactmods.machines.api.CompactMachines
+    compileOnly(project(":dimension-api"))         // dev.compactmods.machines.api.dimension.CompactDimension
+    compileOnly(project(":room-system"))           // dev.compactmods.machines.api.room.template.RoomTemplate (api source set)
+    compileOnly(project(":shrinking"))
 //    implementation(libs.curios)
 }
 

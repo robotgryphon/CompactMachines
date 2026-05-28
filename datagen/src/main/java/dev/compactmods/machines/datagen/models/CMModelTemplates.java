@@ -1,11 +1,9 @@
 package dev.compactmods.machines.datagen.models;
 
-import dev.compactmods.machines.api.CompactMachines;
+import dev.compactmods.machines.core.CompactMachinesCore;
 import net.minecraft.client.data.models.model.ModelTemplate;
 import net.minecraft.client.data.models.model.ModelTemplates;
 import net.minecraft.client.data.models.model.TextureSlot;
-import net.minecraft.client.renderer.special.SpecialModelRenderer;
-import net.minecraft.client.renderer.special.SpecialModelRenderers;
 import net.minecraft.resources.Identifier;
 
 public class CMModelTemplates {
@@ -14,7 +12,7 @@ public class CMModelTemplates {
     public static final TextureSlot TINT_SLOT = TextureSlot.create("tint");
     public static final TextureSlot BORDER_SLOT = TextureSlot.create("border");
 
-    public static final ModelTemplate MACHINE_TEMPLATE = ModelTemplates.create(CompactMachines.id("machine"),
+    public static final ModelTemplate MACHINE_TEMPLATE = ModelTemplates.create(CompactMachinesCore.id("machine"),
                     TextureSlot.PARTICLE,
                     BORDER_SLOT,
                     TINT_SLOT,
@@ -35,7 +33,7 @@ public class CMModelTemplates {
                     .tintindex(1)))
             .build();
 
-    public static final ModelTemplate ROOM_CORE_TEMPLATE = ModelTemplates.create(CompactMachines.id("room_core"), TextureSlot.PARTICLE)
+    public static final ModelTemplate ROOM_CORE_TEMPLATE = ModelTemplates.create(CompactMachinesCore.id("room_core"), TextureSlot.PARTICLE)
             .extend()
 
             .build();

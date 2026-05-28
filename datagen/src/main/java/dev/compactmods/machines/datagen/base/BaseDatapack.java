@@ -1,6 +1,7 @@
 package dev.compactmods.machines.datagen.base;
 
 import dev.compactmods.machines.api.CompactMachines;
+import dev.compactmods.machines.core.CompactMachinesCore;
 import dev.compactmods.machines.datagen.base.lang.EnglishLangGenerator;
 import dev.compactmods.machines.datagen.base.loot.BlockLootGenerator;
 import dev.compactmods.machines.datagen.base.tags.BlockTagGenerator;
@@ -43,7 +44,7 @@ public class BaseDatapack {
         ));
 
         event.createProvider((output,provider)
-                -> new BasicRoomTemplateRecipeGenerator.Runner(CompactMachines.dotPrefix("base"), output, provider));
+                -> new BasicRoomTemplateRecipeGenerator.Runner(CompactMachinesCore.dotPrefix("base"), output, provider));
 
         event.createProvider(BlockTagGenerator::new);
         event.createProvider(ItemTagGenerator::new);

@@ -9,10 +9,10 @@ import dev.compactmods.machines.core.Translations;
 import dev.compactmods.machines.Advancements;
 import dev.compactmods.machines.i18n.CommandTranslations;
 import dev.compactmods.machines.i18n.MachineTranslations;
-import dev.compactmods.machines.i18n.RoomTranslations;
 import dev.compactmods.machines.client.keybinds.room.RoomExitKeyMapping;
 import dev.compactmods.machines.client.creative.CreativeTabs;
 import dev.compactmods.machines.client.keybinds.room.RoomUpgradeUIMapping;
+import dev.compactmods.machines.room.RoomTranslations;
 import dev.compactmods.machines.room.Rooms;
 import dev.compactmods.machines.shrinking.Shrinking;
 import dev.compactmods.machines.villager.Villagers;
@@ -59,7 +59,6 @@ public class EnglishLangGenerator extends dev.compactmods.machines.datagen.base.
         add(CompactMachines.MOD_ID + ".direction.side", "Side: %s");
         add(CompactMachines.MOD_ID + ".connected_block", "Connected: %s");
 
-        add(Translations.IDs.UNBREAKABLE_BLOCK, "Warning! Unbreakable for non-creative players!");
         add(Translations.IDs.HINT_HOLD_SHIFT, "Hold shift for details.");
 
         addCreativeTab(CreativeTabs.MAIN_RL, "Compact Machines");
@@ -86,7 +85,6 @@ public class EnglishLangGenerator extends dev.compactmods.machines.datagen.base.
         addGamerule(CMGameRules.ALLOW_CREATIVE_OUT_OF_BOUNDS_KEY, "Allow Creative OOB", "Allow out-of-bounds creative players");
         addGamerule(CMGameRules.ALLOW_SPECTATORS_OUT_OF_BOUNDS_KEY, "Allow Spectators OOB", "Allow out-of-bounds spectators");
         addGamerule(CMGameRules.DAMAGE_OOB_PLAYERS_KEY, "Damage OOB Players", "Damage players that are out of bounds");
-        addGamerule(CMGameRules.DAMAGE_PSD_ITEMS_ON_ROOM_EXIT_KEY, "Damage PSDs on Exit", "Damage shrinking devices by leaving rooms");
 
     }
 

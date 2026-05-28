@@ -25,7 +25,14 @@ dependencies {
     compileOnly(project(":core"))
     compileOnly(project(":dimension-api"))
 
+    // The `api` source set is compiled in isolation by Gradle and gets its own
+    // parallel configuration chain (apiCompileOnly / apiImplementation / …).
+    // Every project consumed from a source file under src/api/java must be
+    // listed here explicitly — `compileOnly(...)` above only feeds the `main`
+    // source set. The IDE flattens source-set classpaths so unqualified
+    // imports look fine in the editor but fail in `./gradlew compileApiJava`.
     "apiCompileOnly"(project(":core"))
+    "apiCompileOnly"(project(":dimension-api"))
 
     implementation(libs.jnanoid)
 

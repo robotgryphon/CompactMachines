@@ -3,6 +3,13 @@ license = "MIT"
 [[accessTransformers]]
 file = "META-INF/accesstransformer.cfg"
 
+# Registered here, not via the MixinConfigs MANIFEST.MF entry — modern NeoForge
+# (FML 11+) discovers mixin configs from this toml. The config file itself
+# lives at the root of core-*.jar, which is on the runtime classpath as a
+# GAMELIBRARY, so Mixin resolves the resource by name across the classpath.
+[[mixins]]
+config = "compactmachines.mixins.json"
+
 [[mods]] #mandatory
 modId = "compactmachines"
 version = "${mod_version}"

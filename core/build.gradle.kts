@@ -4,6 +4,10 @@ plugins {
     id("java-library")
     id("maven-publish")
     id("cm-module-conventions")
+    // moddev is applied here (rather than only via cm-module-conventions'
+    // afterEvaluate hook) so the `neoForge { interfaceInjectionData {…} }`
+    // extension below is available at script-evaluation time.
+    alias(neoforged.plugins.moddev)
 }
 
 sourceSets {
@@ -28,12 +32,24 @@ java {
     withSourcesJar()
 }
 
-//neoForge{
-//    interfaceInjectionData {
-//        this.from(project.file("interfaces.json"))
-//        this.publish(project.file("interfaces.json"))
-//    }
-//}
+// Interface injection: at compile time, moddev rewrites the bytecode of every
+// type listed in interfaces.json so it appears to implement the matching
+// interface. Configured here in :core so that the metadata travels with the
+// core artifact — every downstream module that depends on :core
+// (compactmachines, room-system, room-upgrades, shrinking, …) automatically
+// sees `MinecraftServer implements IForwardingAttachmentHolder` and can call
+// `server.getData(…)` without a cast. The matching runtime addition comes
+// from MinecraftServerMixin in this same module.
+//
+// `from(…)` consumes the JSON during *this* module's compile/runtime; `publish(…)`
+// attaches it to the Maven publication so consumers' moddev plugins resolve and
+// apply the same injection transitively.
+neoForge {
+    interfaceInjectionData {
+        from(project.file("interfaces.json"))
+        publish(project.file("interfaces.json"))
+    }
+}
 
 tasks.withType<JavaCompile> {
     options.encoding = "UTF-8"

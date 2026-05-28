@@ -1,6 +1,7 @@
 package dev.compactmods.machines.datagen.basic_room_templates;
 
 import dev.compactmods.machines.api.CompactMachines;
+import dev.compactmods.machines.core.CompactMachinesCore;
 import dev.compactmods.machines.datagen.basic_room_templates.lang.RoomTemplatesEnglishLangGenerator;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.data.metadata.PackMetadataGenerator;
@@ -21,7 +22,7 @@ public class BasicRoomTemplatesDatapack {
 
         basicTemplates.addProvider(output -> new RoomTemplatesGenerator(output, lookupProvider));
         event.createProvider((output,provider)
-                -> new BasicRoomTemplateRecipeGenerator.Runner(CompactMachines.dotPrefix("basic_room_templates"), output, provider));
+                -> new BasicRoomTemplateRecipeGenerator.Runner(CompactMachinesCore.dotPrefix("basic_room_templates"), output, provider));
 
         basicTemplates.addProvider(RoomTemplatesEnglishLangGenerator::new);
     }

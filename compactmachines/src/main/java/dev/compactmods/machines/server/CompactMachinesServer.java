@@ -2,6 +2,7 @@ package dev.compactmods.machines.server;
 
 import dev.compactmods.machines.api.room.capability.RoomCapabilities;
 import dev.compactmods.machines.core.CompactMachinesCore;
+import dev.compactmods.machines.core.attachment.IForwardingAttachmentHolder;
 import dev.compactmods.machines.core.capability.CapabilityHelper;
 import dev.compactmods.machines.core.capability.ServerCapability;
 import dev.compactmods.machines.core.data.Saveable;

@@ -1,6 +1,5 @@
 package dev.compactmods.machines.datagen.base;
 
-import dev.compactmods.machines.api.room.template.RoomTemplate;
 import dev.compactmods.machines.room.Rooms;
 import dev.compactmods.machines.shrinking.Shrinking;
 import net.minecraft.core.HolderLookup;
