@@ -11,15 +11,12 @@ import dev.compactmods.machines.network.CMNetworks;
 import dev.compactmods.machines.player.PlayerEventHandler;
 import dev.compactmods.machines.room.Rooms;
 import dev.compactmods.machines.room.block.ProtectedBlockEventHandler;
-import dev.compactmods.machines.capabilities.BasicRoomCapabilities;
 import dev.compactmods.machines.server.event.RoomTemplatesCheckEventHandler;
 import dev.compactmods.machines.shrinking.Shrinking;
-import dev.compactmods.machines.upgrades.RoomUpgrades;
 import dev.compactmods.machines.villager.Villagers;
 import net.minecraft.util.ARGB;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.common.Mod;
-import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.neoforged.neoforge.common.NeoForge;
 
 @Mod(CompactMachinesCore.MOD_ID)
@@ -64,7 +61,5 @@ public class CompactMachinesCommon {
 
         NeoForge.EVENT_BUS.addListener(Commands::onCommandsRegister);
         NeoForge.EVENT_BUS.addListener(ProtectedBlockEventHandler::leftClickBlock);
-
-        modBus.addListener(BasicRoomCapabilities::register);
     }
 }

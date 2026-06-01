@@ -5,7 +5,6 @@ import com.mojang.brigadier.suggestion.SuggestionProvider;
 import dev.compactmods.machines.api.room.capability.RoomCapabilities;
 import dev.compactmods.machines.api.room.template.RoomTemplate;
 import dev.compactmods.machines.api.room.upgrade.RoomUpgradeComponentType;
-import dev.compactmods.machines.core.capability.CapabilityHelper;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.SharedSuggestionProvider;
 import net.minecraft.core.Registry;
@@ -30,7 +29,7 @@ public class Suggestors {
 
     public static final SuggestionProvider<CommandSourceStack> ROOM_CODES = (ctx, builder) -> {
         final var server = ctx.getSource().getServer();
-        final var registry = CapabilityHelper.server(server, RoomCapabilities.REGISTRY);
+        final var registry = server.getCapability(RoomCapabilities.REGISTRY);
 
         final var codes = registry.allRoomCodes().toList();
 

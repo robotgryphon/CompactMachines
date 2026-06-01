@@ -1,4 +1,4 @@
-package dev.compactmods.machines.room;
+package dev.compactmods.machines.room.generation;
 
 import com.aventrix.jnanoid.jnanoid.NanoIdUtils;
 

@@ -1,16 +1,12 @@
 package dev.compactmods.machines.upgrades;
 
-import dev.compactmods.machines.api.room.RoomInstance;
 import dev.compactmods.machines.api.room.capability.RoomCapabilities;
 import dev.compactmods.machines.api.room.capability.RoomCapability;
-import dev.compactmods.machines.api.room.registration.RoomRegistry;
 import dev.compactmods.machines.api.room.upgrade.RoomUpgradeComponentType;
 import dev.compactmods.machines.api.room.upgrade.RoomUpgradesApi;
 import dev.compactmods.machines.api.room.upgrade.capability.RoomUpgradeCapabilities;
 import dev.compactmods.machines.api.room.upgrade.component.RoomUpgradeComponentList;
 import dev.compactmods.machines.core.CompactMachinesCore;
-import dev.compactmods.machines.core.capability.ServerCapability;
-import dev.compactmods.machines.core.capability.ServerCapabilityLookup;
 import dev.compactmods.machines.upgrades.event.NeoForgeServerEventProcessor;
 import it.unimi.dsi.fastutil.objects.Reference2ObjectArrayMap;
 import net.minecraft.core.component.DataComponentType;
@@ -26,7 +22,6 @@ import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
 import java.util.Map;
-import java.util.ServiceLoader;
 
 @Mod(CompactMachinesCore.MOD_ID)
 public class RoomUpgrades {

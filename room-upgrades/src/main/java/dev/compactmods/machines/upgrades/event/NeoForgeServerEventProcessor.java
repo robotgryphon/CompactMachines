@@ -1,7 +1,7 @@
 package dev.compactmods.machines.upgrades.event;
 
 import dev.compactmods.machines.api.room.capability.RoomCapabilities;
-import dev.compactmods.machines.api.room.registration.RoomRegistry;
+import dev.compactmods.machines.api.room.registry.RoomRegistry;
 import dev.compactmods.machines.api.room.upgrade.RoomUpgradeComponent;
 import dev.compactmods.machines.api.room.upgrade.RoomUpgradeInstance;
 import dev.compactmods.machines.api.room.upgrade.capability.RoomUpgradeCapabilities;

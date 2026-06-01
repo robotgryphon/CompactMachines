@@ -1,11 +1,10 @@
-package dev.compactmods.machines.room;
+package dev.compactmods.machines.room.registry;
 
 import dev.compactmods.machines.api.dimension.CompactDimension;
 import dev.compactmods.machines.api.room.RoomInstance;
-import dev.compactmods.machines.api.room.generation.NewRoomBuilder;
-import dev.compactmods.machines.api.room.registration.RoomRegistry;
-import dev.compactmods.machines.api.room.template.RoomTemplate;
+import dev.compactmods.machines.api.room.registry.RoomRegistry;
 import dev.compactmods.machines.core.data.CMSingletonDataFileManager;
+import dev.compactmods.machines.room.Rooms;
 import dev.compactmods.machines.room.graph.node.RoomRegistrationNode;
 import it.unimi.dsi.fastutil.objects.Object2ObjectArrayMap;
 import net.minecraft.server.MinecraftServer;
@@ -13,8 +12,6 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Map;
 import java.util.Optional;
-import java.util.UUID;
-import java.util.function.Consumer;
 import java.util.stream.Stream;
 
 public class ServerRoomRegistry implements RoomRegistry, AutoCloseable {
@@ -24,15 +21,11 @@ public class ServerRoomRegistry implements RoomRegistry, AutoCloseable {
     private final Map<String, RoomInstance> instanceCache;
 
     public ServerRoomRegistry(MinecraftServer server) {
-        this.instanceCache = new Object2ObjectArrayMap<>();
         this.server = server;
-        ROOM_REGISTRAR_DATA = new CMSingletonDataFileManager<>(server, "room_registrations", new RoomRegistrarData());
-        ROOM_REGISTRAR_DATA.load();
-    }
+        this.instanceCache = new Object2ObjectArrayMap<>();
 
-    @Override
-    public NewRoomBuilder builder() {
-        return new ServerNewRoomBuilder();
+        ROOM_REGISTRAR_DATA = server.getData(Rooms.DataAttachments.ROOM_REGISTRAR_DATA);
+        ROOM_REGISTRAR_DATA.load();
     }
 
     @Override
@@ -71,29 +64,6 @@ public class ServerRoomRegistry implements RoomRegistry, AutoCloseable {
         if(ROOM_REGISTRAR_DATA == null) return;
         ROOM_REGISTRAR_DATA.save();
     }
-
-//    @Override
-//    public RoomInstance createNew(RoomTemplate template, UUID owner, Consumer<NewRoomBuilder> override) {
-//        final Consumer<NewRoomBuilder> preOverride = builder -> builder.defaultMachineColor(template.defaultMachineColor())
-//                .owner(owner)
-//                .boundaries(getNextBoundaries(template));
-//
-//        // Make builder, set template defaults, then allow overrides
-//        final var b = new ServerNewRoomBuilder();
-//
-//        preOverride.andThen(override).accept(b);
-//
-//        final var inst = b.build(server);
-//
-//        var node = new RoomRegistrationNode(UUID.randomUUID(), new RoomRegistrationNode.Data(inst));
-//
-//        ROOM_REGISTRAR_DATA.data().put(node);
-//
-//        CompactMachines.chunkManager().calculateChunks(inst.code(), node);
-//
-//        instanceCache.put(inst.code(), inst);
-//        return inst;
-//    }
 
     @NotNull
     private RoomInstance getOrMakeRoomInstance(RoomRegistrationNode regNode) {

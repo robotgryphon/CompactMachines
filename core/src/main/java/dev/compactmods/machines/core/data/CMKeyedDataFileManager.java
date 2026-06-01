@@ -41,7 +41,7 @@ public class CMKeyedDataFileManager<Key, T extends CMDataFile & CodecHolder<T>> 
     @Override
     public T data(Key key) {
         return cache.computeIfAbsent(key, k -> {
-            var inst = creator.apply(server, k);
+            var inst = creator. apply(server, k);
             var dir = inst.getDataLocation(server);
             DataFileUtil.ensureDirExists(dir);
             final var file = dir.resolve(getFileKey(k) + ".dat").toFile();

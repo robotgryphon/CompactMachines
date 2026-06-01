@@ -6,7 +6,6 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import dev.compactmods.machines.api.room.capability.RoomCapabilities;
 import dev.compactmods.machines.core.CompactMachinesCore;
-import dev.compactmods.machines.core.capability.CapabilityHelper;
 import dev.compactmods.machines.i18n.CommandTranslations;
 import dev.compactmods.machines.room.RoomTranslations;
 import dev.compactmods.machines.api.room.template.RoomTemplateHelper;
@@ -36,7 +35,7 @@ public class CMGiveCoreSubcommand {
                         .suggests(Suggestors.ROOM_TEMPLATES)
                         .executes(CMGiveCoreSubcommand::giveNewMachineExecutor)));
 
-        // /cm give existing [room-code]
+        // /cm give existing [room-roomCode]
         subRoot.then(Commands.literal("existing")
                 .then(Commands.argument("room", StringArgumentType.string())
                         .suggests(Suggestors.ROOM_CODES)
@@ -51,7 +50,7 @@ public class CMGiveCoreSubcommand {
                             .suggests(Suggestors.ROOM_TEMPLATES)
                             .executes(CMGiveCoreSubcommand::giveNewMachineSpecificPlayer)));
 
-        // /cm give [player] existing [room-code]
+        // /cm give [player] existing [room-roomCode]
         giveSpecificPlayer.then(Commands.literal("existing")
                 .then(Commands.argument("room", StringArgumentType.string())
                         .suggests(Suggestors.ROOM_CODES)
@@ -122,7 +121,9 @@ public class CMGiveCoreSubcommand {
     }
 
     private static void createAndGiveExistingRoom(String roomCode, ServerPlayer player, CommandSourceStack src) {
-        final var registry = CapabilityHelper.server(src.getServer(), RoomCapabilities.REGISTRY);
+        final var server = src.getServer();
+        final var registry = server.getCapability(RoomCapabilities.REGISTRY);
+
         registry.get(roomCode).ifPresentOrElse(room -> {
             ItemStack newItem = Machines.Items.boundToRoom(room.code());
             if (!player.addItem(newItem)) {

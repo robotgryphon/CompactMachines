@@ -1,5 +1,6 @@
 package dev.compactmods.machines.network.room;
 
+import dev.compactmods.machines.api.room.capability.RoomCapabilities;
 import dev.compactmods.machines.core.CompactMachinesCore;
 import dev.compactmods.machines.server.CompactMachinesServer;
 import dev.compactmods.machines.shrinking.Shrinking;
@@ -27,8 +28,8 @@ public record PlayerRequestedTeleportPacket(GlobalPos machine, String room) impl
         ctx.enqueueWork(() -> {
             final var player = ctx.player();
             if (player instanceof ServerPlayer sp) {
-                CompactMachinesServer.caps(player.level().getServer())
-                        .roomRegistry()
+                final var server = player.level().getServer();
+                server.getCapability(RoomCapabilities.REGISTRY)
                         .get(pkt.room)
                         .ifPresent(room -> {
                             var handler = sp.getCapability(Shrinking.SHRINK, room);

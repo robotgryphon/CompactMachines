@@ -154,14 +154,11 @@ public class MachineRoomScreen extends Screen {
         final var hasPsdInInv = player.getInventory()
                 .contains(slotItem -> slotItem.has(Shrinking.DataComponents.SHRINKING_CONFIG));
 
-        if (hasPsdInInv)
-            return true;
+        return hasPsdInInv;
 
 //        if (ModList.get().isLoaded("curios")) {
 //            return CuriosCompat.hasPsdCurio(player);
 //        }
-
-        return false;
     }
 
     private void roomUpgradesButton() {

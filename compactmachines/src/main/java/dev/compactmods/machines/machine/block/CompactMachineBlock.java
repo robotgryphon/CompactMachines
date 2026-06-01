@@ -2,6 +2,7 @@ package dev.compactmods.machines.machine.block;
 
 import dev.compactmods.machines.CMDataAttachments;
 import dev.compactmods.machines.CMDataComponents;
+import dev.compactmods.machines.api.room.capability.RoomCapabilities;
 import dev.compactmods.machines.core.CompactMachinesCore;
 import dev.compactmods.machines.core.machine.MachineColor;
 import dev.compactmods.machines.core.machine.block.IBoundCompactMachineBlockEntity;
@@ -107,8 +108,7 @@ public class CompactMachineBlock extends Block implements EntityBlock {
             return InteractionResult.SUCCESS;
 
         final var server = sl.getServer();
-        final var serverCaps = CompactMachinesServer.caps(server);
-        final var roomRegistry = serverCaps.roomRegistry();
+        final var roomRegistry = server.getCapability(RoomCapabilities.REGISTRY);
 
         if (mainItem.isEmpty())
             return InteractionResult.TRY_WITH_EMPTY_HAND;
@@ -135,7 +135,7 @@ public class CompactMachineBlock extends Block implements EntityBlock {
             tile.connectedRoom().flatMap(roomRegistry::get).ifPresent(room -> {
                 final var shrinkHandler = serverPlayer.getCapability(Shrinking.SHRINK, room);
                 if (shrinkHandler == null) {
-                    CompactMachinesCore.modLog().error("Error: Could not fetch or create a shrinking handler for room code [{}], player [{}].",
+                    CompactMachinesCore.modLog().error("Error: Could not fetch or create a shrinking handler for room roomCode [{}], player [{}].",
                             room.code(), player.getUUID());
 
                     return;

@@ -72,7 +72,7 @@
 //        public void appendServerData(CompoundTag tag, BlockAccessor blockAccessor) {
 //            if (blockAccessor.getBlockEntity() instanceof BoundCompactMachineBlockEntity machine) {
 //                CompactMachinesCore.room(machine.connectedRoom()).ifPresent(inst -> {
-//                    tag.store("room_code", Codec.STRING, inst.code());
+//                    tag.store("room_code", Codec.STRING, inst.roomCode());
 //                    inst.getExistingData(CMDataAttachments.ROOM_OWNER).ifPresent(owner -> {
 //                        tag.store("owner", UUIDUtil.CODEC, owner);
 //                    });

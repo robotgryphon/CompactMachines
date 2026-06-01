@@ -2,13 +2,12 @@ package dev.compactmods.machines.room.spatial;
 
 import dev.compactmods.machines.api.room.RoomInstance;
 import dev.compactmods.machines.api.room.capability.RoomCapabilities;
-import dev.compactmods.machines.api.room.registration.RoomRegistry;
+import dev.compactmods.machines.api.room.registry.RoomRegistry;
 import dev.compactmods.machines.api.room.spatial.RoomBoundaries;
 import dev.compactmods.machines.api.room.spatial.RoomChunkManager;
 import dev.compactmods.machines.api.room.spatial.IRoomChunks;
 import dev.compactmods.feather.MemoryGraph;
 import dev.compactmods.feather.edge.GraphEdge;
-import dev.compactmods.machines.room.ServerRoomRegistry;
 import dev.compactmods.machines.room.graph.GraphNodes;
 import dev.compactmods.machines.room.graph.edge.RoomChunkEdge;
 import dev.compactmods.machines.room.graph.node.RoomChunkNode;
@@ -27,19 +26,22 @@ import java.util.stream.Collectors;
 public class MemoryGraphChunkManager implements RoomChunkManager {
 
     private final MemoryGraph graph;
+    private final MinecraftServer server;
     private final Map<ChunkPos, RoomChunkNode> chunks;
-    private final RoomRegistry registry;
 
     public MemoryGraphChunkManager(MinecraftServer server) {
         this.graph = new MemoryGraph();
+        this.server = server;
         this.chunks = new HashMap<>();
+    }
 
-        RoomRegistry r = RoomCapabilities.REGISTRY.getCapability(server);
-        if(r == null) r = new ServerRoomRegistry(server);
-        this.registry = r;
+    @Override
+    public void initializeCache() {
+        final var registry = this.server.getCapability(RoomCapabilities.REGISTRY);
+        if (registry == null)
+            return;
 
-        registry.allRooms()
-                .forEach(inst -> calculateChunks(inst.code(), inst.boundaries()));
+        registry.allRooms().forEach(inst -> calculateChunks(inst.code(), inst.boundaries()));
     }
 
     @Override
@@ -62,14 +64,22 @@ public class MemoryGraphChunkManager implements RoomChunkManager {
     public Optional<RoomInstance> findRoomByChunk(ChunkPos chunk) {
         if (!chunks.containsKey(chunk)) return Optional.empty();
         final var chunkNode = chunks.get(chunk);
-
-        return graph.inboundEdges(chunkNode, RoomReferenceNode.class)
+        final var roomCode = graph.inboundEdges(chunkNode, RoomReferenceNode.class)
                 .map(GraphEdge::source)
                 .map(WeakReference::get)
                 .filter(Objects::nonNull)
                 .map(RoomReferenceNode::code)
-                .findFirst()
-                .flatMap(registry::get);
+                .findFirst();
+
+        if (roomCode.isEmpty())
+            return Optional.empty();
+
+        // If we do have a mapping, try to look up the room instance in the registry
+        final var registry = this.server.getCapability(RoomCapabilities.REGISTRY);
+        if (registry == null)
+            return Optional.empty();
+
+        return roomCode.flatMap(registry::get);
     }
 
     @Override

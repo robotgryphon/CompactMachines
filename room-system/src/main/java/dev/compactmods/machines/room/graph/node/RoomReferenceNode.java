@@ -13,7 +13,7 @@ import java.util.UUID;
 public record RoomReferenceNode(UUID id, String code) implements Node<String> {
 
     public static final Codec<RoomReferenceNode> CODEC = RecordCodecBuilder.create(i -> i.group(
-            Codec.STRING.fieldOf("code").forGetter(RoomReferenceNode::code)
+            Codec.STRING.fieldOf("roomCode").forGetter(RoomReferenceNode::code)
     ).apply(i, RoomReferenceNode::new));
 
     public RoomReferenceNode(String code) {

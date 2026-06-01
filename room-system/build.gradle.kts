@@ -10,9 +10,20 @@ base {
     version = versionMain
 }
 
+tasks.withType<Jar>().configureEach {
+    manifest {
+        attributes(mapOf("Automatic-Module-Name" to "compactmachines.rooms"))
+    }
+}
+
 val apiSource = sourceSets.register("api")
 
-neoForge.addModdingDependenciesTo(apiSource.get())
+neoForge {
+    addModdingDependenciesTo(apiSource.get())
+    interfaceInjectionData {
+        from(project(":core").file("interfaces.json"))
+    }
+}
 
 sourceSets.main {
     java {

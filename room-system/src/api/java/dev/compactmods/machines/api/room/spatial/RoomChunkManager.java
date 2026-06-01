@@ -7,6 +7,8 @@ import java.util.Optional;
 
 public interface RoomChunkManager {
 
+    void initializeCache();
+    
     void calculateChunks(String roomCode, RoomBoundaries boundaries);
 
     Optional<RoomInstance> findRoomByChunk(ChunkPos chunk);

@@ -10,6 +10,15 @@ base {
     version = versionMain
 }
 
+// See room-system/build.gradle.kts for the rationale; identical fix applies
+// here so the JIJ-extracted copy and the direct project-dep copy share an
+// auto-module name and JarSelector can dedupe them.
+tasks.withType<Jar>().configureEach {
+    manifest {
+        attributes(mapOf("Automatic-Module-Name" to "compactmachines.room.upgrades"))
+    }
+}
+
 val apiSource = sourceSets.register("api")
 
 neoForge.addModdingDependenciesTo(apiSource.get())

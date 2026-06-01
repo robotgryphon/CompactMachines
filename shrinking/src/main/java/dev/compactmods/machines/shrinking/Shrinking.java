@@ -58,7 +58,7 @@ public class Shrinking {
 
     public static final Supplier<AttachmentType<String>> CURRENT_ROOM_CODE = ATTACHMENT_TYPES.register("current_room_code", () -> AttachmentType
             .<String>builder(() -> null)
-            .serialize(Codec.STRING.fieldOf("code"))
+            .serialize(Codec.STRING.fieldOf("roomCode"))
             .build());
 
     public static final Supplier<AttachmentType<RoomEntryPoint>> LAST_ROOM_ENTRYPOINT = ATTACHMENT_TYPES.register("last_entrypoint", () -> AttachmentType.builder(() -> RoomEntryPoint.INVALID)

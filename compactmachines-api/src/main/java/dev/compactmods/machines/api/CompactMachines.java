@@ -2,7 +2,7 @@ package dev.compactmods.machines.api;
 
 import dev.compactmods.machines.api.room.RoomInstance;
 import dev.compactmods.machines.api.room.capability.RoomCapabilities;
-import dev.compactmods.machines.api.room.registration.RoomRegistry;
+import dev.compactmods.machines.api.room.registry.RoomRegistry;
 import dev.compactmods.machines.api.room.spatial.RoomChunkManager;
 import dev.compactmods.machines.core.CompactMachinesCore;
 import net.minecraft.resources.Identifier;
@@ -26,16 +26,16 @@ public class CompactMachines {
 		return roomRegistrar(server).get(roomCode);
 	}
 //
-//	public static Optional<? extends IAttachmentHolder> existingRoomData(String code) {
-//		return ROOM_DATA_ACCESSOR.get(code);
+//	public static Optional<? extends IAttachmentHolder> existingRoomData(String roomCode) {
+//		return ROOM_DATA_ACCESSOR.get(roomCode);
 //	}
 //
 //	public static IRoomDataAttachmentAccessor roomDataAccessor() {
 //		return ROOM_DATA_ACCESSOR;
 //	}
 //
-//	public static IAttachmentHolder roomData(String code) {
-//		return ROOM_DATA_ACCESSOR.getOrCreate(code);
+//	public static IAttachmentHolder roomData(String roomCode) {
+//		return ROOM_DATA_ACCESSOR.getOrCreate(roomCode);
 //	}
 //
 //	public static IRoomUpgradeAccessor upgradeAccessor(RoomInstance instance) {
@@ -66,7 +66,7 @@ public class CompactMachines {
 		return RoomCapabilities.CHUNK_MANAGER.getCapability(server);
 	}
 //
-//	public static IRoomChunks roomChunks(String code) {
-//		return chunkManager().get(code);
+//	public static IRoomChunks roomChunks(String roomCode) {
+//		return chunkManager().get(roomCode);
 //	}
 }

@@ -22,6 +22,8 @@ java {
 neoForge {
     mods.create(modId) {
         this.sourceSet(sourceSets.main.get())
+        this.sourceSet(mainProject.sourceSets.main.get())
+//        this.sourceSet(coreApi.sourceSets.main.get())
     }
 
     runs {

@@ -2,7 +2,6 @@ package dev.compactmods.machines.network.room;
 
 import dev.compactmods.machines.api.room.capability.RoomCapabilities;
 import dev.compactmods.machines.core.CompactMachinesCore;
-import dev.compactmods.machines.core.capability.CapabilityHelper;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
@@ -24,7 +23,7 @@ public record PlayerStartedRoomTrackingPacket(String roomCode) implements Custom
         var sender = ctx.player();
         var server = ctx.player().level().getServer();
 
-        final var registry = CapabilityHelper.server(server, RoomCapabilities.REGISTRY);
+        final var registry = server.getCapability(RoomCapabilities.REGISTRY);
         if(registry == null)
             return;
 

@@ -93,7 +93,7 @@
 //
 //            @Override
 //            public @NotNull AbstractContainerMenu createMenu(int winId, Inventory inventory, Player player) {
-//                return new RoomUpgradeMenu(winId, inventory, room.code());
+//                return new RoomUpgradeMenu(winId, inventory, room.roomCode());
 //            }
 //
 //            @Override
@@ -105,9 +105,9 @@
 //
 //    public static RoomUpgradeMenu createClientMenu(int id, Inventory playerInv, RegistryFriendlyByteBuf extraData) {
 //        final var isIsolated = extraData.readBoolean();
-//        final var code = extraData.readUtf();
+//        final var roomCode = extraData.readUtf();
 //
-//        var menu = new RoomUpgradeMenu(id, playerInv, code);
+//        var menu = new RoomUpgradeMenu(id, playerInv, roomCode);
 //        menu.setIsolated(isIsolated);
 //        return menu;
 //    }

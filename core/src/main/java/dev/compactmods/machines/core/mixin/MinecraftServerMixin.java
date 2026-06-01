@@ -1,7 +1,6 @@
 package dev.compactmods.machines.core.mixin;
 
 import dev.compactmods.machines.core.attachment.IForwardingAttachmentHolder;
-import dev.compactmods.machines.core.attachment.MinecraftServerAttachments;
 import dev.compactmods.machines.core.capability.IServerCapabilityHolder;
 import dev.compactmods.machines.core.capability.ServerCapability;
 import net.minecraft.server.MinecraftServer;
@@ -17,7 +16,7 @@ import java.util.function.Supplier;
 public class MinecraftServerMixin implements IForwardingAttachmentHolder, IServerCapabilityHolder {
 
     @Unique
-    private final AttachmentHolder cm_attachments = new AttachmentHolder.AsField(new MinecraftServerAttachments());
+    private final AttachmentHolder cm_attachments = new AttachmentHolder.AsField(this);
 
     @Override
     public Supplier<IAttachmentHolder> getAttachmentHolder() {

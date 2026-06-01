@@ -56,9 +56,25 @@ sourceSets.test {
 }
 
 evaluationDependsOn(roomSystem.path)
+evaluationDependsOn(core.path)
 
 neoForge {
 //    version = neoforged.versions.neoforge.get()
+
+    // Consumer-side interface injection. :core declares
+    //   neoForge { interfaceInjectionData { from(…); publish(…) } }
+    // pointing at core/interfaces.json — that adds the metadata to its own
+    // compile classpath AND attaches it to the Maven publication. For
+    // *external* consumers that resolve :core through Maven, moddev picks the
+    // metadata up automatically. For *in-source* siblings (this module),
+    // moddev's auto-propagation across project deps is unreliable, so the
+    // consumer has to explicitly read the file too. Without this, MinecraftServer
+    // doesn't appear to implement IForwardingAttachmentHolder /
+    // IServerCapabilityHolder on this module's compile classpath and call sites
+    // like `server.getCapability(...)` fail to resolve.
+    interfaceInjectionData {
+        from(core.file("interfaces.json"))
+    }
 
     val cmMain = this.mods.create(modId) {
         this.modSourceSets.add(sourceSets.main)
@@ -216,12 +232,14 @@ dependencies {
         jarJar(libs.jnanoid)
 
         implementation(project(":core"))
+        implementation(project(":compactmachines-api"))
         implementation(project(":dimension-api"))
         implementation(project(":room-system"))
         implementation(project(":room-upgrades"))
         implementation(project(":shrinking"))
 
         jarJar(project(":core"))
+        jarJar(project(":compactmachines-api"))
         jarJar(project(":dimension-api"))
         jarJar(project(":room-system"))
         jarJar(project(":room-upgrades"))

@@ -1,4 +1,4 @@
-package dev.compactmods.machines.room;
+package dev.compactmods.machines.room.registry;
 
 import dev.compactmods.machines.api.room.RoomInstance;
 import dev.compactmods.machines.api.room.capability.RoomCapabilities;

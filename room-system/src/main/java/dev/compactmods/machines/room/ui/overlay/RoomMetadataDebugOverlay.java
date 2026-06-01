@@ -18,8 +18,8 @@
 //public class RoomMetadataDebugOverlay implements GuiLayer {
 //
 //    private static void drawRoomCode(GuiGraphicsExtractor graphics, Minecraft mc, Player player) {
-//        player.getExistingData(Rooms.DataAttachments.CURRENT_ROOM_CODE).ifPresent(code -> {
-//            graphics.text(mc.font, Component.literal("Current Room: " + code), 0, 0, CommonColors.LIGHT_GRAY);
+//        player.getExistingData(Rooms.DataAttachments.CURRENT_ROOM_CODE).ifPresent(roomCode -> {
+//            graphics.text(mc.font, Component.literal("Current Room: " + roomCode), 0, 0, CommonColors.LIGHT_GRAY);
 //        });
 //    }
 //

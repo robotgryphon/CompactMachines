@@ -2,7 +2,6 @@ package dev.compactmods.machines.network.room;
 
 import dev.compactmods.machines.api.room.capability.RoomCapabilities;
 import dev.compactmods.machines.core.CompactMachinesCore;
-import dev.compactmods.machines.core.capability.CapabilityHelper;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
@@ -21,7 +20,7 @@ public record PlayerRequestedRoomUIPacket(String roomCode) implements CustomPack
         final var player = ctx.player();
         final var server = player.level().getServer();
 
-        final var registry = CapabilityHelper.server(server, RoomCapabilities.REGISTRY);
+        final var registry = server.getCapability(RoomCapabilities.REGISTRY);
         assert registry != null;
 
         registry.get(pkt.roomCode).ifPresent(inst -> {

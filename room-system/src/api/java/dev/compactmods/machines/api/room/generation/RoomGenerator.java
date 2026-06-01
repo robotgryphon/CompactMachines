@@ -3,9 +3,11 @@ package dev.compactmods.machines.api.room.generation;
 import dev.compactmods.machines.api.dimension.MissingDimensionException;
 import dev.compactmods.machines.api.room.RoomInstance;
 
+import java.util.Optional;
+
 public interface RoomGenerator {
 
-    NewRoomBuilder createNew();
+    NewRoomBuilder createNew() throws RoomGenerationException;
 
-    RoomInstance generate(String roomCode, RoomGenerationDetails details) throws MissingDimensionException;
+    Optional<RoomGenerationResult> generate(RoomGenerationDetails details) throws RoomGenerationException;
 }

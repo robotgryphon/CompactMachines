@@ -1,10 +1,12 @@
-package dev.compactmods.machines.room;
+package dev.compactmods.machines.room.generation;
 
 import dev.compactmods.machines.api.room.generation.NewRoomBuilder;
 import dev.compactmods.machines.api.room.generation.RoomGenerationDetails;
 import dev.compactmods.machines.api.room.spatial.RoomBoundaries;
 import dev.compactmods.machines.api.room.template.RoomTemplate;
 import dev.compactmods.machines.core.machine.MachineColor;
+import dev.compactmods.machines.core.util.MathUtil;
+import dev.compactmods.spatial.aabb.AABBAligner;
 import net.minecraft.core.Holder;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
@@ -12,25 +14,16 @@ import net.minecraft.world.phys.Vec3;
 import java.util.UUID;
 
 public class ServerNewRoomBuilder implements NewRoomBuilder {
-    private final String code;
+    private final String roomCode;
+    private final int spiralIndex;
     private MachineColor color = MachineColor.DEFAULT;
 
     private Holder<RoomTemplate> template;
-    private AABB boundaries = AABB.ofSize(Vec3.ZERO, 1, 1, 1);
     UUID owner;
 
-    public ServerNewRoomBuilder() {
-        this.code = RoomCodeGenerator.generateRoomId();
-    }
-
-    public ServerNewRoomBuilder boundaries(AABB boundaries) {
-        this.boundaries = boundaries;
-        return this;
-    }
-
-    public ServerNewRoomBuilder offsetCenter(Vec3 offset) {
-        this.boundaries = this.boundaries.move(offset);
-        return this;
+    public ServerNewRoomBuilder(String roomCode, int spiralIndex) {
+        this.roomCode = roomCode;
+        this.spiralIndex = spiralIndex;
     }
 
     @Override
@@ -50,9 +43,17 @@ public class ServerNewRoomBuilder implements NewRoomBuilder {
         return this;
     }
 
+    private RoomBoundaries calculateBoundaries(RoomTemplate template) {
+        final var region = MathUtil.getRegionPositionByIndex(spiralIndex);
+        final var floor = MathUtil.getCenterWithY(region, 0);
+
+        var outerBounds = AABBAligner.floor(template.getZeroBoundaries().move(floor), 0);
+        return new RoomBoundaries(outerBounds);
+    }
+
     @Override
     public RoomGenerationDetails build() {
-        final var bounds = new RoomBoundaries(boundaries);
-        return new RoomGenerationDetails(template, bounds, owner);
+        final var bounds = calculateBoundaries(template.value());
+        return new RoomGenerationDetails(roomCode, spiralIndex, template, bounds, owner);
     }
 }

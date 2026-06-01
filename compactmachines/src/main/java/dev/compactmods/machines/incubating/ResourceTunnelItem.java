@@ -38,7 +38,7 @@
 //                    .flatMap(CompactMachinesCore::room);
 //
 //            room.ifPresentOrElse(instance -> {
-//                    player.sendOverlayMessage(Component.literal(instance.code()));
+//                    player.sendOverlayMessage(Component.literal(instance.roomCode()));
 //                }
 //        }, () -> {
 //

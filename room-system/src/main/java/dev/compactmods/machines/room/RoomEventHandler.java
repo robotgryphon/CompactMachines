@@ -1,6 +1,7 @@
 package dev.compactmods.machines.room;
 
 import dev.compactmods.machines.api.dimension.CompactDimension;
+import dev.compactmods.machines.api.room.capability.RoomCapabilities;
 import dev.compactmods.machines.core.CompactMachinesCore;
 import dev.compactmods.machines.core.Translations;
 import net.minecraft.server.level.ServerPlayer;
@@ -48,7 +49,7 @@ public class RoomEventHandler {
 //            roomProvider.findByChunk(serverPlayer.chunkPosition()).ifPresent(roomInfo -> {
 //                CompactMachinesNet.CHANNEL.send(
 //                        PacketDistributor.PLAYER.with(() -> serverPlayer),
-//                        new SyncRoomMetadataPacket(roomInfo.code(), roomInfo.owner(roomProvider))
+//                        new SyncRoomMetadataPacket(roomInfo.roomCode(), roomInfo.owner(roomProvider))
 //                );
 //            });
         } else {
@@ -90,15 +91,14 @@ public class RoomEventHandler {
      */
     private static boolean positionInsideRoom(Entity entity, Vec3 target) {
         final var level = entity.level();
-        if (!CompactDimension.isLevelCompact(entity.level())) return false;
+        if(!CompactDimension.isLevelCompact(entity.level()))
+            return false;
 
-        return true;
-        // TODO
-//        return CompactMachines.chunkManager()
-//                .findRoomByChunk(entity.chunkPosition())
-//                .flatMap(CompactMachines::room)
-//                .map(ib -> ib.boundaries().innerBounds().contains(target))
-//                .orElse(false);
+        return level.getServer()
+                .getCapability(RoomCapabilities.CHUNK_MANAGER)
+                .findRoomByChunk(entity.chunkPosition())
+                .map(ib -> ib.boundaries().innerBounds().contains(target))
+                .orElse(false);
     }
 
     private static void doEntityTeleportHandle(EntityTeleportEvent evt, Vec3 target, Entity ent) {

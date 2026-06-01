@@ -3,11 +3,9 @@ package dev.compactmods.machines.command.rooms;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import dev.compactmods.machines.api.CompactMachines;
 import dev.compactmods.machines.api.room.capability.RoomCapabilities;
-import dev.compactmods.machines.core.CompactMachinesCore;
-import dev.compactmods.machines.CMDataAttachments;
 import dev.compactmods.machines.api.dimension.CompactDimension;
-import dev.compactmods.machines.core.capability.CapabilityHelper;
 import dev.compactmods.machines.core.machine.MachineConstants;
 import dev.compactmods.machines.i18n.MachineTranslations;
 import dev.compactmods.machines.room.RoomTranslations;
@@ -18,7 +16,12 @@ import net.minecraft.commands.Commands;
 import net.minecraft.commands.arguments.EntityArgument;
 import net.minecraft.commands.arguments.coordinates.BlockPosArgument;
 import net.minecraft.commands.arguments.coordinates.ColumnPosArgument;
+import net.minecraft.network.chat.ClickEvent;
+import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.HoverEvent;
+import net.minecraft.util.CommonColors;
+import net.minecraft.world.item.DyeColor;
 import org.jetbrains.annotations.NotNull;
 
 public class CMFindRoomSubcommand {
@@ -56,7 +59,8 @@ public class CMFindRoomSubcommand {
     }
 
     private static int fetchByChunkPos(CommandContext<CommandSourceStack> ctx) {
-        final var chunkManager = CapabilityHelper.server(ctx.getSource().getServer(), RoomCapabilities.CHUNK_MANAGER);
+        final var server = ctx.getSource().getServer();
+        final var chunkManager = server.getCapability(RoomCapabilities.CHUNK_MANAGER);
 
         final var chunkPos = ColumnPosArgument.getColumnPos(ctx, "chunk");
 
@@ -80,7 +84,8 @@ public class CMFindRoomSubcommand {
             return -1;
         }
 
-        final var registry = CapabilityHelper.server(ctx.getSource().getServer(), RoomCapabilities.REGISTRY);
+        final var server = ctx.getSource().getServer();
+        final var registry = server.getCapability(RoomCapabilities.REGISTRY);
         if (level.getBlockEntity(block) instanceof CompactMachineBlockEntity be) {
             be.connectedRoom()
                     .flatMap(registry::get)
@@ -105,13 +110,40 @@ public class CMFindRoomSubcommand {
             return -1;
         }
 
-        final var chunkManager = CapabilityHelper.server(ctx.getSource().getServer(), RoomCapabilities.CHUNK_MANAGER);
-        final var m = chunkManager
-                .findRoomByChunk(player.chunkPosition())
-                .map(room -> RoomTranslations.PLAYER_ROOM_INFO.apply(player, room.code()))
-                .orElse(RoomTranslations.UNKNOWN_ROOM_BY_PLAYER_CHUNK.apply(player));
+        final var server = ctx.getSource().getServer();
+        final var chunkManager = server.getCapability(RoomCapabilities.CHUNK_MANAGER);
 
-        source.sendSuccess(() -> m, false);
+        final var maybeRoom = chunkManager.findRoomByChunk(player.chunkPosition());
+
+        maybeRoom.ifPresentOrElse(room -> {
+            final var roomPreamble = RoomTranslations.PLAYER_ROOM_INFO.apply(player, room.code());
+
+            final var teleportSenderIntoRoom = Component.literal("Teleport to Room")
+                    .withStyle(s -> s.withClickEvent(new ClickEvent.SuggestCommand("/compactmachines tp " + room.code()))
+                            .withHoverEvent(new HoverEvent.ShowText(Component.literal("Click to teleport into the room")))
+                            .withUnderlined(true)
+                            .withColor(DyeColor.CYAN.getTextColor()));
+
+            final var ejectPlayerFromRoom = Component.literal("Eject ")
+                    .append(Component.literal(player.nameAndId().name()))
+                    .append(Component.literal(" from Room"))
+                    .withStyle(s -> s.withClickEvent(new ClickEvent.SuggestCommand("/compactmachines eject " + player.nameAndId().id()))
+                            .withHoverEvent(new HoverEvent.ShowText(Component.literal("Click to eject " + player.nameAndId().name() + " back to their spawn")))
+                            .withUnderlined(true)
+                            .withColor(DyeColor.PINK.getTextColor()));
+
+            ;
+            source.sendSuccess(() -> CommonComponents.joinLines(roomPreamble,
+                    CommonComponents.EMPTY,
+                    Component.literal(" ")
+                            .append(teleportSenderIntoRoom)
+                            .append(Component.literal(" - "))
+                            .append(ejectPlayerFromRoom)), false);
+
+        }, () -> {
+            final var notFound = RoomTranslations.UNKNOWN_ROOM_BY_PLAYER_CHUNK.apply(player);
+            source.sendFailure(notFound);
+        });
 
         return 0;
     }
@@ -120,7 +152,8 @@ public class CMFindRoomSubcommand {
         final var owner = EntityArgument.getPlayer(ctx, "owner");
         final var source = ctx.getSource();
 
-        final var registry = CapabilityHelper.server(ctx.getSource().getServer(), RoomCapabilities.REGISTRY);
+        final var server = ctx.getSource().getServer();
+        final var registry = server.getCapability(RoomCapabilities.REGISTRY);
         final var owned = registry.allRooms()
                 .filter(i -> i.getExistingData(Rooms.DataAttachments.ROOM_OWNER).map(id -> id.equals(owner)).orElse(false))
                 .toList();

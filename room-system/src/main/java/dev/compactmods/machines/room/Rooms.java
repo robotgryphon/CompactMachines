@@ -1,20 +1,19 @@
 package dev.compactmods.machines.room;
 
-import com.google.common.base.Predicates;
 import dev.compactmods.machines.core.CompactMachinesCore;
+import dev.compactmods.machines.core.data.CMSingletonDataFileManager;
 import dev.compactmods.machines.room.block.BreakableWallBlock;
 import dev.compactmods.machines.room.block.ItemBlockWall;
 import dev.compactmods.machines.room.block.SolidWallBlock;
-import net.minecraft.core.BlockPos;
-import net.minecraft.core.GlobalPos;
+import dev.compactmods.machines.room.registry.RoomRegistrarData;
 import net.minecraft.core.UUIDUtil;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.Util;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
@@ -75,6 +74,10 @@ public interface Rooms {
         Supplier<AttachmentType<UUID>> ROOM_OWNER = ATTACHMENT_TYPES.register("room_owner", () -> AttachmentType
                 .builder(() -> Util.NIL_UUID)
                 .serialize(UUIDUtil.CODEC.fieldOf("owner"))
+                .build());
+
+        Supplier<AttachmentType<CMSingletonDataFileManager<RoomRegistrarData>>> ROOM_REGISTRAR_DATA = ATTACHMENT_TYPES.register("room_registrar_data", () -> AttachmentType
+                .builder((server) -> new CMSingletonDataFileManager<>(((MinecraftServer) server), "room_registrations", new RoomRegistrarData()))
                 .build());
 
         static void prepare() {

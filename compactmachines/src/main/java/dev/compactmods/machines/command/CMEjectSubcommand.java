@@ -4,8 +4,6 @@ import com.mojang.brigadier.builder.ArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import dev.compactmods.machines.api.room.capability.RoomCapabilities;
-import dev.compactmods.machines.core.CompactMachinesCore;
-import dev.compactmods.machines.core.capability.CapabilityHelper;
 import dev.compactmods.machines.shrinking.Shrinking;
 import dev.compactmods.machines.shrinking.ShrinkingHelper;
 import net.minecraft.commands.CommandSourceStack;
@@ -28,7 +26,9 @@ public class CMEjectSubcommand {
     private static int execSpecificPlayer(CommandContext<CommandSourceStack> ctx) throws CommandSyntaxException {
         Collection<ServerPlayer> ent = EntityArgument.getPlayers(ctx, "player");
 
-        final var history = CapabilityHelper.server(ctx.getSource().getServer(), Shrinking.HISTORY_MANAGER);
+        final var server = ctx.getSource().getServer();
+        final var history = server.getCapability(Shrinking.HISTORY_MANAGER);
+
         ent.forEach(player -> player.getExistingData(Shrinking.CURRENT_ROOM_CODE).ifPresent(_ -> {
             history.clearHistory(player);
             ShrinkingHelper.teleportPlayerToRespawnOrOverworld(ctx.getSource().getServer(), player);
@@ -42,7 +42,7 @@ public class CMEjectSubcommand {
         final MinecraftServer server = ctx.getSource().getServer();
 
         server.submitAsync(() -> {
-            final var history = CapabilityHelper.server(server, Shrinking.HISTORY_MANAGER);
+            final var history = server.getCapability(Shrinking.HISTORY_MANAGER);
             history.clearHistory(player);
         });
 

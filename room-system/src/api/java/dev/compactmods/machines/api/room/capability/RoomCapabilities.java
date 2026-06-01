@@ -3,7 +3,7 @@ package dev.compactmods.machines.api.room.capability;
 import dev.compactmods.machines.core.CompactMachinesCore;
 import dev.compactmods.machines.core.capability.ServerCapability;
 import dev.compactmods.machines.api.room.generation.RoomGenerator;
-import dev.compactmods.machines.api.room.registration.RoomRegistry;
+import dev.compactmods.machines.api.room.registry.RoomRegistry;
 import dev.compactmods.machines.api.room.spatial.RoomChunkManager;
 import dev.compactmods.machines.api.room.spawn.IRoomSpawnManager;
 import net.neoforged.neoforge.attachment.IAttachmentHolder;
