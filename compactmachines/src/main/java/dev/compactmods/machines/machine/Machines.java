@@ -37,6 +37,7 @@ public interface Machines {
             .pushReaction(PushReaction.IGNORE)
             .sound(SoundType.METAL)
             .strength(8.0F, 20.0F)
+            .noOcclusion()
             .requiresCorrectToolForDrops();
 
     Supplier<Item.Properties> MACHINE_ITEM_PROPS = Item.Properties::new;

@@ -20,6 +20,7 @@ import dev.compactmods.machines.shrinking.PersonalShrinkingDevice;
 import dev.compactmods.machines.shrinking.Shrinking;
 import dev.compactmods.machines.shrinking.api.ShrinkingDeviceConfiguration;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.core.GlobalPos;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.chat.Component;
@@ -51,6 +52,16 @@ import javax.annotation.ParametersAreNonnullByDefault;
 public class CompactMachineBlock extends Block implements EntityBlock {
     public CompactMachineBlock(Properties pProperties) {
         super(pProperties);
+    }
+
+    /**
+     * Two adjacent compact machines should read as one continuous glass surface:
+     * the cullface'd panes on the touching faces drop out, leaving only the frame
+     * bars at the seam. Same pattern vanilla {@code HalfTransparentBlock} uses.
+     */
+    @Override
+    protected boolean skipRendering(BlockState state, BlockState neighborState, Direction direction) {
+        return neighborState.is(this) || super.skipRendering(state, neighborState, direction);
     }
 
     @Override

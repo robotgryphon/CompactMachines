@@ -36,8 +36,7 @@ public class CMBlockModelGenerators extends BlockModelGenerators {
     public Identifier createCompactMachine(Holder<Block> block) {
         final var textures = new TextureMapping()
                 .put(TextureSlot.PARTICLE, new Material(CompactMachines.identifier("block/machine/tiny")))
-                .put(CMModelTemplates.BORDER_SLOT, new Material(CompactMachines.identifier("block/machine/border")))
-                .put(CMModelTemplates.OVERLAY_SLOT, new Material(CompactMachines.identifier("block/machine/overlay")))
+                .put(CMModelTemplates.FRAME_SLOT, new Material(CompactMachines.identifier("block/machine/frame")))
                 .put(CMModelTemplates.TINT_SLOT, new Material(CompactMachines.identifier("block/machine/tint")));
 
         return createSimpleWithTextures(block, CMModelTemplates.MACHINE_TEMPLATE, textures);
