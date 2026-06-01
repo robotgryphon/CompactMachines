@@ -1,5 +1,6 @@
 package dev.compactmods.machines.room;
 
+import com.mojang.serialization.Codec;
 import dev.compactmods.machines.core.CompactMachinesCore;
 import dev.compactmods.machines.core.data.CMSingletonDataFileManager;
 import dev.compactmods.machines.room.block.BreakableWallBlock;
@@ -7,8 +8,11 @@ import dev.compactmods.machines.room.block.ItemBlockWall;
 import dev.compactmods.machines.room.block.SolidWallBlock;
 import dev.compactmods.machines.room.registry.RoomRegistrarData;
 import net.minecraft.core.UUIDUtil;
+import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.Util;
@@ -21,16 +25,19 @@ import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.attachment.AttachmentType;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.registries.*;
+import org.jspecify.annotations.NullMarked;
 
 import java.util.UUID;
 import java.util.function.Supplier;
 
+@NullMarked
 public interface Rooms {
 
     DeferredRegister.Blocks BLOCKS = DeferredRegister.createBlocks(CompactMachinesCore.MOD_ID);
     DeferredRegister.Items ITEMS = DeferredRegister.createItems(CompactMachinesCore.MOD_ID);
     DeferredRegister<MenuType<?>> CONTAINERS = DeferredRegister.create(BuiltInRegistries.MENU, CompactMachinesCore.MOD_ID);
     DeferredRegister<AttachmentType<?>> ATTACHMENT_TYPES = DeferredRegister.create(NeoForgeRegistries.ATTACHMENT_TYPES, CompactMachinesCore.MOD_ID);
+    DeferredRegister.DataComponents DATA_COMPONENTS = DeferredRegister.createDataComponents(Registries.DATA_COMPONENT_TYPE, CompactMachinesCore.MOD_ID);
 
     interface Blocks {
         ResourceKey<Block> SOLID_WALL_KEY = ResourceKey.create(Registries.BLOCK, CompactMachinesCore.identifier("solid_wall"));
@@ -84,10 +91,27 @@ public interface Rooms {
         }
     }
 
+    interface DataComponents {
+
+        DeferredHolder<DataComponentType<?>, DataComponentType<String>> BOUND_ROOM_CODE = DATA_COMPONENTS
+                .registerComponentType("room_code", (builder) -> builder
+                        .persistent(Codec.STRING)
+                        .networkSynchronized(ByteBufCodecs.STRING_UTF8));
+
+        DeferredHolder<DataComponentType<?>, DataComponentType<Identifier>> ROOM_TEMPLATE_ID = DATA_COMPONENTS
+                .registerComponentType("room_template", (builder) -> builder
+                        .persistent(Identifier.CODEC)
+                        .networkSynchronized(Identifier.STREAM_CODEC));
+
+        static void prepare() {
+        }
+    }
+
     static void prepare() {
         Blocks.prepare();
         Items.prepare();
         DataAttachments.prepare();
+        DataComponents.prepare();
     }
 
     static void registerContent(IEventBus modBus) {
@@ -95,6 +119,7 @@ public interface Rooms {
         ITEMS.register(modBus);
         CONTAINERS.register(modBus);
         ATTACHMENT_TYPES.register(modBus);
+        DATA_COMPONENTS.register(modBus);
     }
 
     static void registerEvents(IEventBus modBus) {
@@ -102,5 +127,7 @@ public interface Rooms {
         NeoForge.EVENT_BUS.addListener(RoomEventHandler::entityChangedDimensions);
         NeoForge.EVENT_BUS.addListener(RoomEventHandler::entityJoined);
         NeoForge.EVENT_BUS.addListener(RoomEventHandler::entityTeleport);
+
+        NeoForge.EVENT_BUS.addListener(RoomItemHandler::handleTooltips);
     }
 }

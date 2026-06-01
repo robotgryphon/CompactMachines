@@ -4,6 +4,7 @@ import dev.compactmods.machines.core.CompactMachinesCore;
 import dev.compactmods.machines.CMDataComponents;
 import dev.compactmods.machines.i18n.MachineTranslations;
 import dev.compactmods.machines.machine.Machines;
+import dev.compactmods.machines.room.Rooms;
 import net.minecraft.util.Util;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.BlockItem;
@@ -25,7 +26,7 @@ public class BoundCompactMachineItem extends BlockItem {
     public void appendHoverText(ItemStack stack, TooltipContext context, TooltipDisplay tooltipDisplay, Consumer<Component> tooltipAdder, TooltipFlag flag) {
         super.appendHoverText(stack, context, tooltipDisplay, tooltipAdder, flag);
 
-        var roomCode = stack.get(CMDataComponents.BOUND_ROOM_CODE);
+        var roomCode = stack.get(Rooms.DataComponents.BOUND_ROOM_CODE);
         if (roomCode != null) {
             // TODO - Server-synced room name list
             // tooltip.add(TranslationUtil.tooltip(Tooltips.ROOM_NAME, room));

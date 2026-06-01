@@ -9,6 +9,7 @@ import dev.compactmods.machines.machine.block.CompactMachineBlock;
 import dev.compactmods.machines.machine.block.CompactMachineBlockEntity;
 import dev.compactmods.machines.machine.item.BoundCompactMachineItem;
 import dev.compactmods.machines.machine.ui.MachineUIMenu;
+import dev.compactmods.machines.room.Rooms;
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
@@ -61,7 +62,7 @@ public interface Machines {
 
         static ItemStack boundToRoom(String roomCode) {
             ItemStack stack = new ItemStack(net.minecraft.world.item.Items.PAPER);
-            stack.set(CMDataComponents.BOUND_ROOM_CODE, roomCode);
+            stack.set(Rooms.DataComponents.BOUND_ROOM_CODE, roomCode);
             return stack;
         }
 
@@ -69,7 +70,7 @@ public interface Machines {
             var template = templateHolder.value();
 
             final var stack = new ItemStack(net.minecraft.world.item.Items.PAPER);
-            stack.set(CMDataComponents.ROOM_TEMPLATE_ID, templateHolder.key().identifier());
+            stack.set(Rooms.DataComponents.ROOM_TEMPLATE_ID, templateHolder.key().identifier());
             stack.set(CMDataComponents.MACHINE_COLOR, template.defaultMachineColor());
             return stack;
         }

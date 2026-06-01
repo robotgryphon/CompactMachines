@@ -1,21 +1,17 @@
 package dev.compactmods.machines.machine.ui;
 
-import dev.compactmods.machines.CMDataComponents;
-import dev.compactmods.machines.api.room.RoomInstance;
-import dev.compactmods.machines.api.room.capability.RoomCapabilities;
 import dev.compactmods.machines.api.room.template.RoomTemplate;
 import dev.compactmods.machines.api.room.template.RoomTemplateHelper;
 import dev.compactmods.machines.machine.Machines;
 import dev.compactmods.machines.machine.block.CompactMachineBlockEntity;
+import dev.compactmods.machines.room.Rooms;
 import net.minecraft.core.GlobalPos;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
-import net.neoforged.neoforge.transfer.access.HandlerItemAccess;
-import net.neoforged.neoforge.transfer.access.ItemAccess;
-import net.neoforged.neoforge.transfer.item.CarriedSlotWrapper;
 import net.neoforged.neoforge.transfer.item.ResourceHandlerSlot;
 import org.jetbrains.annotations.ApiStatus;
 import org.jspecify.annotations.Nullable;
@@ -26,13 +22,15 @@ public class MachineUIMenu extends AbstractContainerMenu {
     private final GlobalPos machinePos;
     private final @Nullable CompactMachineBlockEntity machine;
 
+    private final @Nullable Slot coreSlot;
+
     @ApiStatus.Internal
     public MachineUIMenu(int containerId, Player player, GlobalPos machinePos) {
         super(Machines.MACHINE_UI_MENU.get(), containerId);
         this.machinePos = machinePos;
 
         final var inv = player.getInventory();
-        this.addStandardInventorySlots(inv, 0, 84);
+        this.addStandardInventorySlots(inv, 10, 84);
 //        this.addInventoryHotbarSlots(inv, 0, 112);
 
         final var level = player.level();
@@ -40,10 +38,10 @@ public class MachineUIMenu extends AbstractContainerMenu {
             this.machine = tile;
 
             final var coreHandler = tile.coreHandler();
-            final var coreSlot = new ResourceHandlerSlot(coreHandler, coreHandler::set,0, 10, 10);
-            this.addSlot(coreSlot);
+            this.coreSlot = this.addSlot(new ResourceHandlerSlot(coreHandler, coreHandler::set,0, 10, 10));
         } else {
             this.machine = null;
+            this.coreSlot = null;
         }
     }
 
@@ -79,10 +77,14 @@ public class MachineUIMenu extends AbstractContainerMenu {
         if(currentCore.isEmpty())
             return Optional.empty();
 
-        final var tid = currentCore.get(CMDataComponents.ROOM_TEMPLATE_ID);
+        final var tid = currentCore.get(Rooms.DataComponents.ROOM_TEMPLATE_ID);
         if(tid == null)
             return Optional.empty();
 
         return RoomTemplateHelper.getTemplateOptional(machine.getLevel().registryAccess(), tid);
+    }
+
+    public @Nullable Slot getCoreSlot() {
+        return coreSlot;
     }
 }

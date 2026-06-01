@@ -4,6 +4,7 @@ import dev.compactmods.machines.CMDataComponents;
 import dev.compactmods.machines.core.machine.MachineColor;
 import dev.compactmods.machines.core.machine.block.IBoundCompactMachineBlockEntity;
 import dev.compactmods.machines.machine.Machines;
+import dev.compactmods.machines.room.Rooms;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.GlobalPos;
 import net.minecraft.core.HolderLookup;
@@ -50,8 +51,8 @@ public class CompactMachineBlockEntity extends BlockEntity implements IBoundComp
         this.coreItemHandler = new ItemStacksResourceHandler(1) {
             @Override
             public boolean isValid(int index, ItemResource resource) {
-                return resource.has(CMDataComponents.BOUND_ROOM_CODE) ||
-                        resource.has(CMDataComponents.ROOM_TEMPLATE_ID);
+                return resource.has(Rooms.DataComponents.BOUND_ROOM_CODE) ||
+                        resource.has(Rooms.DataComponents.ROOM_TEMPLATE_ID);
             }
 
             @Override
@@ -80,7 +81,7 @@ public class CompactMachineBlockEntity extends BlockEntity implements IBoundComp
     public void removeComponentsFromTag(ValueOutput out) {
         super.removeComponentsFromTag(out);
         out.discard("CustomName");
-        out.discard(CMDataComponents.KEY_MACHINE_COLOR);
+        out.discard("machine_color");
     }
 
     @Override
@@ -92,7 +93,7 @@ public class CompactMachineBlockEntity extends BlockEntity implements IBoundComp
     protected void loadAdditional(ValueInput input) {
         super.loadAdditional(input);
         input.readChild("core", coreItemHandler);
-        this.machineColor = input.read(CMDataComponents.KEY_MACHINE_COLOR, MachineColor.CODEC).orElse(MachineColor.DEFAULT);
+        this.machineColor = input.read("machine_color", MachineColor.CODEC).orElse(MachineColor.DEFAULT);
         this.customName = input.read("CustomName", ComponentSerialization.CODEC).orElse(null);
         this.owner = input.read(NBT_OWNER, UUIDUtil.CODEC).orElse(null);
     }
@@ -101,7 +102,7 @@ public class CompactMachineBlockEntity extends BlockEntity implements IBoundComp
     protected void saveAdditional(ValueOutput output) {
         super.saveAdditional(output);
         output.putChild("core", coreItemHandler);
-        output.store(CMDataComponents.KEY_MACHINE_COLOR, MachineColor.CODEC, getMachineColor());
+        output.store("machine_color", MachineColor.CODEC, getMachineColor());
         output.storeNullable("CustomName", ComponentSerialization.CODEC, this.customName);
         output.storeNullable(NBT_OWNER, UUIDUtil.CODEC, this.owner);
     }
@@ -120,10 +121,10 @@ public class CompactMachineBlockEntity extends BlockEntity implements IBoundComp
 
     public Optional<String> connectedRoom() {
         final var core = this.coreItemHandler.getResource(0);
-        if (core.isEmpty() || !core.has(CMDataComponents.BOUND_ROOM_CODE))
+        if (core.isEmpty() || !core.has(Rooms.DataComponents.BOUND_ROOM_CODE))
             return Optional.empty();
 
-        final var code = core.get(CMDataComponents.BOUND_ROOM_CODE);
+        final var code = core.get(Rooms.DataComponents.BOUND_ROOM_CODE);
         return Optional.ofNullable(code);
     }
 
@@ -149,7 +150,7 @@ public class CompactMachineBlockEntity extends BlockEntity implements IBoundComp
 
     @Override
     public boolean setCore(@org.jspecify.annotations.Nullable Player player, ItemStack newCore) {
-        if (newCore.has(CMDataComponents.BOUND_ROOM_CODE) || newCore.has(CMDataComponents.ROOM_TEMPLATE_ID)) {
+        if (newCore.has(Rooms.DataComponents.BOUND_ROOM_CODE) || newCore.has(Rooms.DataComponents.ROOM_TEMPLATE_ID)) {
             coreItemHandler.set(0, ItemResource.of(newCore), 1);
             newCore.shrink(1);
             this.setChanged();

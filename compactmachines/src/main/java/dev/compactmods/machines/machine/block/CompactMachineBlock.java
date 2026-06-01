@@ -14,6 +14,7 @@ import dev.compactmods.machines.core.machine.block.ICompactMachineBlockEntity;
 import dev.compactmods.machines.machine.Machines;
 import dev.compactmods.machines.machine.ui.MachineUIMenu;
 import dev.compactmods.machines.network.machine.MachineColorSyncPacket;
+import dev.compactmods.machines.room.Rooms;
 import dev.compactmods.machines.server.CompactMachinesServer;
 import dev.compactmods.machines.shrinking.PersonalShrinkingDevice;
 import dev.compactmods.machines.shrinking.Shrinking;
@@ -127,7 +128,8 @@ public class CompactMachineBlock extends Block implements EntityBlock {
         if (tile == null)
             return InteractionResult.FAIL;
 
-        if (mainItem.has(CMDataComponents.BOUND_ROOM_CODE) || mainItem.has(CMDataComponents.ROOM_TEMPLATE_ID)) {
+        // FIXME: Core overwrite bug (should swap cores, not overwrite)
+        if (mainItem.has(Rooms.DataComponents.BOUND_ROOM_CODE) || mainItem.has(Rooms.DataComponents.ROOM_TEMPLATE_ID)) {
             boolean yay = tile.setCore(serverPlayer, mainItem);
             return yay ? InteractionResult.SUCCESS : InteractionResult.FAIL;
         }
@@ -141,9 +143,13 @@ public class CompactMachineBlock extends Block implements EntityBlock {
                 return InteractionResult.FAIL;
 
 
-            if(currentCore.has(CMDataComponents.BOUND_ROOM_CODE)) {
+            if(currentCore.has(Rooms.DataComponents.BOUND_ROOM_CODE)) {
+
+                // var shrinking = level.getCapability(Shrinking.SHRINK_HANDLER);
+                // shrinking.enter(player, mainItem);
+
                 final var room = roomRegistry
-                        .get(currentCore.get(CMDataComponents.BOUND_ROOM_CODE))
+                        .get(currentCore.get(Rooms.DataComponents.BOUND_ROOM_CODE))
                         .orElse(null);
 
                 if (room != null) {
@@ -151,12 +157,15 @@ public class CompactMachineBlock extends Block implements EntityBlock {
                 }
             }
 
-            if(currentCore.has(CMDataComponents.ROOM_TEMPLATE_ID)) {
-                final var templateId = currentCore.get(CMDataComponents.ROOM_TEMPLATE_ID);
+            if(currentCore.has(Rooms.DataComponents.ROOM_TEMPLATE_ID)) {
+                final var templateId = currentCore.get(Rooms.DataComponents.ROOM_TEMPLATE_ID);
                 final var template = RoomTemplateHelper.getTemplate(level, templateId);
 
                 try {
                     final var generator = server.getCapability(RoomCapabilities.GENERATOR);
+                    if(generator == null)
+                        return InteractionResult.FAIL;
+
                     final var details = generator.createNew()
                             .template(template)
                             .owner(player.getUUID())
@@ -165,19 +174,20 @@ public class CompactMachineBlock extends Block implements EntityBlock {
                     generator.generate(details).ifPresent(result -> {
                         final var room = result.newCode();
 
+                        // Audit
                         final var log = CompactMachinesCore.modLog();
-                        log.info("Generated room: " + room);
-                        log.debug("Template used: " + templateId);
-                        log.debug("Player: " + player.nameAndId().name());
+                        log.info("Generated room: {}", room);
+                        log.debug("Template used: {}", templateId);
+                        log.debug("Player: {}", player.nameAndId().name());
 
-
+                        // Swap the core template for the room details
                         final var newCore = currentCore.toStack(1);
-                        newCore.remove(CMDataComponents.ROOM_TEMPLATE_ID);
-                        newCore.set(CMDataComponents.BOUND_ROOM_CODE, room);
+                        newCore.remove(Rooms.DataComponents.ROOM_TEMPLATE_ID);
+                        newCore.set(Rooms.DataComponents.BOUND_ROOM_CODE, room);
                         tile.setCore(player, newCore);
 
+                        // Enter the room
                         final var instance = roomRegistry.get(room).orElseThrow();
-
                         tryEnterRoom(mainItem, player, serverPlayer, instance, tile, config);
                     });
                 } catch (RoomGenerationException e) {

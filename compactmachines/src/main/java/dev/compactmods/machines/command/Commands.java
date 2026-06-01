@@ -22,7 +22,7 @@ public class Commands {
         Commands.CM_COMMAND_ROOT.then(CMTeleportSubcommand.make());
         Commands.CM_COMMAND_ROOT.then(CMEjectSubcommand.make());
         Commands.CM_COMMAND_ROOT.then(CMRoomsSubcommand.make());
-        Commands.CM_COMMAND_ROOT.then(CMGiveCoreSubcommand.make());
+        Commands.CM_COMMAND_ROOT.then(CMRoomCoreSubcommand.make());
         Commands.CM_COMMAND_ROOT.then(SpawnSubcommand.make());
         Commands.CM_COMMAND_ROOT.then(RoomUpgradesSubcommand.make());
         Commands.CM_COMMAND_ROOT.then(EnableBasicTemplatesSubcommand.make());
