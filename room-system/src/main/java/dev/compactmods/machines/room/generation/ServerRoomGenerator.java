@@ -181,6 +181,11 @@ public class ServerRoomGenerator implements RoomGenerator {
         registrationData.data().put(new RoomRegistrationNode(UUID.randomUUID(), new RoomRegistrationNode.Data(details.code(), details.boundaries())));
         registrationData.save();
 
+        // Inform the chunk manager to track new room chunks
+        var chunkManager = server.getCapability(RoomCapabilities.CHUNK_MANAGER);
+        if(chunkManager != null)
+            chunkManager.calculateChunks(details.code(), details.boundaries());
+
         pendingReservations.remove(details.code());
         return Optional.of(result);
     }

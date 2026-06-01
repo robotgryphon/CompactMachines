@@ -2,7 +2,11 @@ package dev.compactmods.machines.machine.block;
 
 import dev.compactmods.machines.CMDataAttachments;
 import dev.compactmods.machines.CMDataComponents;
+import dev.compactmods.machines.api.CompactMachines;
+import dev.compactmods.machines.api.room.RoomInstance;
 import dev.compactmods.machines.api.room.capability.RoomCapabilities;
+import dev.compactmods.machines.api.room.generation.RoomGenerationException;
+import dev.compactmods.machines.api.room.template.RoomTemplateHelper;
 import dev.compactmods.machines.core.CompactMachinesCore;
 import dev.compactmods.machines.core.machine.MachineColor;
 import dev.compactmods.machines.core.machine.block.IBoundCompactMachineBlockEntity;
@@ -123,7 +127,7 @@ public class CompactMachineBlock extends Block implements EntityBlock {
         if (tile == null)
             return InteractionResult.FAIL;
 
-        if (mainItem.has(CMDataComponents.BOUND_ROOM_CODE)) {
+        if (mainItem.has(CMDataComponents.BOUND_ROOM_CODE) || mainItem.has(CMDataComponents.ROOM_TEMPLATE_ID)) {
             boolean yay = tile.setCore(serverPlayer, mainItem);
             return yay ? InteractionResult.SUCCESS : InteractionResult.FAIL;
         }
@@ -132,26 +136,77 @@ public class CompactMachineBlock extends Block implements EntityBlock {
         if (mainItem.has(Shrinking.DataComponents.SHRINKING_CONFIG)) {
             var config = mainItem.getOrDefault(Shrinking.DataComponents.SHRINKING_CONFIG, ShrinkingDeviceConfiguration.DEFAULT_CONFIG);
 
-            tile.connectedRoom().flatMap(roomRegistry::get).ifPresent(room -> {
-                final var shrinkHandler = serverPlayer.getCapability(Shrinking.SHRINK, room);
-                if (shrinkHandler == null) {
-                    CompactMachinesCore.modLog().error("Error: Could not fetch or create a shrinking handler for room roomCode [{}], player [{}].",
-                            room.code(), player.getUUID());
+            final var currentCore = tile.coreHandler().getResource(0);
+            if(currentCore.isEmpty())
+                return InteractionResult.FAIL;
 
-                    return;
+
+            if(currentCore.has(CMDataComponents.BOUND_ROOM_CODE)) {
+                final var room = roomRegistry
+                        .get(currentCore.get(CMDataComponents.BOUND_ROOM_CODE))
+                        .orElse(null);
+
+                if (room != null) {
+                    tryEnterRoom(mainItem, player, serverPlayer, room, tile, config);
                 }
+            }
 
-                shrinkHandler.tryEnter(tile.getLevelPosition(), config).thenAccept(result -> {
-                    if (result.successful()) {
-                        PersonalShrinkingDevice.handleSuccessfulAtomicShift(mainItem, serverPlayer, config);
-                    }
-                });
-            });
+            if(currentCore.has(CMDataComponents.ROOM_TEMPLATE_ID)) {
+                final var templateId = currentCore.get(CMDataComponents.ROOM_TEMPLATE_ID);
+                final var template = RoomTemplateHelper.getTemplate(level, templateId);
+
+                try {
+                    final var generator = server.getCapability(RoomCapabilities.GENERATOR);
+                    final var details = generator.createNew()
+                            .template(template)
+                            .owner(player.getUUID())
+                            .build();
+
+                    generator.generate(details).ifPresent(result -> {
+                        final var room = result.newCode();
+
+                        final var log = CompactMachinesCore.modLog();
+                        log.info("Generated room: " + room);
+                        log.debug("Template used: " + templateId);
+                        log.debug("Player: " + player.nameAndId().name());
+
+
+                        final var newCore = currentCore.toStack(1);
+                        newCore.remove(CMDataComponents.ROOM_TEMPLATE_ID);
+                        newCore.set(CMDataComponents.BOUND_ROOM_CODE, room);
+                        tile.setCore(player, newCore);
+
+                        final var instance = roomRegistry.get(room).orElseThrow();
+
+                        tryEnterRoom(mainItem, player, serverPlayer, instance, tile, config);
+                    });
+                } catch (RoomGenerationException e) {
+                    throw new RuntimeException(e);
+                }
+            }
 
             return InteractionResult.SUCCESS;
         }
 
         return InteractionResult.PASS;
+    }
+
+    private static boolean tryEnterRoom(ItemStack mainItem, Player player, ServerPlayer serverPlayer, RoomInstance room, CompactMachineBlockEntity tile, ShrinkingDeviceConfiguration config) {
+        final var shrinkHandler = serverPlayer.getCapability(Shrinking.SHRINK, room);
+        if (shrinkHandler == null) {
+            CompactMachinesCore.modLog().error("Error: Could not fetch or create a shrinking handler for room roomCode [{}], player [{}].",
+                    room.code(), player.getUUID());
+
+            return false;
+        }
+
+        shrinkHandler.tryEnter(tile.getLevelPosition(), config).thenAccept(result -> {
+            if (result.successful()) {
+                PersonalShrinkingDevice.handleSuccessfulAtomicShift(mainItem, serverPlayer, config);
+            }
+        });
+
+        return true;
     }
 
     @Override

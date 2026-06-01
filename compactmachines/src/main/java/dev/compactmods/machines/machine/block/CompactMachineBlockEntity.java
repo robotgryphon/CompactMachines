@@ -22,6 +22,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.TagValueOutput;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
+import net.neoforged.neoforge.transfer.access.ItemAccess;
 import net.neoforged.neoforge.transfer.item.ItemResource;
 import net.neoforged.neoforge.transfer.item.ItemStacksResourceHandler;
 import net.neoforged.neoforge.transfer.transaction.Transaction;
@@ -39,16 +40,24 @@ public class CompactMachineBlockEntity extends BlockEntity implements IBoundComp
     @Nullable
     private Component customName;
 
-    private ItemStacksResourceHandler coreItemHandler;
+    private final ItemStacksResourceHandler coreItemHandler;
 
     public CompactMachineBlockEntity(BlockPos pos, BlockState state) {
         super(Machines.BlockEntities.MACHINE.get(), pos, state);
         this.machineColor = MachineColor.DEFAULT;
+
+        final var machine = this;
         this.coreItemHandler = new ItemStacksResourceHandler(1) {
             @Override
             public boolean isValid(int index, ItemResource resource) {
                 return resource.has(CMDataComponents.BOUND_ROOM_CODE) ||
                         resource.has(CMDataComponents.ROOM_TEMPLATE_ID);
+            }
+
+            @Override
+            protected void onContentsChanged(int index, ItemStack previousContents) {
+                super.onContentsChanged(index, previousContents);
+                machine.setChanged();
             }
         };
     }
@@ -75,21 +84,26 @@ public class CompactMachineBlockEntity extends BlockEntity implements IBoundComp
     }
 
     @Override
+    public void saveCustomOnly(ValueOutput output) {
+        super.saveCustomOnly(output);
+    }
+
+    @Override
     protected void loadAdditional(ValueInput input) {
         super.loadAdditional(input);
+        input.readChild("core", coreItemHandler);
         this.machineColor = input.read(CMDataComponents.KEY_MACHINE_COLOR, MachineColor.CODEC).orElse(MachineColor.DEFAULT);
         this.customName = input.read("CustomName", ComponentSerialization.CODEC).orElse(null);
         this.owner = input.read(NBT_OWNER, UUIDUtil.CODEC).orElse(null);
-        coreItemHandler.deserialize(input);
     }
 
     @Override
     protected void saveAdditional(ValueOutput output) {
         super.saveAdditional(output);
+        output.putChild("core", coreItemHandler);
         output.store(CMDataComponents.KEY_MACHINE_COLOR, MachineColor.CODEC, getMachineColor());
         output.storeNullable("CustomName", ComponentSerialization.CODEC, this.customName);
         output.storeNullable(NBT_OWNER, UUIDUtil.CODEC, this.owner);
-        coreItemHandler.serialize(output);
     }
 
     @Override
@@ -119,7 +133,7 @@ public class CompactMachineBlockEntity extends BlockEntity implements IBoundComp
 
     @Override
     public MachineColor getMachineColor() {
-        if(this.machineColor != null)
+        if (this.machineColor != null)
             return this.machineColor;
 
         return MachineColor.DEFAULT;
@@ -127,7 +141,7 @@ public class CompactMachineBlockEntity extends BlockEntity implements IBoundComp
 
     @Override
     public void setMachineColor(MachineColor machineColor) {
-        if(machineColor != null) {
+        if (machineColor != null) {
             this.machineColor = machineColor;
             this.setChanged();
         }
@@ -135,16 +149,11 @@ public class CompactMachineBlockEntity extends BlockEntity implements IBoundComp
 
     @Override
     public boolean setCore(@org.jspecify.annotations.Nullable Player player, ItemStack newCore) {
-        if (newCore.has(CMDataComponents.BOUND_ROOM_CODE)) {
-            try(var tx = Transaction.openRoot()) {
-                var accepted = coreItemHandler.insert(ItemResource.of(newCore), 1, tx);
-                if(accepted == 1) {
-                    newCore.shrink(1);
-                    tx.commit();
-                }
-
-                return true;
-            }
+        if (newCore.has(CMDataComponents.BOUND_ROOM_CODE) || newCore.has(CMDataComponents.ROOM_TEMPLATE_ID)) {
+            coreItemHandler.set(0, ItemResource.of(newCore), 1);
+            newCore.shrink(1);
+            this.setChanged();
+            return true;
         }
 
         return false;
@@ -156,6 +165,7 @@ public class CompactMachineBlockEntity extends BlockEntity implements IBoundComp
             final var resource = coreItemHandler.getResource(0);
             if (!resource.isEmpty() && coreItemHandler.extract(resource, 1, tx) == 1) {
                 tx.commit();
+                this.setChanged();
                 return resource.toStack(1);
             }
         }

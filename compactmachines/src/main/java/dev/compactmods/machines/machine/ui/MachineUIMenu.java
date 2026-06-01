@@ -1,6 +1,8 @@
 package dev.compactmods.machines.machine.ui;
 
 import dev.compactmods.machines.CMDataComponents;
+import dev.compactmods.machines.api.room.RoomInstance;
+import dev.compactmods.machines.api.room.capability.RoomCapabilities;
 import dev.compactmods.machines.api.room.template.RoomTemplate;
 import dev.compactmods.machines.api.room.template.RoomTemplateHelper;
 import dev.compactmods.machines.machine.Machines;
@@ -11,6 +13,9 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.ItemStack;
+import net.neoforged.neoforge.transfer.access.HandlerItemAccess;
+import net.neoforged.neoforge.transfer.access.ItemAccess;
+import net.neoforged.neoforge.transfer.item.CarriedSlotWrapper;
 import net.neoforged.neoforge.transfer.item.ResourceHandlerSlot;
 import org.jetbrains.annotations.ApiStatus;
 import org.jspecify.annotations.Nullable;
@@ -35,7 +40,7 @@ public class MachineUIMenu extends AbstractContainerMenu {
             this.machine = tile;
 
             final var coreHandler = tile.coreHandler();
-            final var coreSlot = new ResourceHandlerSlot(coreHandler, coreHandler::set, 0, 10, 10);
+            final var coreSlot = new ResourceHandlerSlot(coreHandler, coreHandler::set,0, 10, 10);
             this.addSlot(coreSlot);
         } else {
             this.machine = null;
@@ -59,7 +64,17 @@ public class MachineUIMenu extends AbstractContainerMenu {
         return player.isWithinBlockInteractionRange(machinePos.pos(), 5);
     }
 
+    public Optional<String> currentRoom() {
+        if(machine == null)
+            return Optional.empty();
+
+        return machine.connectedRoom();
+    }
+
     public Optional<RoomTemplate> currentTemplate() {
+        if(machine == null)
+            return Optional.empty();
+
         final var currentCore = machine.coreHandler().getResource(0);
         if(currentCore.isEmpty())
             return Optional.empty();
