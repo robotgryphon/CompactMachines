@@ -65,8 +65,8 @@ public interface MachineShaders {
     RenderType TYE_DYE_RENDER_TYPE = RenderType.create(
             "compactmachines:tye_dye",
             RenderSetup.builder(TYE_DYE_PIPELINE)
-                    .sortOnUpload()
-                    .setOutputTarget(OutputTarget.ITEM_ENTITY_TARGET)
+//                    .sortOnUpload()
+//                    .setOutputTarget(OutputTarget.ITEM_ENTITY_TARGET)
                     .createRenderSetup());
 
     /**

@@ -13,7 +13,7 @@ in vec3 faceNormal; // outward normal of the pane (kept so future shaders can
 
 out vec4 fragColor;
 
-const float OPACITY = 0.5; // matches the tinted-glass look the user dialled in.
+const float OPACITY = 0.8; // matches the tinted-glass look the user dialled in.
 
 // Palette — default is a saturated ROY G BIV spectrum so the base case reads
 // as "rainbow lava lamp". Customise by editing these constants and bumping

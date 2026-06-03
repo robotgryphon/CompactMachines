@@ -60,9 +60,9 @@ public final class MachineFlagRenderTypes {
             var renderType = RenderType.create(
                     "compactmachines:" + flag.id().getPath().replace('/', '_'),
                     RenderSetup.builder(pipeline)
-                            .sortOnUpload()
-                            .setOutputTarget(OutputTarget.MAIN_TARGET)
-                            .setLayeringTransform(LayeringTransform.VIEW_OFFSET_Z_LAYERING)
+//                            .sortOnUpload()
+//                            .setOutputTarget(OutputTarget.MAIN_TARGET)
+//                            .setLayeringTransform(LayeringTransform.VIEW_OFFSET_Z_LAYERING)
                             .createRenderSetup());
             BY_FLAG_ID.put(flag.id(), renderType);
         }
@@ -95,7 +95,7 @@ public final class MachineFlagRenderTypes {
         Identifier location = CompactMachines.identifier(
                 "pipeline/" + flag.id().getPath().replace('/', '_'));
 
-        RenderPipeline.Builder b = RenderPipeline.builder(RenderPipelines.GLOBALS_SNIPPET)
+        RenderPipeline.Builder b = RenderPipeline.builder(RenderPipelines.MATRICES_PROJECTION_SNIPPET, RenderPipelines.BLOCK_SNIPPET)
                 .withLocation(location)
                 .withVertexShader(CompactMachines.identifier("pride_stripes"))
                 .withFragmentShader(CompactMachines.identifier("pride_stripes"))

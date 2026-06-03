@@ -35,7 +35,7 @@ public final class MachineShaderResolver {
     /** Pure-function variant for places that have no attachment holder yet (item icons, JEI). */
     public static Optional<Identifier> dateDefault() {
         if (ClientConfig.ENABLE_PRIDE_IN_JUNE.get() && LocalDate.now().getMonth() == Month.JUNE) {
-            return Optional.of(MachineFlags.PURPLE.id());
+            return Optional.of(MachineFlags.WHITE.id());
         }
         return Optional.empty();
     }

@@ -1,12 +1,15 @@
 package dev.compactmods.machines.client.machine;
 
 import dev.compactmods.machines.client.machine.render.CompactMachineRenderer;
+import dev.compactmods.machines.client.machine.render.MachineShaderRenderer;
 import dev.compactmods.machines.client.machine.shader.MachineFlagRenderTypes;
 import dev.compactmods.machines.client.machine.shader.MachineShaders;
 import dev.compactmods.machines.machine.Machines;
+import net.neoforged.bus.api.EventPriority;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.client.event.EntityRenderersEvent;
 import net.neoforged.neoforge.client.event.RegisterRenderPipelinesEvent;
+import net.neoforged.neoforge.common.NeoForge;
 
 public interface MachinesClient {
    static void registerEvents(IEventBus modBus) {
@@ -14,6 +17,9 @@ public interface MachinesClient {
 	  modBus.addListener(MachineColors::onItemColors);
 	  modBus.addListener(MachinesClient::registerRenderers);
 	  modBus.addListener(MachinesClient::registerRenderPipelines);
+
+       NeoForge.EVENT_BUS.addListener(EventPriority.HIGH, MachineShaderRenderer::afterBlocksRender);
+       NeoForge.EVENT_BUS.addListener(MachineShaderRenderer::afterTranslucent);
    }
 
    static void registerRenderers(EntityRenderersEvent.RegisterRenderers event) {

@@ -20,9 +20,13 @@ import org.jspecify.annotations.Nullable;
 
 public class CompactMachineRenderer implements BlockEntityRenderer<CompactMachineBlockEntity, MachineRenderState> {
 
-    /** Tiny outward offset so the overlay always wins the depth test against the panes. */
+    /**
+     * Tiny outward offset so the overlay always wins the depth test against the panes.
+     */
     private static final float OUTSET = 0.001f;
-    /** Pane geometry in block-local space (matches the model — 14×14 inset by 1px). */
+    /**
+     * Pane geometry in block-local space (matches the model — 14×14 inset by 1px).
+     */
     private static final float A = 1f / 16f;
     private static final float B = 15f / 16f;
 
@@ -74,8 +78,15 @@ public class CompactMachineRenderer implements BlockEntityRenderer<CompactMachin
 
         final int skipMask = state.neighborMachineMask;
 
-        collector.submitCustomGeometry(poseStack, renderType,
-                (pose, buffer) -> emitPanes(pose, buffer, skipMask));
+//        collector.submitCustomGeometry(poseStack, renderType,
+//                (pose, buffer) -> {
+//                    emitPanes(pose, buffer, skipMask);
+//                });
+
+//        collector.submitCustomGeometry(poseStack, renderType, (pose, buffer) -> {
+//            pose.translate(0, 5, 0);
+//            emitFace(pose, buffer, Direction.EAST, 1f + OUTSET, A, A, B, B);
+//        });
     }
 
     // --- geometry --------------------------------------------------------------------
@@ -87,21 +98,21 @@ public class CompactMachineRenderer implements BlockEntityRenderer<CompactMachin
      * opacity is set by the fragment shader, not the vertex alpha);
      * {@code Normal} carries the outward face direction.
      */
-    private static void emitPanes(PoseStack.Pose pose, VertexConsumer buf, int skipMask) {
+    public static void emitPanes(PoseStack.Pose pose, VertexConsumer buffer, int skipMask) {
         // Side panes: each at the face's outer plane, 14×14 area between frame bars.
         // Sentinel for the "outside" axis: 0 - OUTSET on the negative face, 1 + OUTSET on the positive.
         if (!isSkipped(skipMask, Direction.NORTH))
-            emitFace(pose, buf, Direction.NORTH, -OUTSET,     A, A, B, B);
+            emitFace(pose, buffer, Direction.NORTH, -OUTSET, A, A, B, B);
         if (!isSkipped(skipMask, Direction.SOUTH))
-            emitFace(pose, buf, Direction.SOUTH, 1f + OUTSET, A, A, B, B);
+            emitFace(pose, buffer, Direction.SOUTH, 1f + OUTSET, A, A, B, B);
         if (!isSkipped(skipMask, Direction.WEST))
-            emitFace(pose, buf, Direction.WEST,  -OUTSET,     A, A, B, B);
+            emitFace(pose, buffer, Direction.WEST, -OUTSET, A, A, B, B);
         if (!isSkipped(skipMask, Direction.EAST))
-            emitFace(pose, buf, Direction.EAST,  1f + OUTSET, A, A, B, B);
+            emitFace(pose, buffer, Direction.EAST, 1f + OUTSET, A, A, B, B);
         if (!isSkipped(skipMask, Direction.UP))
-            emitFace(pose, buf, Direction.UP,    1f + OUTSET, A, A, B, B);
+            emitFace(pose, buffer, Direction.UP, 1f + OUTSET, A, A, B, B);
         if (!isSkipped(skipMask, Direction.DOWN))
-            emitFace(pose, buf, Direction.DOWN,  -OUTSET,     A, A, B, B);
+            emitFace(pose, buffer, Direction.DOWN, -OUTSET, A, A, B, B);
     }
 
     private static boolean isSkipped(int mask, Direction dir) {
@@ -114,9 +125,9 @@ public class CompactMachineRenderer implements BlockEntityRenderer<CompactMachin
      * in-plane extents — they line up with the inner 14×14 window between the
      * frame bars.
      */
-    private static void emitFace(PoseStack.Pose pose, VertexConsumer buf,
-                                 Direction face, float plane,
-                                 float u1, float v1, float u2, float v2) {
+    public static void emitFace(PoseStack.Pose pose, VertexConsumer buf,
+                                Direction face, float plane,
+                                float u1, float v1, float u2, float v2) {
         float nx = face.getStepX();
         float ny = face.getStepY();
         float nz = face.getStepZ();
@@ -165,7 +176,9 @@ public class CompactMachineRenderer implements BlockEntityRenderer<CompactMachin
         }
     }
 
-    /** Emit a single vertex. See {@link #emitPanes} for the format conventions. */
+    /**
+     * Emit a single vertex. See {@link #emitPanes} for the format conventions.
+     */
     private static void vertex(PoseStack.Pose pose, VertexConsumer buf,
                                float x, float y, float z,
                                float nx, float ny, float nz) {
@@ -175,8 +188,14 @@ public class CompactMachineRenderer implements BlockEntityRenderer<CompactMachin
         buf.addVertex(pose, x, y, z)
                 .setColor(r, g, b, 255)
                 .setNormal(nx, ny, nz);
+
     }
 
-    private static float clamp01(float v) { return v < 0 ? 0 : (v > 1 ? 1 : v); }
-    private static int clampByte(int v) { return v < 0 ? 0 : (v > 255 ? 255 : v); }
+    private static float clamp01(float v) {
+        return v < 0 ? 0 : (v > 1 ? 1 : v);
+    }
+
+    private static int clampByte(int v) {
+        return v < 0 ? 0 : (v > 255 ? 255 : v);
+    }
 }

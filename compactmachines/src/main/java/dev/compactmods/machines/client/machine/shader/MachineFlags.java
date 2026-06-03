@@ -35,14 +35,14 @@ public final class MachineFlags {
                     0x732982  // violet
             ));
 
-    public static final MachineFlag PURPLE = new MachineFlag(
-            CompactMachinesCore.identifier("purple"),
-            List.of(CommonColors.DARK_PURPLE));
+    public static final MachineFlag WHITE = new MachineFlag(
+            CompactMachinesCore.identifier("white"),
+            List.of(CommonColors.WHITE));
 
     private static final Map<Identifier, MachineFlag> BY_ID = new LinkedHashMap<>();
     static {
         register(BAKER_PRIDE);
-        register(PURPLE);
+        register(WHITE);
     }
 
     /** Add a flag to the registry. Datapack loaders will call this once the

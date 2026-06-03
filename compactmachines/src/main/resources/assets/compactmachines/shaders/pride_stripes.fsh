@@ -21,7 +21,7 @@ in vec3 faceNormal; // outward normal of the pane.
 
 out vec4 fragColor;
 
-const float OPACITY = 0.5;
+const float OPACITY = 0.2;
 
 // ----- palette defines (Baker defaults) ------------------------------------
 #ifndef PALETTE_SIZE
