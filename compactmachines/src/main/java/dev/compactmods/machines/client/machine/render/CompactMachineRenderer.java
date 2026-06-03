@@ -3,7 +3,6 @@ package dev.compactmods.machines.client.machine.render;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
-import dev.compactmods.machines.client.machine.shader.MachineShaderResolver;
 import dev.compactmods.machines.client.machine.shader.MachineShaders;
 import dev.compactmods.machines.machine.Machines;
 import dev.compactmods.machines.machine.block.CompactMachineBlockEntity;
@@ -61,11 +60,9 @@ public class CompactMachineRenderer implements BlockEntityRenderer<CompactMachin
                                    float partialTick, Vec3 cameraPos,
                                    ModelFeatureRenderer.@Nullable CrumblingOverlay crumbling) {
         BlockEntityRenderState.extractBase(be, state, crumbling);
-        state.shaderId = MachineShaderResolver.resolve(be).orElse(null);
         // gameTime stays on the state for future shaders that might want a frame-
         // stamped tick value; the current pride shader reads the Globals UBO directly.
         state.gameTime = be.getLevel() != null ? be.getLevel().getGameTime() + partialTick : 0f;
-        state.neighborMachineMask = computeNeighborMask(be.getLevel(), be.getBlockPos());
         extractCoreItem(be, state);
     }
 
@@ -95,44 +92,10 @@ public class CompactMachineRenderer implements BlockEntityRenderer<CompactMachin
         state.hasCoreItem = !state.coreItem.isEmpty();
     }
 
-    /**
-     * Look at each of the six neighbour blocks. Bit set ⇒ neighbour is another
-     * compact machine, so the BER should skip its overlay quad on that face
-     */
-    private static int computeNeighborMask(@Nullable Level level, BlockPos pos) {
-        if (level == null) return 0;
-        int mask = 0;
-        var machineBlock = Machines.Blocks.MACHINE.get();
-        BlockPos.MutableBlockPos cursor = new BlockPos.MutableBlockPos();
-        for (Direction dir : Direction.values()) {
-            cursor.setWithOffset(pos, dir);
-            if (level.getBlockState(cursor).is(machineBlock)) {
-                mask |= 1 << dir.get3DDataValue();
-            }
-        }
-        return mask;
-    }
-
     @Override
     public void submit(MachineRenderState state, PoseStack poseStack,
                        SubmitNodeCollector collector, CameraRenderState camera) {
         submitCoreItem(state, poseStack, collector);
-
-        if (state.shaderId == null) return;
-        var renderType = MachineShaders.renderTypeFor(state.shaderId);
-        if (renderType == null) return;
-
-        final int skipMask = state.neighborMachineMask;
-//
-//        collector.submitCustomGeometry(poseStack, MachineShaders.renderTypeFor(MachineFlags.BAKER_PRIDE.id()),
-//                (pose, buffer) -> {
-//                    emitPanes(pose, buffer, skipMask);
-//                });
-
-//        collector.submitCustomGeometry(poseStack, renderType, (pose, buffer) -> {
-//            pose.translate(0, 5, 0);
-//            emitFace(pose, buffer, Direction.EAST, 1f + OUTSET, A, A, B, B);
-//        });
     }
 
     /**

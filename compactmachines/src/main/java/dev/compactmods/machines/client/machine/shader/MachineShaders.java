@@ -15,17 +15,7 @@ import net.minecraft.client.renderer.rendertype.OutputTarget;
 import net.minecraft.client.renderer.rendertype.RenderSetup;
 import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.resources.Identifier;
-import org.jspecify.annotations.Nullable;
 
-/**
- * Known shader ids the Compact Machine block model can dispatch to, plus the
- * standalone {@link RenderPipeline}s / {@link RenderType}s backing them.
- *
- * <p>This is intentionally not a full registry yet — it's a small constants
- * holder for shaders whose behaviour is fixed at compile time (tye_dye). The
- * stripe-style "flag" shaders are configured at runtime instead, see
- * {@link MachineFlagRenderTypes} and {@link MachineFlags}.</p>
- */
 public interface MachineShaders {
 
     /**
@@ -68,17 +58,4 @@ public interface MachineShaders {
 //                    .sortOnUpload()
 //                    .setOutputTarget(OutputTarget.ITEM_ENTITY_TARGET)
                     .createRenderSetup());
-
-    /**
-     * Look up the {@link RenderType} for a given shader / flag id, or
-     * {@code null} if neither catalog knows it.
-     *
-     * <p>Tye-dye is checked first because it's the single special-effect
-     * shader; everything else is dispatched to the
-     * {@link MachineFlagRenderTypes flag-driven} pipelines.</p>
-     */
-    static @Nullable RenderType renderTypeFor(Identifier id) {
-        if (TYE_DYE.equals(id)) return TYE_DYE_RENDER_TYPE;
-        return MachineFlagRenderTypes.byId(id).orElse(null);
-    }
 }
