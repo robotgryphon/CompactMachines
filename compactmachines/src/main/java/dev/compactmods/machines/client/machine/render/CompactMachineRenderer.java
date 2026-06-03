@@ -2,7 +2,7 @@ package dev.compactmods.machines.client.machine.render;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
-import dev.compactmods.machines.client.machine.shader.MachineFlags;
+import com.mojang.math.Axis;
 import dev.compactmods.machines.client.machine.shader.MachineShaderResolver;
 import dev.compactmods.machines.client.machine.shader.MachineShaders;
 import dev.compactmods.machines.machine.Machines;
@@ -12,9 +12,14 @@ import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.blockentity.state.BlockEntityRenderState;
 import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
+import net.minecraft.client.renderer.item.ItemModelResolver;
 import net.minecraft.client.renderer.state.level.CameraRenderState;
+import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.util.Mth;
+import net.minecraft.world.item.ItemDisplayContext;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import org.jspecify.annotations.Nullable;
@@ -31,8 +36,19 @@ public class CompactMachineRenderer implements BlockEntityRenderer<CompactMachin
     private static final float A = 1f / 16f;
     private static final float B = 15f / 16f;
 
+    /** Radians per tick — one full turn every {@code 2π / RPS ≈ 125 ticks} (~6.3 s). */
+    private static final float CORE_SPIN_RATE = 0.05f;
+    /** Peak vertical displacement of the bob, in block units. */
+    private static final float CORE_BOB_AMPLITUDE = 0.08f;
+    /** Tick frequency of the bob — slow enough to feel like it's floating. */
+    private static final float CORE_BOB_RATE = 0.1f;
+    /** Uniform scale applied to the GROUND-context item so it reads as a held core. */
+    private static final float CORE_ITEM_SCALE = 1.2f;
+
+    private final ItemModelResolver itemModelResolver;
+
     public CompactMachineRenderer(BlockEntityRendererProvider.Context ctx) {
-        // No resources captured — everything we need lives on the render state.
+        this.itemModelResolver = ctx.itemModelResolver();
     }
 
     @Override
@@ -50,6 +66,33 @@ public class CompactMachineRenderer implements BlockEntityRenderer<CompactMachin
         // stamped tick value; the current pride shader reads the Globals UBO directly.
         state.gameTime = be.getLevel() != null ? be.getLevel().getGameTime() + partialTick : 0f;
         state.neighborMachineMask = computeNeighborMask(be.getLevel(), be.getBlockPos());
+        extractCoreItem(be, state);
+    }
+
+    /**
+     * Pull the core item out of the BE's 1-slot handler and bake an
+     * {@link net.minecraft.client.renderer.item.ItemStackRenderState} for it.
+     * When the slot is empty we clear the cached render state so its layers
+     * release any references — same pattern as vanilla's lectern / item-frame
+     * BERs in the deferred pipeline.
+     */
+    private void extractCoreItem(CompactMachineBlockEntity be, MachineRenderState state) {
+        final var resource = be.coreHandler().getResource(0);
+        if (resource.isEmpty()) {
+            state.coreItem.clear();
+            state.hasCoreItem = false;
+            return;
+        }
+
+        ItemStack stack = resource.toStack(1);
+        // Block-pos hash gives a stable per-block seed for any randomised
+        // item-model variants (e.g. tinted layers). Mirrors what
+        // BlockEntity-bound renderers use elsewhere in vanilla.
+        int seed = be.getBlockPos().hashCode();
+        this.itemModelResolver.updateForTopItem(
+                state.coreItem, stack, ItemDisplayContext.GROUND,
+                be.getLevel(), null, seed);
+        state.hasCoreItem = !state.coreItem.isEmpty();
     }
 
     /**
@@ -73,6 +116,8 @@ public class CompactMachineRenderer implements BlockEntityRenderer<CompactMachin
     @Override
     public void submit(MachineRenderState state, PoseStack poseStack,
                        SubmitNodeCollector collector, CameraRenderState camera) {
+        submitCoreItem(state, poseStack, collector);
+
         if (state.shaderId == null) return;
         var renderType = MachineShaders.renderTypeFor(state.shaderId);
         if (renderType == null) return;
@@ -88,6 +133,30 @@ public class CompactMachineRenderer implements BlockEntityRenderer<CompactMachin
 //            pose.translate(0, 5, 0);
 //            emitFace(pose, buffer, Direction.EAST, 1f + OUTSET, A, A, B, B);
 //        });
+    }
+
+    /**
+     * Float the core item at the centre of the block and slowly spin it on
+     * the Y axis — same general approach as the enchantment table book.
+     * The shader overlay is drawn around it later in {@link #submit}.
+     */
+    private static void submitCoreItem(MachineRenderState state, PoseStack poseStack,
+                                       SubmitNodeCollector collector) {
+        if (!state.hasCoreItem) return;
+
+        final float bob = Mth.sin(state.gameTime * CORE_BOB_RATE) * CORE_BOB_AMPLITUDE;
+        final float yaw = state.gameTime * CORE_SPIN_RATE;
+
+        poseStack.pushPose();
+        // Centre of the block, then bob — the GROUND-context model sits
+        // around the origin so this places it dead-centre in the cube.
+        poseStack.translate(0.5f, 0.4f, 0.5f);
+        poseStack.mulPose(Axis.YP.rotation(yaw));
+        poseStack.scale(CORE_ITEM_SCALE, CORE_ITEM_SCALE, CORE_ITEM_SCALE);
+
+        state.coreItem.submit(poseStack, collector,
+                state.lightCoords, OverlayTexture.NO_OVERLAY, /* outlineColor = */ 0);
+        poseStack.popPose();
     }
 
     // --- geometry --------------------------------------------------------------------
