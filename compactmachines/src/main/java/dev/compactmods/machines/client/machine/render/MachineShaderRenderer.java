@@ -1,21 +1,19 @@
 package dev.compactmods.machines.client.machine.render;
 
-import com.mojang.blaze3d.pipeline.RenderTarget;
-import com.mojang.blaze3d.vertex.PoseStack;
 import dev.compactmods.machines.api.CompactMachines;
 import dev.compactmods.machines.client.machine.shader.MachineFlags;
 import dev.compactmods.machines.client.machine.shader.MachineShaders;
-import dev.compactmods.machines.machine.Machines;
+import dev.compactmods.machines.machine.block.CompactMachineBlockEntity;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
+import net.minecraft.util.context.ContextKey;
 import net.minecraft.world.phys.Vec3;
+import net.neoforged.neoforge.client.event.ExtractLevelRenderStateEvent;
 import net.neoforged.neoforge.client.event.RenderLevelStageEvent;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static dev.compactmods.machines.client.machine.render.CompactMachineRenderer.emitFace;
 import static dev.compactmods.machines.client.machine.render.CompactMachineRenderer.emitPanes;
 
 public class MachineShaderRenderer {
@@ -30,17 +28,20 @@ public class MachineShaderRenderer {
     private static final float A = 1f / 16f;
     private static final float B = 15f / 16f;
 
-    private static List<BlockPos> visibleMachines = new ArrayList<>();
+    private static final ContextKey<PRIDE> KEY = new ContextKey<>(CompactMachines.identifier("pride_renderer"));
 
-    public static void afterBlocksRender(RenderLevelStageEvent.AfterOpaqueBlocks e) {
-        visibleMachines = e.getLevelRenderState().blockEntityRenderStates
-                .stream()
-                .filter(be -> be.blockEntityType.equals(Machines.BlockEntities.MACHINE.get()))
-                .map(s -> s.blockPos.immutable())
-                .toList();
+    public static void afterBlocksRender(ExtractLevelRenderStateEvent e) {
+
+        var customState = new PRIDE();
+        e.getLevelRenderer().iterateVisibleBlockEntities(be -> {
+            if(be instanceof CompactMachineBlockEntity mbe)
+                customState.visibleMachines.add(mbe.getBlockPos());
+        });
+
+        e.getRenderState().setRenderData(KEY, customState);
     }
 
-    public static void afterTranslucent(RenderLevelStageEvent.AfterOpaqueBlocks e) {
+    public static void afterTranslucent(RenderLevelStageEvent.AfterTranslucentBlocks e) {
 
         final var poseStack = e.getPoseStack();
 
@@ -53,9 +54,10 @@ public class MachineShaderRenderer {
 
 //        visibleMachines = List.of(BlockPos.ZERO);
 
-        for (var pos : visibleMachines) {
+        final var customState = e.getLevelRenderState().getRenderDataOrThrow(KEY);
+        for (var pos : customState.visibleMachines) {
             poseStack.pushPose();
-            collector.submitCustomGeometry(poseStack, MachineShaders.renderTypeFor(MachineFlags.BAKER_PRIDE.id()), (pose, buffer) -> {
+            collector.submitCustomGeometry(poseStack, MachineShaders.TYE_DYE_RENDER_TYPE, (pose, buffer) -> {
                 pose.translate(pos.getX(), pos.getY(), pos.getZ());
                 emitPanes(pose, buffer, 0);
 //                emitFace(pose, buffer, Direction.UP, 1f + OUTSET, A, A, B, B);
@@ -64,5 +66,9 @@ public class MachineShaderRenderer {
         }
 
         poseStack.popPose();
+    }
+
+    private static class PRIDE {
+        List<BlockPos> visibleMachines = new ArrayList<>();
     }
 }

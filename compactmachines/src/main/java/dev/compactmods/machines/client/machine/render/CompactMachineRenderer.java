@@ -2,6 +2,7 @@ package dev.compactmods.machines.client.machine.render;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
+import dev.compactmods.machines.client.machine.shader.MachineFlags;
 import dev.compactmods.machines.client.machine.shader.MachineShaderResolver;
 import dev.compactmods.machines.client.machine.shader.MachineShaders;
 import dev.compactmods.machines.machine.Machines;
@@ -77,8 +78,8 @@ public class CompactMachineRenderer implements BlockEntityRenderer<CompactMachin
         if (renderType == null) return;
 
         final int skipMask = state.neighborMachineMask;
-
-//        collector.submitCustomGeometry(poseStack, renderType,
+//
+//        collector.submitCustomGeometry(poseStack, MachineShaders.renderTypeFor(MachineFlags.BAKER_PRIDE.id()),
 //                (pose, buffer) -> {
 //                    emitPanes(pose, buffer, skipMask);
 //                });

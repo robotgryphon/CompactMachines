@@ -2,6 +2,7 @@ package dev.compactmods.machines.client.machine;
 
 import dev.compactmods.machines.client.machine.render.CompactMachineRenderer;
 import dev.compactmods.machines.client.machine.render.MachineShaderRenderer;
+import dev.compactmods.machines.client.machine.shader.FlagShader;
 import dev.compactmods.machines.client.machine.shader.MachineFlagRenderTypes;
 import dev.compactmods.machines.client.machine.shader.MachineShaders;
 import dev.compactmods.machines.machine.Machines;
@@ -32,7 +33,7 @@ public interface MachinesClient {
     * matching shader sources on shader pack load.
     *
     * <p>The tye-dye pipeline is fixed; the flag pipelines are generated at
-    * event time, one per registered {@link dev.compactmods.machines.client.machine.shader.MachineFlag},
+    * event time, one per registered {@link FlagShader},
     * each with its palette baked in via shader defines.</p>
     */
    static void registerRenderPipelines(RegisterRenderPipelinesEvent event) {

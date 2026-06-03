@@ -29,13 +29,13 @@ public final class MachineShaderResolver {
             Optional<Identifier> explicit = holder.getExistingData(CMDataAttachments.MACHINE_SHADER.get());
             if (explicit.isPresent()) return explicit;
         }
-        return dateDefault();
+        return Optional.empty();
     }
 
     /** Pure-function variant for places that have no attachment holder yet (item icons, JEI). */
-    public static Optional<Identifier> dateDefault() {
+    public static Optional<FlagShader> dateDefault() {
         if (ClientConfig.ENABLE_PRIDE_IN_JUNE.get() && LocalDate.now().getMonth() == Month.JUNE) {
-            return Optional.of(MachineFlags.WHITE.id());
+            return Optional.of(MachineFlags.WHITE);
         }
         return Optional.empty();
     }

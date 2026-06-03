@@ -1,25 +1,24 @@
 package dev.compactmods.machines;
 
+import dev.compactmods.machines.api.CompactMachines;
 import dev.compactmods.machines.api.room.template.RoomTemplate;
+import dev.compactmods.machines.client.machine.shader.FlagShader;
 import dev.compactmods.machines.core.CompactMachinesCore;
-import dev.compactmods.machines.shrinking.Shrinking;
 import dev.compactmods.machines.villager.Villagers;
 import net.minecraft.commands.synchronization.ArgumentTypeInfo;
+import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.entity.ai.village.poi.PoiType;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.CreativeModeTab;
-import net.minecraft.world.item.CreativeModeTabs;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.gamerules.GameRule;
 import net.neoforged.bus.api.IEventBus;
-import net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent;
 import net.neoforged.neoforge.registries.DataPackRegistryEvent;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
-import java.util.function.UnaryOperator;
 import java.util.stream.Stream;
 
 public interface CMRegistries {
@@ -46,7 +45,9 @@ public interface CMRegistries {
 
 	DeferredRegister<MenuType<?>> MENUS = DeferredRegister.create(BuiltInRegistries.MENU, CompactMachinesCore.MOD_ID);
 
-	static void setup(IEventBus modBus) {
+	DeferredRegister<FlagShader> FLAG_SHADERS = DeferredRegister.create(FlagShader.REGISTRY_KEY, CompactMachines.MOD_ID);
+
+    static void setup(IEventBus modBus) {
 		Stream.of(BLOCKS, ITEMS, BLOCK_ENTITIES, CONTAINERS, COMMAND_ARGUMENT_TYPES, GAME_RULES,
                 POINTS_OF_INTEREST, Villagers.VILLAGERS, TABS,
 				CMDataAttachments.ATTACHMENT_TYPES,
@@ -56,6 +57,7 @@ public interface CMRegistries {
 
 		modBus.addListener((DataPackRegistryEvent.NewRegistry newRegistries) -> {
 			newRegistries.dataPackRegistry(RoomTemplate.REGISTRY_KEY, RoomTemplate.CODEC, RoomTemplate.CODEC);
+			newRegistries.dataPackRegistry(FlagShader.REGISTRY_KEY, FlagShader.CODEC, FlagShader.CODEC);
 		});
 	}
 }

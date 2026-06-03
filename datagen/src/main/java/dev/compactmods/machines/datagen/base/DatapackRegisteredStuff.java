@@ -1,7 +1,10 @@
 package dev.compactmods.machines.datagen.base;
 
+import dev.compactmods.machines.CMRegistries;
 import dev.compactmods.machines.api.room.template.RoomTemplate;
 import dev.compactmods.machines.api.dimension.CompactDimension;
+import dev.compactmods.machines.client.machine.shader.FlagShader;
+import dev.compactmods.machines.core.CompactMachinesCore;
 import dev.compactmods.machines.datagen.util.DimensionTypeBuilder;
 import dev.compactmods.machines.dimension.Dimension;
 import net.minecraft.core.RegistrySetBuilder;
@@ -32,7 +35,21 @@ public class DatapackRegisteredStuff {
             .add(Registries.DIMENSION_TYPE, DatapackRegisteredStuff::generateDimensionTypes)
             .add(Registries.LEVEL_STEM, DatapackRegisteredStuff::generateDimensions)
             .add(RoomTemplate.REGISTRY_KEY, (ctx) -> {
-            });
+            })
+            .add(FlagShader.REGISTRY_KEY, DatapackRegisteredStuff::generateFlagDefinitions);
+
+    private static void generateFlagDefinitions(BootstrapContext<FlagShader> ctx) {
+        final var bakerPride = new FlagShader(List.of(
+                0xE40303, // red
+                0xFF8C00, // orange
+                0xFFED00, // yellow
+                0x008026, // green
+                0x24408E, // blue
+                0x732982  // violet
+        ));
+
+        ctx.register(ResourceKey.create(FlagShader.REGISTRY_KEY, CompactMachinesCore.identifier("flag/baker_pride")), bakerPride);
+    }
 
     private static void generateBiomes(BootstrapContext<Biome> ctx) {
         var spawnBuilder = new MobSpawnSettings.Builder();
