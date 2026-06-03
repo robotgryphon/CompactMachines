@@ -1,0 +1,43 @@
+package dev.compactmods.machines.client.machine.render;
+
+import com.mojang.blaze3d.buffers.GpuBuffer;
+import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.*;
+import it.unimi.dsi.fastutil.longs.LongList;
+import net.minecraft.client.renderer.culling.Frustum;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.phys.Vec3;
+import org.jspecify.annotations.Nullable;
+
+import java.util.function.Supplier;
+
+public class MachineMeshHelper {
+    private static final VertexFormat VERTEX_FORMAT = DefaultVertexFormat.POSITION_COLOR_NORMAL;
+    private static final ByteBufferBuilder meshBuffer = new ByteBufferBuilder(VERTEX_FORMAT.getVertexSize() * 8);
+
+    static @Nullable MeshData buildMesh(PoseStack stack, LongList positions, Frustum frustum) {
+        var size = positions.size() * VERTEX_FORMAT.getVertexSize();
+        if (size == 0) return null;
+
+        var builder = new BufferBuilder(meshBuffer, VertexFormat.Mode.QUADS, VERTEX_FORMAT);
+        for (long position : positions) {
+            var x = BlockPos.getX(position);
+            var y = BlockPos.getY(position);
+            var z = BlockPos.getZ(position);
+
+            // add a cube
+            stack.pushPose();
+            stack.translate(-frustum.getCamX(), -frustum.getCamY(), -frustum.getCamZ());
+            stack.translate(x, y, z);
+            CompactMachineRenderer.emitPanes(stack.last(), builder, 0);
+            stack.popPose();
+        }
+
+        var result = builder.build();
+        if (result != null) result.sortQuads(meshBuffer, VertexSorting.DISTANCE_TO_ORIGIN);
+
+        return result;
+    }
+}
+
+

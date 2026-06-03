@@ -13,7 +13,7 @@ in vec3 faceNormal; // outward normal of the pane (kept so future shaders can
 
 out vec4 fragColor;
 
-const float OPACITY = 0.8; // matches the tinted-glass look the user dialled in.
+const float OPACITY = 0.4; // matches the tinted-glass look the user dialled in.
 
 // Palette — default is a saturated ROY G BIV spectrum so the base case reads
 // as "rainbow lava lamp". Customise by editing these constants and bumping
@@ -96,7 +96,7 @@ void main() {
     // GameTime cycles 0..1 over 24000 ticks (20 min). Drift coefficients below
     // scale GameTime directly. Halved from the previous pass so a noise feature
     // takes roughly 6-12 seconds to cross — calmer "lava lamp" pace.
-    float t = GameTime;
+    float t = GameTime / 2;
 
     // Sample anchor is the absolute world position so adjacent machines blend
     // continuously. Frequency 0.6 means a noise feature spans ~1.5 blocks —

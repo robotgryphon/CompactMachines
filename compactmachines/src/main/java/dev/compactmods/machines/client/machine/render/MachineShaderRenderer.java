@@ -1,20 +1,26 @@
 package dev.compactmods.machines.client.machine.render;
 
+import com.mojang.blaze3d.buffers.GpuBuffer;
+import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.MeshData;
+import com.mojang.blaze3d.vertex.PoseStack;
 import dev.compactmods.machines.api.CompactMachines;
-import dev.compactmods.machines.client.machine.shader.MachineFlags;
 import dev.compactmods.machines.client.machine.shader.MachineShaders;
+import dev.compactmods.machines.core.CompactMachinesCore;
 import dev.compactmods.machines.machine.block.CompactMachineBlockEntity;
+import it.unimi.dsi.fastutil.longs.LongArrayList;
+import it.unimi.dsi.fastutil.longs.LongList;
 import net.minecraft.client.Minecraft;
-import net.minecraft.core.BlockPos;
 import net.minecraft.util.context.ContextKey;
-import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.client.event.ExtractLevelRenderStateEvent;
 import net.neoforged.neoforge.client.event.RenderLevelStageEvent;
+import org.joml.Matrix4f;
+import org.joml.Vector3f;
+import org.joml.Vector4f;
+import org.jspecify.annotations.Nullable;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import static dev.compactmods.machines.client.machine.render.CompactMachineRenderer.emitPanes;
+import java.util.OptionalDouble;
+import java.util.OptionalInt;
 
 public class MachineShaderRenderer {
 
@@ -28,47 +34,88 @@ public class MachineShaderRenderer {
     private static final float A = 1f / 16f;
     private static final float B = 15f / 16f;
 
+    private static final LongList positions = new LongArrayList();
     private static final ContextKey<PRIDE> KEY = new ContextKey<>(CompactMachines.identifier("pride_renderer"));
 
-    public static void afterBlocksRender(ExtractLevelRenderStateEvent e) {
+    public static void extractPrideRenderState(ExtractLevelRenderStateEvent e) {
 
-        var customState = new PRIDE();
+        var state = e.getRenderState().getRenderDataOrDefault(KEY, PRIDE.INSTANCE);
+
+        state.reset();
+
+        positions.clear();
+        // iterate positions of BEs
         e.getLevelRenderer().iterateVisibleBlockEntities(be -> {
             if(be instanceof CompactMachineBlockEntity mbe)
-                customState.visibleMachines.add(mbe.getBlockPos());
+                positions.add(mbe.getBlockPos().asLong());
         });
 
-        e.getRenderState().setRenderData(KEY, customState);
+        final var poseStack = new PoseStack();
+        try (var mesh = MachineMeshHelper.buildMesh(poseStack, positions, e.getFrustum())) {
+            if (mesh != null) {
+                state.MeshState = mesh.drawState();
+                state.VertexBuffer = VerticesHelper.uploadVertices(state.VertexBuffer, mesh, () -> CompactMachinesCore.dotPrefix("machine_vertices"));
+                state.IndexBuffer = VerticesHelper.uploadIndices(state.IndexBuffer, mesh, () -> CompactMachinesCore.dotPrefix("machine_vertices"));
+            }
+        }
+
+        e.getRenderState().setRenderData(KEY, state);
     }
+
+    // named constants for clarity
+    private static final Vector4f colorModulator = new Vector4f(1, 1, 1, 1);
+    private static final Vector3f worldOffset = new Vector3f(0, 0, 0);
+    private static final Matrix4f textureTransform = new Matrix4f();
 
     public static void afterTranslucent(RenderLevelStageEvent.AfterTranslucentBlocks e) {
 
-        final var poseStack = e.getPoseStack();
+        var state = e.getLevelRenderState().getRenderDataOrThrow(KEY);
 
-//        final var poseStack = new PoseStack();
-        poseStack.pushPose();
-        poseStack.translate(Vec3.ZERO.subtract(e.getLevelRenderState().cameraRenderState.pos));
+        if (state.MeshState == null) return;
 
-        final var gameRenderer = Minecraft.getInstance().gameRenderer;
-        final var collector = gameRenderer.getSubmitNodeStorage();
+        var transforms = RenderSystem.getDynamicUniforms().writeTransform(RenderSystem.getModelViewMatrix(), colorModulator, worldOffset, textureTransform);
 
-//        visibleMachines = List.of(BlockPos.ZERO);
+        var renderTarget = Minecraft.getInstance().getMainRenderTarget();
+        if(e.getLevelRenderer().getTranslucentTarget() != null)
+            renderTarget =  e.getLevelRenderer().getTranslucentTarget();
 
-        final var customState = e.getLevelRenderState().getRenderDataOrThrow(KEY);
-        for (var pos : customState.visibleMachines) {
-            poseStack.pushPose();
-            collector.submitCustomGeometry(poseStack, MachineShaders.TYE_DYE_RENDER_TYPE, (pose, buffer) -> {
-                pose.translate(pos.getX(), pos.getY(), pos.getZ());
-                emitPanes(pose, buffer, 0);
-//                emitFace(pose, buffer, Direction.UP, 1f + OUTSET, A, A, B, B);
-            });
-            poseStack.popPose();
+        try (var pass = RenderSystem.getDevice().createCommandEncoder().createRenderPass(
+                () -> CompactMachinesCore.dotPrefix("machines"),
+                renderTarget.getColorTextureView(),
+                OptionalInt.empty(),
+                renderTarget.getDepthTextureView(),
+                OptionalDouble.empty())
+        ) {
+            pass.setPipeline(MachineShaders.TYE_DYE_PIPELINE);
+            RenderSystem.bindDefaultUniforms(pass);
+            pass.setVertexBuffer(0, state.VertexBuffer);
+            pass.setIndexBuffer(state.IndexBuffer, state.MeshState.indexType());
+//            pass.bindTexture("Sampler0", texture.getTextureView(), texture.getSampler());
+            pass.setUniform("DynamicTransforms", transforms);
+            pass.drawIndexed(0, 0, state.MeshState.indexCount(), 1);
         }
-
-        poseStack.popPose();
     }
 
     private static class PRIDE {
-        List<BlockPos> visibleMachines = new ArrayList<>();
+        public static final PRIDE INSTANCE = new PRIDE();
+
+        public MeshData.@Nullable DrawState MeshState;
+        public @Nullable GpuBuffer VertexBuffer;
+        public @Nullable GpuBuffer IndexBuffer;
+
+        public void reset() {
+            MeshState = null;
+            if (VertexBuffer != null) {
+                VertexBuffer.close();
+                VertexBuffer = null;
+            }
+
+            if (IndexBuffer != null) {
+                IndexBuffer.close();
+                IndexBuffer = null;
+            }
+        }
     }
+
+
 }
