@@ -17,7 +17,10 @@ public interface CMDataComponents {
                     .persistent(MachineColor.CODEC)
                     .networkSynchronized(MachineColor.STREAM_CODEC));
 
-
+    DeferredHolder<DataComponentType<?>, DataComponentType<Identifier>> PRIDE_FLAG = CMRegistries.DATA_COMPONENTS
+            .registerComponentType("pride_flag", (builder) -> builder
+                    .persistent(Identifier.CODEC)
+                    .networkSynchronized(Identifier.STREAM_CODEC));
 
     DeferredHolder<DataComponentType<?>, DataComponentType<UUID>> UPGRADE_INSTANCE_ID = CMRegistries.DATA_COMPONENTS
             .registerComponentType("upgrade_id", (builder) -> builder

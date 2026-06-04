@@ -13,7 +13,8 @@ public class ClientConfig {
      * specific shader (via the {@code machine_shader} data attachment) will
      * automatically render with the Pride rainbow shader during June.
      */
-    public static ModConfigSpec.BooleanValue ENABLE_PRIDE_IN_JUNE;
+    public static ModConfigSpec.BooleanValue ENABLE_PRIDE;
+    public static ModConfigSpec.ConfigValue<String> DEFAULT_PRIDE_FLAG;
 
     static {
         generateConfig();
@@ -26,9 +27,13 @@ public class ClientConfig {
                 .comment("Enable room preview when opening a bound machine UI")
                 .define("enableRoomPreviews", true);
 
-        ENABLE_PRIDE_IN_JUNE = builder
-                .comment("Render Compact Machines with the rainbow Pride shader during June if no explicit shader is set on the block.")
-                .define("enablePrideInJune", true);
+        ENABLE_PRIDE = builder
+                .comment("Render Compact Machines with Pride shaders.")
+                .define("enablePride", true);
+
+        DEFAULT_PRIDE_FLAG = builder
+                .comment("The default pride flag shader ID to use if one is not set on the core item.")
+                .define("defaultPrideShader", "compactmachines:pride/baker");
 
         CONFIG = builder.build();
     }

@@ -2,8 +2,8 @@ package dev.compactmods.machines.client.machine;
 
 import dev.compactmods.machines.client.machine.render.CompactMachineRenderer;
 import dev.compactmods.machines.client.machine.render.MachineShaderRenderer;
-import dev.compactmods.machines.client.machine.shader.FlagShader;
-import dev.compactmods.machines.client.machine.shader.MachineFlagRenderTypes;
+import dev.compactmods.machines.client.machine.shader.flag.FlagShader;
+import dev.compactmods.machines.client.machine.shader.flag.FlagShaders;
 import dev.compactmods.machines.client.machine.shader.MachineShaders;
 import dev.compactmods.machines.machine.Machines;
 import net.neoforged.bus.api.EventPriority;
@@ -38,6 +38,6 @@ public interface MachinesClient {
     */
    static void registerRenderPipelines(RegisterRenderPipelinesEvent event) {
 	  event.registerPipeline(MachineShaders.TYE_DYE_PIPELINE);
-	  MachineFlagRenderTypes.registerAll(event);
+	  FlagShaders.registerAll(event);
    }
 }

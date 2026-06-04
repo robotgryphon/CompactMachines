@@ -1,9 +1,8 @@
 package dev.compactmods.machines.datagen.base;
 
-import dev.compactmods.machines.CMRegistries;
 import dev.compactmods.machines.api.room.template.RoomTemplate;
 import dev.compactmods.machines.api.dimension.CompactDimension;
-import dev.compactmods.machines.client.machine.shader.FlagShader;
+import dev.compactmods.machines.client.machine.shader.flag.FlagShader;
 import dev.compactmods.machines.core.CompactMachinesCore;
 import dev.compactmods.machines.datagen.util.DimensionTypeBuilder;
 import dev.compactmods.machines.dimension.Dimension;
@@ -11,6 +10,7 @@ import net.minecraft.core.RegistrySetBuilder;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.data.worldgen.BootstrapContext;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.util.ColorRGBA;
 import net.minecraft.world.attribute.EnvironmentAttributes;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.BiomeGenerationSettings;
@@ -39,16 +39,23 @@ public class DatapackRegisteredStuff {
             .add(FlagShader.REGISTRY_KEY, DatapackRegisteredStuff::generateFlagDefinitions);
 
     private static void generateFlagDefinitions(BootstrapContext<FlagShader> ctx) {
-        final var bakerPride = new FlagShader(List.of(
-                0xE40303, // red
-                0xFF8C00, // orange
-                0xFFED00, // yellow
-                0x008026, // green
-                0x24408E, // blue
-                0x732982  // violet
-        ));
+        generateFlag(ctx, "baker", 0xE50000, 0xFF8D00, 0xFFEE00,
+                0x028121, 0x004CFF, 0x770088);
 
-        ctx.register(ResourceKey.create(FlagShader.REGISTRY_KEY, CompactMachinesCore.identifier("flag/baker_pride")), bakerPride);
+        generateFlag(ctx, "lesbian", 0xD62800, 0xFF9B56, 0xFFFFFF, 0xD462A6, 0xA40062);
+
+        generateFlag(ctx, "bisexual", 0xD60270, 0x9BF96, 0x0038A8);
+
+        generateFlag(ctx, "asexual", 0x000000, 0xA4A4A4, 0xFFFFFF, 0x810081);
+
+        generateFlag(ctx, "transgender", 0x5BCFFB, 0xF5ABB9, 0xFFFFFF, 0xF5ABB9, 0x5BCFFB);
+
+        generateFlag(ctx, "non-binary", 0xFCF431, 0xFCFCFC, 0x9D59D2, 0x282828);
+    }
+
+    private static void generateFlag(BootstrapContext<FlagShader> ctx, String id, Integer... colors) {
+        final var definition = new FlagShader(List.of(colors));
+        ctx.register(ResourceKey.create(FlagShader.REGISTRY_KEY, CompactMachinesCore.identifier("pride/" + id)), definition);
     }
 
     private static void generateBiomes(BootstrapContext<Biome> ctx) {

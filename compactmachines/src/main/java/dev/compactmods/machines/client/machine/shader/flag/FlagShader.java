@@ -1,11 +1,14 @@
-package dev.compactmods.machines.client.machine.shader;
+package dev.compactmods.machines.client.machine.shader.flag;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import dev.compactmods.machines.api.CompactMachines;
+import dev.compactmods.machines.client.machine.shader.MachineShader;
+import dev.compactmods.machines.client.machine.shader.MachineShaderType;
 import net.minecraft.core.Registry;
-import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.util.ColorRGBA;
+import net.minecraft.util.ExtraCodecs;
 
 import java.util.List;
 
@@ -19,7 +22,7 @@ import java.util.List;
 /// declares a fixed `vec3[10]` palette array.
 ///
 /// @param colors stripe colours, top-to-bottom, packed `0xRRGGBB`.
-public record FlagShader(List<Integer> colors) {
+public record FlagShader(List<Integer> colors) implements MachineShader {
 
     public static final int MAX_STRIPES = 10;
 
@@ -29,12 +32,13 @@ public record FlagShader(List<Integer> colors) {
         return Math.min(colors.size(), MAX_STRIPES);
     }
 
-    public float r(int idx) { return ((colors.get(idx) >> 16) & 0xFF) / 255f; }
-    public float g(int idx) { return ((colors.get(idx) >>  8) & 0xFF) / 255f; }
-    public float b(int idx) { return ((colors.get(idx))       & 0xFF) / 255f; }
-
     /** Codec for future datapack loading; not wired into a real registry yet. */
     public static final Codec<FlagShader> CODEC = RecordCodecBuilder.create(inst -> inst.group(
-            Codec.INT.listOf().fieldOf("colors").forGetter(FlagShader::colors)
+            ExtraCodecs.STRING_RGB_COLOR.listOf().fieldOf("colors").forGetter(FlagShader::colors)
     ).apply(inst, FlagShader::new));
+
+    @Override
+    public MachineShaderType<?> type() {
+        return null;
+    }
 }

@@ -2,14 +2,12 @@ package dev.compactmods.machines;
 
 import dev.compactmods.machines.api.CompactMachines;
 import dev.compactmods.machines.api.room.template.RoomTemplate;
-import dev.compactmods.machines.client.machine.shader.FlagShader;
+import dev.compactmods.machines.client.machine.shader.flag.FlagShader;
 import dev.compactmods.machines.core.CompactMachinesCore;
 import dev.compactmods.machines.villager.Villagers;
 import net.minecraft.commands.synchronization.ArgumentTypeInfo;
-import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.entity.ai.village.poi.PoiType;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.CreativeModeTab;

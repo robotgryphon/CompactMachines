@@ -1,4 +1,4 @@
-package dev.compactmods.machines.client.machine.shader;
+package dev.compactmods.machines.client.machine.shader.flag;
 
 import com.mojang.blaze3d.pipeline.BlendFunction;
 import com.mojang.blaze3d.pipeline.ColorTargetState;
@@ -15,15 +15,9 @@ import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.client.renderer.rendertype.OutputTarget;
 import net.minecraft.client.renderer.rendertype.RenderSetup;
 import net.minecraft.client.renderer.rendertype.RenderType;
-import net.minecraft.resources.Identifier;
 import net.neoforged.neoforge.client.event.RegisterRenderPipelinesEvent;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
-
-public final class MachineFlagRenderTypes {
+public final class FlagShaders {
 
     // Happy Pride y'all
     public static final OutputTarget TRANSLUCENT_TARGET = new OutputTarget("trans_target",

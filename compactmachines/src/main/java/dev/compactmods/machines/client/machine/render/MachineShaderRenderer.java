@@ -7,16 +7,20 @@ import com.mojang.blaze3d.pipeline.RenderPipeline;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.MeshData;
 import com.mojang.blaze3d.vertex.PoseStack;
+import dev.compactmods.machines.CMDataComponents;
 import dev.compactmods.machines.api.CompactMachines;
-import dev.compactmods.machines.client.machine.shader.FlagShader;
-import dev.compactmods.machines.client.machine.shader.MachineFlagRenderTypes;
-import dev.compactmods.machines.client.machine.shader.MachineShaders;
+import dev.compactmods.machines.client.config.ClientConfig;
+import dev.compactmods.machines.client.machine.shader.flag.FlagShader;
+import dev.compactmods.machines.client.machine.shader.flag.FlagShaders;
 import dev.compactmods.machines.core.CompactMachinesCore;
 import dev.compactmods.machines.machine.block.CompactMachineBlockEntity;
 import it.unimi.dsi.fastutil.longs.LongArrayList;
 import it.unimi.dsi.fastutil.longs.LongList;
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.resources.Identifier;
+import net.minecraft.util.ARGB;
 import net.minecraft.util.context.ContextKey;
 import net.neoforged.neoforge.client.event.ExtractLevelRenderStateEvent;
 import net.neoforged.neoforge.client.event.RenderLevelStageEvent;
@@ -27,8 +31,9 @@ import org.jspecify.annotations.Nullable;
 import org.lwjgl.system.MemoryStack;
 
 import java.nio.ByteBuffer;
-import java.util.OptionalDouble;
-import java.util.OptionalInt;
+import java.time.LocalDate;
+import java.time.Month;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class MachineShaderRenderer {
@@ -43,13 +48,14 @@ public class MachineShaderRenderer {
     private static final float A = 1f / 16f;
     private static final float B = 15f / 16f;
 
-    private static final LongList positions = new LongArrayList();
     private static final ContextKey<PrideRenderState> KEY = new ContextKey<>(CompactMachines.identifier("pride_renderer"));
 
     // named constants for clarity
     private static final Vector4f colorModulator = new Vector4f(1, 1, 1, 1);
     private static final Vector3f worldOffset = new Vector3f(0, 0, 0);
     private static final Matrix4f textureTransform = new Matrix4f();
+
+    private static final Identifier DEFAULT_FLAG = CompactMachines.identifier("pride/baker");
 
     /**
      * Size of the {@code FlagPalette} UBO in bytes — std140 layout of:
@@ -78,24 +84,65 @@ public class MachineShaderRenderer {
     public static void extractPrideRenderState(ExtractLevelRenderStateEvent e) {
 
         var state = e.getRenderState().getRenderDataOrDefault(KEY, PrideRenderState.INSTANCE);
+        if (state.meshes == null || state.meshes.isEmpty())
+            state.meshes = new Object2ObjectOpenHashMap<>();
 
-        state.reset();
+        for (var mesh : state.meshes.values())
+            mesh.reset();
 
-        positions.clear();
         state.clientLevel = e.getLevel();
+        final var shadersTmp = new Object2ObjectOpenHashMap<Identifier, LongList>();
+
+        final var shaders = state.clientLevel.registryAccess()
+                .lookupOrThrow(FlagShader.REGISTRY_KEY);
+
+        shaders.registryKeySet()
+                .forEach(rk -> shadersTmp.put(rk.identifier(), new LongArrayList()));
+
+        var defaultFlag = Identifier.tryParse(ClientConfig.DEFAULT_PRIDE_FLAG.get());
+        if(defaultFlag == null)
+            defaultFlag = shaders.getAny().map(r -> r.key().identifier()).orElse(DEFAULT_FLAG);
 
         // iterate positions of BEs
+        Identifier finalDefaultFlag = defaultFlag;
         e.getLevelRenderer().iterateVisibleBlockEntities(be -> {
-            if(be instanceof CompactMachineBlockEntity mbe)
-                positions.add(mbe.getBlockPos().asLong());
+            if (be instanceof CompactMachineBlockEntity mbe) {
+                final var core = mbe.coreHandler().getResource(0);
+
+                // If we have a core, try to pull the shader from the core item
+                if (!core.isEmpty()) {
+                    final var flag = core.getOrDefault(CMDataComponents.PRIDE_FLAG, finalDefaultFlag);
+                    if(shadersTmp.containsKey(flag)) {
+                        final var list = shadersTmp.get(flag);
+                        if (list != null)
+                            list.add(mbe.getBlockPos().asLong());
+                    }
+                } else {
+                    // If we DO NOT have a core, and it's Pride month...
+                    if(ClientConfig.ENABLE_PRIDE.isFalse() || LocalDate.now().getMonth() != Month.JUNE)
+                        return;
+
+                    if(shadersTmp.containsKey(finalDefaultFlag)) {
+                        final var list = shadersTmp.get(finalDefaultFlag);
+                        if (list != null)
+                            list.add(mbe.getBlockPos().asLong());
+                    }
+                }
+            }
         });
 
+        state.shaders = shadersTmp;
+
         final var poseStack = new PoseStack();
-        try (var mesh = MachineMeshHelper.buildMesh(poseStack, positions, e.getFrustum())) {
-            if (mesh != null) {
-                state.MeshState = mesh.drawState();
-                state.VertexBuffer = VerticesHelper.uploadVertices(state.VertexBuffer, mesh, () -> CompactMachinesCore.dotPrefix("machine_vertices"));
-                state.IndexBuffer = VerticesHelper.uploadIndices(state.IndexBuffer, mesh, () -> CompactMachinesCore.dotPrefix("machine_vertices"));
+        for (var kvp : state.shaders.entrySet()) {
+            try (var mesh = MachineMeshHelper.buildMesh(poseStack, kvp.getValue(), e.getFrustum())) {
+                if (mesh != null) {
+                    final var mesh2 = new PrideRenderState.Mesh();
+                    mesh2.MeshState = mesh.drawState();
+                    mesh2.VertexBuffer = VerticesHelper.uploadVertices(mesh2.VertexBuffer, mesh, () -> CompactMachinesCore.dotPrefix("machine_vertices"));
+                    mesh2.IndexBuffer = VerticesHelper.uploadIndices(mesh2.IndexBuffer, mesh, () -> CompactMachinesCore.dotPrefix("machine_vertices"));
+                    state.meshes.put(kvp.getKey(), mesh2);
+                }
             }
         }
 
@@ -104,48 +151,60 @@ public class MachineShaderRenderer {
 
     public static void afterTranslucent(RenderLevelStageEvent.AfterTranslucentBlocks e) {
 
-        var state = e.getLevelRenderState().getRenderDataOrThrow(KEY);
+        var state = e.getLevelRenderState().getRenderData(KEY);
 
-        if (state.MeshState == null) return;
+        if (state == null || state.meshes.isEmpty())
+            return;
 
         var transforms = RenderSystem.getDynamicUniforms().writeTransform(RenderSystem.getModelViewMatrix(), colorModulator, worldOffset, textureTransform);
 
         var renderTarget = Minecraft.getInstance().getMainRenderTarget();
-        if(e.getLevelRenderer().getTranslucentTarget() != null)
-            renderTarget =  e.getLevelRenderer().getTranslucentTarget();
+        if (e.getLevelRenderer().getTranslucentTarget() != null)
+            renderTarget = e.getLevelRenderer().getTranslucentTarget();
 
-        AtomicReference<RenderPipeline> shader = new AtomicReference<>(MachineShaders.TYE_DYE_PIPELINE);
-        final var prideShader = state.clientLevel.registryAccess()
-                .lookupOrThrow(FlagShader.REGISTRY_KEY)
-                .getRandom(state.clientLevel.getRandom());
+        AtomicReference<RenderPipeline> shader = new AtomicReference<>(FlagShaders.PRIDE_STRIPES_PIPELINE);
 
-        // Whether the pride pipeline is active this frame — gates the palette
-        // UBO upload + bind below. Avoids touching the buffer for the tye-dye
-        // path, which doesn't declare FlagPalette.
-        final boolean[] usePride = { false };
-        prideShader.ifPresent(ref -> {
-            shader.set(MachineFlagRenderTypes.PRIDE_STRIPES_PIPELINE);
-            usePride[0] = true;
-            uploadPaletteUbo(ref.value());
-        });
+        for (var shaderId : state.shaders.keySet()) {
+            var mesh = state.meshes.get(shaderId);
+            if (mesh == null)
+                continue;
 
-        try (var pass = RenderSystem.getDevice().createCommandEncoder().createRenderPass(
-                () -> CompactMachinesCore.dotPrefix("machines"),
-                renderTarget.getColorTextureView(),
-                OptionalInt.empty(),
-                renderTarget.getDepthTextureView(),
-                OptionalDouble.empty())
-        ) {
-            pass.setPipeline(shader.get());
-            RenderSystem.bindDefaultUniforms(pass);
-            pass.setVertexBuffer(0, state.VertexBuffer);
-            pass.setIndexBuffer(state.IndexBuffer, state.MeshState.indexType());
+            if(mesh.MeshState == null || mesh.VertexBuffer == null || mesh.IndexBuffer == null)
+                continue;
+
+            final var registry = state.clientLevel.registryAccess()
+                    .lookupOrThrow(FlagShader.REGISTRY_KEY);
+
+            final var prideShader = registry.getOptional(shaderId);
+
+            // Whether the pride pipeline is active this frame — gates the palette
+            // UBO upload + bind below. Avoids touching the buffer for the tye-dye
+            // path, which doesn't declare FlagPalette.
+            final boolean[] usePride = {false};
+            prideShader.ifPresent(ref -> {
+                shader.set(FlagShaders.PRIDE_STRIPES_PIPELINE);
+                usePride[0] = true;
+                uploadPaletteUbo(ref);
+            });
+
+            try (var pass = RenderSystem.getDevice().createCommandEncoder().createRenderPass(
+                    () -> CompactMachinesCore.dotPrefix("machines"),
+                    renderTarget.getColorTextureView(),
+                    OptionalInt.empty(),
+                    renderTarget.getDepthTextureView(),
+                    OptionalDouble.empty())
+            ) {
+                pass.setPipeline(shader.get());
+                RenderSystem.bindDefaultUniforms(pass);
+                pass.setVertexBuffer(0, mesh.VertexBuffer);
+                pass.setIndexBuffer(mesh.IndexBuffer, mesh.MeshState.indexType());
 //            pass.bindTexture("Sampler0", texture.getTextureView(), texture.getSampler());
-            pass.setUniform("DynamicTransforms", transforms);
-            if (usePride[0] && paletteBuffer != null) {
-                pass.setUniform("FlagPalette", paletteBuffer);
+                pass.setUniform("DynamicTransforms", transforms);
+                if (usePride[0] && paletteBuffer != null) {
+                    pass.setUniform("FlagPalette", paletteBuffer);
+                }
+                pass.drawIndexed(0, 0, mesh.MeshState.indexCount(), 1);
             }
-            pass.drawIndexed(0, 0, state.MeshState.indexCount(), 1);
         }
     }
 
@@ -178,7 +237,8 @@ public class MachineShaderRenderer {
             // shader, which clamps to paletteMeta.x).
             for (int i = 0; i < FlagShader.MAX_STRIPES; i++) {
                 if (i < shader.size()) {
-                    b.putVec4(shader.r(i), shader.g(i), shader.b(i), 0f);
+                    final var color = shader.colors().get(i);
+                    b.putVec4(ARGB.redFloat(color), ARGB.greenFloat(color), ARGB.blueFloat(color), 0f);
                 } else {
                     b.putVec4(0f, 0f, 0f, 0f);
                 }
@@ -194,20 +254,26 @@ public class MachineShaderRenderer {
         public static final PrideRenderState INSTANCE = new PrideRenderState();
 
         public ClientLevel clientLevel;
-        public MeshData.@Nullable DrawState MeshState;
-        public @Nullable GpuBuffer VertexBuffer;
-        public @Nullable GpuBuffer IndexBuffer;
 
-        public void reset() {
-            MeshState = null;
-            if (VertexBuffer != null) {
-                VertexBuffer.close();
-                VertexBuffer = null;
-            }
+        public Map<Identifier, LongList> shaders;
+        public Map<Identifier, Mesh> meshes;
 
-            if (IndexBuffer != null) {
-                IndexBuffer.close();
-                IndexBuffer = null;
+        static class Mesh {
+            public MeshData.@Nullable DrawState MeshState;
+            public @Nullable GpuBuffer VertexBuffer;
+            public @Nullable GpuBuffer IndexBuffer;
+
+            public void reset() {
+                MeshState = null;
+                if (VertexBuffer != null) {
+                    VertexBuffer.close();
+                    VertexBuffer = null;
+                }
+
+                if (IndexBuffer != null) {
+                    IndexBuffer.close();
+                    IndexBuffer = null;
+                }
             }
         }
     }
