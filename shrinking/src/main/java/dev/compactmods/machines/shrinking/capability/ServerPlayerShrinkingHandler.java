@@ -56,7 +56,7 @@ public class ServerPlayerShrinkingHandler implements PlayerShrinkingHandler {
         final var result = historyManager.push(player.getUUID(), entry);
 
         if (result == RoomEntryResult.FAILED_TOO_FAR_DOWN) {
-            player.sendOverlayMessage(Component.translatableWithFallback("compactmachines.errors.too_far_down", "An otherworldly force prevents you from shrinking more.")
+            player.sendOverlayMessage(Component.translatableWithFallback("CompactMachinesCore.errors.too_far_down", "An otherworldly force prevents you from shrinking more.")
                     .withStyle(ChatFormatting.DARK_RED)
                     .withStyle(ChatFormatting.ITALIC));
 

@@ -1,7 +1,6 @@
 package dev.compactmods.machines;
 
 import com.google.common.base.Predicates;
-import dev.compactmods.machines.api.CompactMachines;
 import dev.compactmods.machines.core.CompactMachinesCore;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.GlobalPos;
@@ -11,7 +10,6 @@ import net.neoforged.neoforge.attachment.AttachmentType;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import net.neoforged.neoforge.registries.NeoForgeRegistries;
 
-import java.util.Optional;
 import java.util.function.Supplier;
 
 public interface CMDataAttachments {
@@ -27,8 +25,10 @@ public interface CMDataAttachments {
      * Selects which renderer drives a Compact Machine's glass faces.
      */
     Supplier<AttachmentType<Identifier>> MACHINE_SHADER = ATTACHMENT_TYPES.register("machine_shader",
-            () -> AttachmentType.builder(() -> CompactMachines.identifier("none"))
-                    .serialize(Identifier.CODEC.fieldOf("shader_id"), id -> !(id.getNamespace().equals(CompactMachines.MOD_ID) && id.getPath().equals("none")))
+            () -> AttachmentType.builder(() -> {
+                        return CompactMachinesCore.identifier("none");
+                    })
+                    .serialize(Identifier.CODEC.fieldOf("shader_id"), id -> !(id.getNamespace().equals(CompactMachinesCore.MOD_ID) && id.getPath().equals("none")))
                     .build());
 
     static void prepare() {

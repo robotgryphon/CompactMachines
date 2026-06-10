@@ -61,8 +61,7 @@ repositories {
 
 dependencies {
     compileOnly(coreApi)
-    implementation(mainProject)
-    compileOnly(project(":compactmachines-api"))  // dev.compactmods.machines.api.CompactMachines
+    implementation(mainProject) // dev.compactmods.machines.api.CompactMachines
     compileOnly(project(":dimension-api"))         // dev.compactmods.machines.api.dimension.CompactDimension
     compileOnly(project(":room-system"))           // dev.compactmods.machines.api.room.template.RoomTemplate (api source set)
     compileOnly(project(":shrinking"))

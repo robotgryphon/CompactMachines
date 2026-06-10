@@ -1,6 +1,6 @@
 package dev.compactmods.machines.datagen.base;
 
-import dev.compactmods.machines.api.CompactMachines;
+
 import dev.compactmods.machines.core.CompactMachinesCore;
 import dev.compactmods.machines.datagen.base.lang.EnglishLangGenerator;
 import dev.compactmods.machines.datagen.base.loot.BlockLootGenerator;
@@ -33,7 +33,7 @@ public class BaseDatapack {
         // Server
         event.createProvider(ModelAndStateGenerator::new);
 
-        event.createDatapackRegistryObjects(DatapackRegisteredStuff.BUILDER, Set.of(CompactMachines.MOD_ID));
+        event.createDatapackRegistryObjects(DatapackRegisteredStuff.BUILDER, Set.of(CompactMachinesCore.MOD_ID));
 
         event.createProvider(PointOfInterestTagGenerator::new);
 

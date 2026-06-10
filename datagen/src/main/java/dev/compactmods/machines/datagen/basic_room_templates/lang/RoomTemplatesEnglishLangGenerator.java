@@ -16,11 +16,11 @@ public class RoomTemplatesEnglishLangGenerator extends BaseLangGenerator {
 
     private void blocksAndItems() {
         final var machineTranslation = getMachineTranslation();
-        add("machine.compactmachines.tiny", "%s (%s)".formatted(machineTranslation, "Tiny"));
-        add("machine.compactmachines.small", "%s (%s)".formatted(machineTranslation, "Small"));
-        add("machine.compactmachines.normal", "%s (%s)".formatted(machineTranslation, "Normal"));
-        add("machine.compactmachines.large", "%s (%s)".formatted(machineTranslation, "Large"));
-        add("machine.compactmachines.giant", "%s (%s)".formatted(machineTranslation, "Giant"));
-        add("machine.compactmachines.colossal", "%s (%s)".formatted(machineTranslation, "Colossal"));
+        add("machine.CompactMachinesCore.tiny", "%s (%s)".formatted(machineTranslation, "Tiny"));
+        add("machine.CompactMachinesCore.small", "%s (%s)".formatted(machineTranslation, "Small"));
+        add("machine.CompactMachinesCore.normal", "%s (%s)".formatted(machineTranslation, "Normal"));
+        add("machine.CompactMachinesCore.large", "%s (%s)".formatted(machineTranslation, "Large"));
+        add("machine.CompactMachinesCore.giant", "%s (%s)".formatted(machineTranslation, "Giant"));
+        add("machine.CompactMachinesCore.colossal", "%s (%s)".formatted(machineTranslation, "Colossal"));
     }
 }

@@ -1,7 +1,8 @@
 package dev.compactmods.machines.datagen.basic_room_templates;
 
-import dev.compactmods.machines.api.CompactMachines;
+
 import dev.compactmods.machines.api.room.template.RoomTemplate;
+import dev.compactmods.machines.core.CompactMachinesCore;
 import dev.compactmods.machines.datagen.base.RecipeGenerator;
 import dev.compactmods.machines.machine.Machines;
 import dev.compactmods.machines.room.Rooms;
@@ -30,15 +31,15 @@ public class BasicRoomTemplateRecipeGenerator extends RecipeGenerator {
 
     @Override
     protected void buildRecipes() {
-        addMachineRecipe(CompactMachines.identifier("tiny"), Tags.Items.INGOTS_COPPER);
-        addMachineRecipe(CompactMachines.identifier("small"), Tags.Items.INGOTS_IRON);
-        addMachineRecipe(CompactMachines.identifier("normal"), Tags.Items.INGOTS_GOLD);
-        addMachineRecipe(CompactMachines.identifier("large"), Tags.Items.GEMS_DIAMOND);
-        addMachineRecipe(CompactMachines.identifier("giant"), Tags.Items.OBSIDIANS);
-        addMachineRecipe(CompactMachines.identifier("colossal"), Tags.Items.INGOTS_NETHERITE);
+        addMachineRecipe(CompactMachinesCore.identifier("tiny"), Tags.Items.INGOTS_COPPER);
+        addMachineRecipe(CompactMachinesCore.identifier("small"), Tags.Items.INGOTS_IRON);
+        addMachineRecipe(CompactMachinesCore.identifier("normal"), Tags.Items.INGOTS_GOLD);
+        addMachineRecipe(CompactMachinesCore.identifier("large"), Tags.Items.GEMS_DIAMOND);
+        addMachineRecipe(CompactMachinesCore.identifier("giant"), Tags.Items.OBSIDIANS);
+        addMachineRecipe(CompactMachinesCore.identifier("colossal"), Tags.Items.INGOTS_NETHERITE);
 
-        addMachineRecipe(CompactMachines.identifier("soaryn"), Tags.Items.NETHER_STARS);
-        addMachineRecipe(CompactMachines.identifier("farming"), Items.DIAMOND_HOE);
+        addMachineRecipe(CompactMachinesCore.identifier("soaryn"), Tags.Items.NETHER_STARS);
+        addMachineRecipe(CompactMachinesCore.identifier("farming"), Items.DIAMOND_HOE);
     }
 
     private void addMachineRecipe(Identifier id, TagKey<Item> catalyst) {

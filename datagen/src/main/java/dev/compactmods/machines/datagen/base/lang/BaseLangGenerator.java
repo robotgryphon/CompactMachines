@@ -1,6 +1,7 @@
 package dev.compactmods.machines.datagen.base.lang;
 
-import dev.compactmods.machines.api.CompactMachines;
+
+import dev.compactmods.machines.core.CompactMachinesCore;
 import net.minecraft.util.Util;
 import net.minecraft.core.Holder;
 import net.minecraft.data.PackOutput;
@@ -11,7 +12,7 @@ import net.neoforged.neoforge.common.data.LanguageProvider;
 public abstract class BaseLangGenerator extends LanguageProvider {
 
     public BaseLangGenerator(PackOutput packOutput, String locale) {
-        super(packOutput, CompactMachines.MOD_ID, locale);
+        super(packOutput, CompactMachinesCore.MOD_ID, locale);
     }
 
     protected String getMachineTranslation() {

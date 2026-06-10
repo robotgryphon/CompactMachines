@@ -1,9 +1,10 @@
 package dev.compactmods.machines.datagen.base.lang;
 
-import dev.compactmods.machines.api.CompactMachines;
+
 import dev.compactmods.machines.api.dimension.CompactDimension;
 import dev.compactmods.machines.api.room.template.RoomTemplate;
 import dev.compactmods.machines.client.room.RoomKeyMappings;
+import dev.compactmods.machines.core.CompactMachinesCore;
 import dev.compactmods.machines.gamerule.CMGameRules;
 import dev.compactmods.machines.core.Translations;
 import dev.compactmods.machines.Advancements;
@@ -16,6 +17,7 @@ import dev.compactmods.machines.room.RoomTranslations;
 import dev.compactmods.machines.room.Rooms;
 import dev.compactmods.machines.shrinking.Shrinking;
 import dev.compactmods.machines.villager.Villagers;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.Util;
 import net.minecraft.data.PackOutput;
 
@@ -56,8 +58,8 @@ public class EnglishLangGenerator extends dev.compactmods.machines.datagen.base.
         commands();
         advancements();
 
-        add(CompactMachines.MOD_ID + ".direction.side", "Side: %s");
-        add(CompactMachines.MOD_ID + ".connected_block", "Connected: %s");
+        add(CompactMachinesCore.MOD_ID + ".direction.side", "Side: %s");
+        add(CompactMachinesCore.MOD_ID + ".connected_block", "Connected: %s");
 
         add(Translations.IDs.HINT_HOLD_SHIFT, "Hold shift for details.");
 
@@ -66,8 +68,8 @@ public class EnglishLangGenerator extends dev.compactmods.machines.datagen.base.
         addBiome(CompactDimension.COMPACT_BIOME_KEY, "Compact Machine");
         addDimension(CompactDimension.LEVEL_KEY, "Compact Machine");
 
-        add("jei.compactmachines.machines", "Machines are used to make pocket dimensions. Craft a machine and place it in world, then use a Personal Shrinking Device to go inside.");
-        add("jei.compactmachines.shrinking_device", "Use the Personal Shrinking Device (PSD) on a machine in order to enter a compact space.");
+        add("jei.CompactMachinesCore.machines", "Machines are used to make pocket dimensions. Craft a machine and place it in world, then use a Personal Shrinking Device to go inside.");
+        add("jei.CompactMachinesCore.shrinking_device", "Use the Personal Shrinking Device (PSD) on a machine in order to enter a compact space.");
         // add("death.attack." + VoidAirBlock.DAMAGE_SOURCE.msgId, "%1$s failed to enter the void");
 
         add("curios.identifier.psd", "Personal Shrinking Device");
@@ -97,7 +99,7 @@ public class EnglishLangGenerator extends dev.compactmods.machines.datagen.base.
         addItem(Shrinking.PERSONAL_SHRINKING_DEVICE, "Personal Shrinking Device");
         addItem(Shrinking.SHRINKING_MODULE, "Atom Shrinking Module");
         addItem(Shrinking.ENLARGING_MODULE, "Atom Enlarging Module");
-        add(Util.makeDescriptionId("block", CompactMachines.identifier("bound_machine_fallback")), machineTranslation);
+        add(Util.makeDescriptionId("block", CompactMachinesCore.identifier("bound_machine_fallback")), machineTranslation);
     }
 
     protected void advancements() {
@@ -116,7 +118,7 @@ public class EnglishLangGenerator extends dev.compactmods.machines.datagen.base.
     }
 
     private void addJade() {
-        add("config.jade.plugin_compactmachines.bound_machine", "Bound Compact Machines");
-        add("config.jade.plugin_compactmachines.show_owner", "Show Machine Owners");
+        add("config.jade.plugin_CompactMachinesCore.bound_machine", "Bound Compact Machines");
+        add("config.jade.plugin_CompactMachinesCore.show_owner", "Show Machine Owners");
     }
 }

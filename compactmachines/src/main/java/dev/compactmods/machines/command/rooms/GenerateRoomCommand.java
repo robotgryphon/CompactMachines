@@ -3,7 +3,6 @@ package dev.compactmods.machines.command.rooms;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import dev.compactmods.machines.api.CompactMachines;
 import dev.compactmods.machines.api.room.capability.RoomCapabilities;
 import dev.compactmods.machines.api.room.generation.RoomGenerationException;
 import dev.compactmods.machines.core.CompactMachinesCore;
@@ -19,7 +18,11 @@ import net.minecraft.util.Util;
 
 public class GenerateRoomCommand {
 
-    private static final String CREATED_I18N_KEY = Util.makeDescriptionId("generation", CompactMachines.identifier("created_new_room_via_command"));
+    private static final String CREATED_I18N_KEY;
+
+    static {
+        CREATED_I18N_KEY = Util.makeDescriptionId("generation", CompactMachinesCore.identifier("created_new_room_via_command"));
+    }
 
     public static LiteralArgumentBuilder<CommandSourceStack> make() {
         // /cm rooms
@@ -47,7 +50,7 @@ public class GenerateRoomCommand {
             final var generator = server.getCapability(RoomCapabilities.GENERATOR);
 
             if (generator == null) {
-                src.sendFailure(Component.translatableWithFallback(Util.makeDescriptionId("error", CompactMachines.identifier("capability_not_found")), "Room Generator not registered. Report this as a bug!"));
+                src.sendFailure(Component.translatableWithFallback(Util.makeDescriptionId("error", CompactMachinesCore.identifier("capability_not_found")), "Room Generator not registered. Report this as a bug!"));
                 return -1;
             }
 

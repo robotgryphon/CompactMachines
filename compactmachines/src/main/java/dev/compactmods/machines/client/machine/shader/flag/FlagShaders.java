@@ -8,7 +8,6 @@ import com.mojang.blaze3d.platform.CompareOp;
 import com.mojang.blaze3d.shaders.UniformType;
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.VertexFormat;
-import dev.compactmods.machines.api.CompactMachines;
 import dev.compactmods.machines.core.CompactMachinesCore;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.RenderPipelines;
@@ -23,21 +22,25 @@ public final class FlagShaders {
     public static final OutputTarget TRANSLUCENT_TARGET = new OutputTarget("trans_target",
             () -> Minecraft.getInstance().levelRenderer.getTranslucentTarget());
 
-    public static final RenderPipeline PRIDE_STRIPES_PIPELINE = RenderPipeline.builder(RenderPipelines.MATRICES_PROJECTION_SNIPPET, RenderPipelines.BLOCK_SNIPPET)
-            .withLocation(CompactMachines.identifier("pride_stripes"))
-            .withVertexShader(CompactMachines.identifier("pride_stripes"))
-            .withFragmentShader(CompactMachines.identifier("pride_stripes"))
-            .withVertexFormat(DefaultVertexFormat.POSITION_COLOR_NORMAL, VertexFormat.Mode.QUADS)
-            .withUniform("DynamicTransforms", UniformType.UNIFORM_BUFFER)
-            .withUniform("Projection", UniformType.UNIFORM_BUFFER)
-            // Palette UBO — populated each frame by MachineShaderRenderer from
-            // the resolved FlagShader registry entry. See pride_stripes.fsh for
-            // the std140 layout of the block.
-            .withUniform("FlagPalette", UniformType.UNIFORM_BUFFER)
-            .withCull(true)
-            .withDepthStencilState(new DepthStencilState(CompareOp.LESS_THAN_OR_EQUAL, true))
-            .withColorTargetState(new ColorTargetState(BlendFunction.TRANSLUCENT))
-            .build();
+    public static final RenderPipeline PRIDE_STRIPES_PIPELINE;
+
+    static {
+        PRIDE_STRIPES_PIPELINE = RenderPipeline.builder(RenderPipelines.MATRICES_PROJECTION_SNIPPET, RenderPipelines.BLOCK_SNIPPET)
+                .withLocation(CompactMachinesCore.identifier("pride_stripes"))
+                .withVertexShader(CompactMachinesCore.identifier("pride_stripes"))
+                .withFragmentShader(CompactMachinesCore.identifier("pride_stripes"))
+                .withVertexFormat(DefaultVertexFormat.POSITION_COLOR_NORMAL, VertexFormat.Mode.QUADS)
+                .withUniform("DynamicTransforms", UniformType.UNIFORM_BUFFER)
+                .withUniform("Projection", UniformType.UNIFORM_BUFFER)
+                // Palette UBO — populated each frame by MachineShaderRenderer from
+                // the resolved FlagShader registry entry. See pride_stripes.fsh for
+                // the std140 layout of the block.
+                .withUniform("FlagPalette", UniformType.UNIFORM_BUFFER)
+                .withCull(true)
+                .withDepthStencilState(new DepthStencilState(CompareOp.LESS_THAN_OR_EQUAL, true))
+                .withColorTargetState(new ColorTargetState(BlendFunction.TRANSLUCENT))
+                .build();
+    }
 
     public static final RenderType PRIDE_STRIPES_RENDER_TYPE = RenderType.create(
             CompactMachinesCore.id("pride_stripes"),

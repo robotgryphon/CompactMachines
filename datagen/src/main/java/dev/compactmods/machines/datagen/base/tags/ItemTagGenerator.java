@@ -1,6 +1,7 @@
 package dev.compactmods.machines.datagen.base.tags;
 
-import dev.compactmods.machines.api.CompactMachines;
+
+import dev.compactmods.machines.core.CompactMachinesCore;
 import dev.compactmods.machines.core.machine.MachineConstants;
 import dev.compactmods.machines.CMRegistries;
 import dev.compactmods.machines.machine.Machines;
@@ -16,7 +17,7 @@ import java.util.concurrent.CompletableFuture;
 
 public class ItemTagGenerator extends ItemTagsProvider {
     public ItemTagGenerator(PackOutput packOut, CompletableFuture<HolderLookup.Provider> lookups) {
-        super(packOut, lookups, CompactMachines.MOD_ID);
+        super(packOut, lookups, CompactMachinesCore.MOD_ID);
     }
 
     @Override

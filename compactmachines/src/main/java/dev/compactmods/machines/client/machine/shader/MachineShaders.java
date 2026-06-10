@@ -8,7 +8,7 @@ import com.mojang.blaze3d.platform.CompareOp;
 import com.mojang.blaze3d.shaders.UniformType;
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.VertexFormat;
-import dev.compactmods.machines.api.CompactMachines;
+import dev.compactmods.machines.core.CompactMachinesCore;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.client.renderer.rendertype.OutputTarget;
 import net.minecraft.client.renderer.rendertype.RenderSetup;
@@ -27,9 +27,9 @@ public interface MachineShaders {
 
     /** Tye-dye lava-lamp pipeline. */
     RenderPipeline TYE_DYE_PIPELINE = RenderPipeline.builder(SEMITRANSPARENT_SNIPPET)
-            .withLocation(CompactMachines.identifier("pipeline/tye_dye"))
-            .withVertexShader(CompactMachines.identifier("tye_dye"))
-            .withFragmentShader(CompactMachines.identifier("tye_dye"))
+            .withLocation(CompactMachinesCore.identifier("pipeline/tye_dye"))
+            .withVertexShader(CompactMachinesCore.identifier("tye_dye"))
+            .withFragmentShader(CompactMachinesCore.identifier("tye_dye"))
             .build();
 
     /**

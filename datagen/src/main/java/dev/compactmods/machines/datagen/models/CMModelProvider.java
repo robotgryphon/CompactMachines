@@ -1,6 +1,7 @@
 package dev.compactmods.machines.datagen.models;
 
-import dev.compactmods.machines.api.CompactMachines;
+
+import dev.compactmods.machines.core.CompactMachinesCore;
 import net.minecraft.client.data.models.BlockModelGenerators;
 import net.minecraft.client.data.models.ItemModelGenerators;
 import net.minecraft.client.data.models.ModelProvider;
@@ -8,7 +9,7 @@ import net.minecraft.data.PackOutput;
 
 public abstract class CMModelProvider extends ModelProvider {
     public CMModelProvider(PackOutput packOutput) {
-        super(packOutput, CompactMachines.MOD_ID);
+        super(packOutput, CompactMachinesCore.MOD_ID);
     }
 
     @Override

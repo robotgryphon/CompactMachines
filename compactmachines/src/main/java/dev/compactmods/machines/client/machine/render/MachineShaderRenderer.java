@@ -8,7 +8,6 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.MeshData;
 import com.mojang.blaze3d.vertex.PoseStack;
 import dev.compactmods.machines.CMDataComponents;
-import dev.compactmods.machines.api.CompactMachines;
 import dev.compactmods.machines.client.config.ClientConfig;
 import dev.compactmods.machines.client.machine.shader.flag.FlagShader;
 import dev.compactmods.machines.client.machine.shader.flag.FlagShaders;
@@ -48,14 +47,22 @@ public class MachineShaderRenderer {
     private static final float A = 1f / 16f;
     private static final float B = 15f / 16f;
 
-    private static final ContextKey<PrideRenderState> KEY = new ContextKey<>(CompactMachines.identifier("pride_renderer"));
+    private static final ContextKey<PrideRenderState> KEY;
+
+    static {
+        KEY = new ContextKey<>(CompactMachinesCore.identifier("pride_renderer"));
+    }
 
     // named constants for clarity
     private static final Vector4f colorModulator = new Vector4f(1, 1, 1, 1);
     private static final Vector3f worldOffset = new Vector3f(0, 0, 0);
     private static final Matrix4f textureTransform = new Matrix4f();
 
-    private static final Identifier DEFAULT_FLAG = CompactMachines.identifier("pride/baker");
+    private static final Identifier DEFAULT_FLAG;
+
+    static {
+        DEFAULT_FLAG = CompactMachinesCore.identifier("pride/baker");
+    }
 
     /**
      * Size of the {@code FlagPalette} UBO in bytes — std140 layout of:

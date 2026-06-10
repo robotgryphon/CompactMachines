@@ -1,6 +1,6 @@
 package dev.compactmods.machines.datagen.basic_room_templates;
 
-import dev.compactmods.machines.api.CompactMachines;
+
 import dev.compactmods.machines.core.CompactMachinesCore;
 import dev.compactmods.machines.datagen.basic_room_templates.lang.RoomTemplatesEnglishLangGenerator;
 import net.minecraft.data.DataGenerator;
@@ -14,7 +14,7 @@ public class BasicRoomTemplatesDatapack {
         final var generator = event.getGenerator();
         final var lookupProvider = event.getLookupProvider();
 
-        DataGenerator.PackGenerator basicTemplates = generator.getBuiltinDatapack(true, CompactMachines.MOD_ID, "basic_templates");
+        DataGenerator.PackGenerator basicTemplates = generator.getBuiltinDatapack(true, CompactMachinesCore.MOD_ID, "basic_templates");
         basicTemplates.addProvider(output -> PackMetadataGenerator.forFeaturePack(
                 output,
                 Component.literal("Enables the basic room templates, built in to the mod.")

@@ -1,6 +1,5 @@
 package dev.compactmods.machines;
 
-import dev.compactmods.machines.api.CompactMachines;
 import dev.compactmods.machines.api.room.template.RoomTemplate;
 import dev.compactmods.machines.client.machine.shader.flag.FlagShader;
 import dev.compactmods.machines.core.CompactMachinesCore;
@@ -43,7 +42,7 @@ public interface CMRegistries {
 
 	DeferredRegister<MenuType<?>> MENUS = DeferredRegister.create(BuiltInRegistries.MENU, CompactMachinesCore.MOD_ID);
 
-	DeferredRegister<FlagShader> FLAG_SHADERS = DeferredRegister.create(FlagShader.REGISTRY_KEY, CompactMachines.MOD_ID);
+	DeferredRegister<FlagShader> FLAG_SHADERS = DeferredRegister.create(FlagShader.REGISTRY_KEY, CompactMachinesCore.MOD_ID);
 
     static void setup(IEventBus modBus) {
 		Stream.of(BLOCKS, ITEMS, BLOCK_ENTITIES, CONTAINERS, COMMAND_ARGUMENT_TYPES, GAME_RULES,

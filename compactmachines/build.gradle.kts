@@ -232,14 +232,12 @@ dependencies {
         jarJar(libs.jnanoid)
 
         implementation(project(":core"))
-        implementation(project(":compactmachines-api"))
         implementation(project(":dimension-api"))
         implementation(project(":room-system"))
         implementation(project(":room-upgrades"))
         implementation(project(":shrinking"))
 
         jarJar(project(":core"))
-        jarJar(project(":compactmachines-api"))
         jarJar(project(":dimension-api"))
         jarJar(project(":room-system"))
         jarJar(project(":room-upgrades"))

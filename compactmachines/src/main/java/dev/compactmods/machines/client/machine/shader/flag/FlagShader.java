@@ -2,12 +2,11 @@ package dev.compactmods.machines.client.machine.shader.flag;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import dev.compactmods.machines.api.CompactMachines;
 import dev.compactmods.machines.client.machine.shader.MachineShader;
 import dev.compactmods.machines.client.machine.shader.MachineShaderType;
+import dev.compactmods.machines.core.CompactMachinesCore;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.util.ColorRGBA;
 import net.minecraft.util.ExtraCodecs;
 
 import java.util.List;
@@ -26,7 +25,11 @@ public record FlagShader(List<Integer> colors) implements MachineShader {
 
     public static final int MAX_STRIPES = 10;
 
-    public static final ResourceKey<Registry<FlagShader>> REGISTRY_KEY = ResourceKey.createRegistryKey(CompactMachines.identifier("flag_shaders"));
+    public static final ResourceKey<Registry<FlagShader>> REGISTRY_KEY;
+
+    static {
+        REGISTRY_KEY = ResourceKey.createRegistryKey(CompactMachinesCore.identifier("flag_shaders"));
+    }
 
     public int size() {
         return Math.min(colors.size(), MAX_STRIPES);

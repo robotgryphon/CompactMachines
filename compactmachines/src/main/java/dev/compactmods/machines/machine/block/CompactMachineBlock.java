@@ -1,8 +1,6 @@
 package dev.compactmods.machines.machine.block;
 
 import dev.compactmods.machines.CMDataAttachments;
-import dev.compactmods.machines.CMDataComponents;
-import dev.compactmods.machines.api.CompactMachines;
 import dev.compactmods.machines.api.room.RoomInstance;
 import dev.compactmods.machines.api.room.capability.RoomCapabilities;
 import dev.compactmods.machines.api.room.generation.RoomGenerationException;
@@ -15,7 +13,6 @@ import dev.compactmods.machines.machine.Machines;
 import dev.compactmods.machines.machine.ui.MachineUIMenu;
 import dev.compactmods.machines.network.machine.MachineColorSyncPacket;
 import dev.compactmods.machines.room.Rooms;
-import dev.compactmods.machines.server.CompactMachinesServer;
 import dev.compactmods.machines.shrinking.PersonalShrinkingDevice;
 import dev.compactmods.machines.shrinking.Shrinking;
 import dev.compactmods.machines.shrinking.api.ShrinkingDeviceConfiguration;

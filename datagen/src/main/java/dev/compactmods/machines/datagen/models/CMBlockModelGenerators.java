@@ -1,6 +1,7 @@
 package dev.compactmods.machines.datagen.models;
 
-import dev.compactmods.machines.api.CompactMachines;
+
+import dev.compactmods.machines.core.CompactMachinesCore;
 import net.minecraft.client.data.models.BlockModelGenerators;
 import net.minecraft.client.data.models.ItemModelOutput;
 import net.minecraft.client.data.models.blockstates.BlockModelDefinitionGenerator;
@@ -35,9 +36,9 @@ public class CMBlockModelGenerators extends BlockModelGenerators {
 
     public Identifier createCompactMachine(Holder<Block> block) {
         final var textures = new TextureMapping()
-                .put(TextureSlot.PARTICLE, new Material(CompactMachines.identifier("block/machine/tiny")))
-                .put(CMModelTemplates.FRAME_SLOT, new Material(CompactMachines.identifier("block/machine/frame")))
-                .put(CMModelTemplates.TINT_SLOT, new Material(CompactMachines.identifier("block/machine/tint")));
+                .put(TextureSlot.PARTICLE, new Material(CompactMachinesCore.identifier("block/machine/tiny")))
+                .put(CMModelTemplates.FRAME_SLOT, new Material(CompactMachinesCore.identifier("block/machine/frame")))
+                .put(CMModelTemplates.TINT_SLOT, new Material(CompactMachinesCore.identifier("block/machine/tint")));
 
         return createSimpleWithTextures(block, CMModelTemplates.MACHINE_TEMPLATE, textures);
     }

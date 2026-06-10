@@ -35,7 +35,6 @@ plugins {
 
 include(":core")
 include(":compactmachines")
-include(":compactmachines-api")
 include(":datagen")
 include(":shrinking")
 include(":dimension-api")

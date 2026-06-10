@@ -3,7 +3,6 @@ package dev.compactmods.machines.command.rooms;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import dev.compactmods.machines.api.CompactMachines;
 import dev.compactmods.machines.api.room.capability.RoomCapabilities;
 import dev.compactmods.machines.api.dimension.CompactDimension;
 import dev.compactmods.machines.core.machine.MachineConstants;
@@ -20,7 +19,6 @@ import net.minecraft.network.chat.ClickEvent;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.HoverEvent;
-import net.minecraft.util.CommonColors;
 import net.minecraft.world.item.DyeColor;
 import org.jetbrains.annotations.NotNull;
 

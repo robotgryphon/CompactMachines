@@ -1,7 +1,8 @@
 package dev.compactmods.machines.datagen.base;
 
-import dev.compactmods.machines.api.CompactMachines;
+
 import dev.compactmods.machines.client.machine.MachineColors;
+import dev.compactmods.machines.core.CompactMachinesCore;
 import dev.compactmods.machines.datagen.models.CMBlockModelGenerators;
 import dev.compactmods.machines.datagen.models.CMItemModelGenerators;
 import dev.compactmods.machines.datagen.models.CMModelProvider;
@@ -16,6 +17,7 @@ import net.minecraft.client.data.models.model.TextureSlot;
 import net.minecraft.client.data.models.model.TexturedModel;
 import net.minecraft.client.resources.model.sprite.Material;
 import net.minecraft.data.PackOutput;
+import net.minecraft.resources.Identifier;
 
 public class ModelAndStateGenerator extends CMModelProvider {
 
@@ -29,11 +31,11 @@ public class ModelAndStateGenerator extends CMModelProvider {
         blockModels.createTrivialBlock(Rooms.Blocks.BREAKABLE_WALL.get(), TexturedModel.CUBE);
 
         blockModels.createAirLikeBlock(Dimension.BLOCK_MACHINE_VOID_AIR.get(),
-                new Material(CompactMachines.identifier("none")));
+                new Material(CompactMachinesCore.identifier("none")));
 
         blockModels.createCompactMachine(Machines.Blocks.MACHINE);
 
-        blockModels.registerSimpleTintedItemModel(Machines.Blocks.MACHINE.get(), CompactMachines.identifier("block/machine"),
+        blockModels.registerSimpleTintedItemModel(Machines.Blocks.MACHINE.get(), CompactMachinesCore.identifier("block/machine"),
                 new MachineColors.MachineColorComponentItemTintSource());
 
 
