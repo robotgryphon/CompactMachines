@@ -1,4 +1,4 @@
-package dev.compactmods.machines.api.room.upgrade.data;
+package dev.compactmods.machines.upgrades.api.data;
 
 import dev.compactmods.machines.core.data.Saveable;
 import net.neoforged.neoforge.attachment.IAttachmentHolder;

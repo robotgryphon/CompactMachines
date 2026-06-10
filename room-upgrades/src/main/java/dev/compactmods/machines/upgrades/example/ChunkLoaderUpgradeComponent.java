@@ -1,9 +1,9 @@
 //package dev.compactmods.machines.upgrades.example;
 //
 //import com.mojang.serialization.MapCodec;
-//import dev.compactmods.machines.api.room.upgrade.RoomUpgradeComponent;
+//import dev.compactmods.machines.upgrades.api.RoomUpgradeComponent;
 //import dev.compactmods.machines.api.room.upgrade.RoomUpgradeInstance;
-//import dev.compactmods.machines.api.room.upgrade.RoomUpgradeComponentType;
+//import dev.compactmods.machines.upgrades.api.RoomUpgradeComponentType;
 //import dev.compactmods.machines.api.room.upgrade.event.RoomUpgradeComponentEvent;
 //import dev.compactmods.machines.api.room.upgrade.event.lifecycle.UpgradeAppliedEventListener;
 //import dev.compactmods.machines.api.room.upgrade.event.lifecycle.UpgradeRemovedEventListener;

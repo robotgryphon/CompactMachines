@@ -48,7 +48,8 @@ dependencies {
     compileOnly(project(":core"))
     compileOnly(project(":room-system"))
     compileOnly(project(":dimension-api"))
-
+    compileOnly(compactmods.spatial)
+    
     "apiCompileOnly"(project(":core"))
     "apiCompileOnly"(project(":room-system"))
 }

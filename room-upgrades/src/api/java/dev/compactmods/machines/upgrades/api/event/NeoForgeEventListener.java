@@ -1,4 +1,4 @@
-package dev.compactmods.machines.api.room.upgrade.event;
+package dev.compactmods.machines.upgrades.api.event;
 
 import net.neoforged.bus.api.Event;
 

@@ -1,9 +1,9 @@
 package dev.compactmods.machines.upgrades.service;
 
-import dev.compactmods.machines.api.room.upgrade.data.IRoomUpgradeDataAttachmentAccessor;
+import dev.compactmods.machines.upgrades.api.data.IRoomUpgradeDataAttachmentAccessor;
 import dev.compactmods.machines.core.data.CMKeyedDataFileManager;
 import dev.compactmods.machines.upgrades.RoomUpgradeDataAttachments;
-import dev.compactmods.machines.upgrades.RoomUpgradeInstanceKey;
+import dev.compactmods.machines.upgrades.RoomUpgradeIdentifier;
 import net.minecraft.server.MinecraftServer;
 import net.neoforged.neoforge.attachment.IAttachmentHolder;
 
@@ -11,12 +11,12 @@ import java.util.Optional;
 import java.util.UUID;
 
 public class RoomUpgradeDataAccessor implements IRoomUpgradeDataAttachmentAccessor, AutoCloseable {
-    private final CMKeyedDataFileManager<RoomUpgradeInstanceKey, RoomUpgradeDataAttachments> DATA_ATTACHMENTS;
+    private final CMKeyedDataFileManager<RoomUpgradeIdentifier, RoomUpgradeDataAttachments> DATA_ATTACHMENTS;
 
     public RoomUpgradeDataAccessor(MinecraftServer server) {
         DATA_ATTACHMENTS = new CMKeyedDataFileManager<>(server, RoomUpgradeDataAttachments::new) {
             @Override
-            public String getFileKey(RoomUpgradeInstanceKey key) {
+            public String getFileKey(RoomUpgradeIdentifier key) {
                 return key.instanceId().toString();
             }
         };
@@ -24,12 +24,12 @@ public class RoomUpgradeDataAccessor implements IRoomUpgradeDataAttachmentAccess
 
     @Override
     public Optional<? extends IAttachmentHolder> get(String roomCode, UUID instanceId) {
-        return DATA_ATTACHMENTS.optionalData(new RoomUpgradeInstanceKey(roomCode, instanceId));
+        return DATA_ATTACHMENTS.optionalData(new RoomUpgradeIdentifier(roomCode, instanceId));
     }
 
     @Override
     public IAttachmentHolder getOrCreate(String roomCode, UUID instanceId) {
-        return DATA_ATTACHMENTS.data(new RoomUpgradeInstanceKey(roomCode, instanceId));
+        return DATA_ATTACHMENTS.data(new RoomUpgradeIdentifier(roomCode, instanceId));
     }
 
     @Override

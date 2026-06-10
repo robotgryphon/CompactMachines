@@ -1,7 +1,7 @@
-package dev.compactmods.machines.api.room.upgrade.event.level;
+package dev.compactmods.machines.upgrades.api.event.level;
 
 import dev.compactmods.machines.api.room.RoomInstance;
-import dev.compactmods.machines.api.room.upgrade.event.RoomUpgradeComponentEvent;
+import dev.compactmods.machines.upgrades.api.event.RoomUpgradeComponentEvent;
 
 @FunctionalInterface
 public interface LevelLoadedUpgradeEventListener extends RoomUpgradeComponentEvent {

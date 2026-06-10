@@ -1,21 +1,17 @@
-package dev.compactmods.machines.command;
+package dev.compactmods.machines.upgrades.command;
 
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import dev.compactmods.machines.CMDataComponents;
-import dev.compactmods.machines.api.room.upgrade.RoomUpgradeComponentType;
-import dev.compactmods.machines.api.room.upgrade.component.RoomUpgradeComponentList;
-import dev.compactmods.machines.command.argument.Suggestors;
-import dev.compactmods.machines.core.CompactMachinesCore;
+import dev.compactmods.machines.upgrades.api.RoomUpgradeComponentType;
+import dev.compactmods.machines.upgrades.api.component.RoomUpgradeComponentList;
 import dev.compactmods.machines.room.CMFeatureFlags;
 import dev.compactmods.machines.upgrades.RoomUpgrades;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.arguments.IdentifierArgument;
 import net.minecraft.network.chat.Component;
-import org.apache.logging.log4j.Logger;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,13 +27,13 @@ public class RoomUpgradesSubcommand {
         // /cm upgrades add [id]
         subRoot.then(Commands.literal("add")
                 .then(Commands.argument("upgrade", IdentifierArgument.id())
-                        .suggests(Suggestors.ROOM_UPGRADE_TYPES)
+                        .suggests(RUCommands.ROOM_UPGRADE_TYPES)
                         .executes(RoomUpgradesSubcommand::applyUpgrade)));
 
         // /cm upgrades remove [id]
         subRoot.then(Commands.literal("remove")
                 .then(Commands.argument("room", StringArgumentType.string())
-                        .suggests(Suggestors.ROOM_UPGRADE_TYPES)
+                        .suggests(RUCommands.ROOM_UPGRADE_TYPES)
                         .executes(RoomUpgradesSubcommand::removeUpgrade)));
 
         return subRoot;

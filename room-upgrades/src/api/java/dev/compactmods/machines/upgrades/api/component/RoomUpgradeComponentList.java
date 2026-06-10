@@ -1,8 +1,8 @@
-package dev.compactmods.machines.api.room.upgrade.component;
+package dev.compactmods.machines.upgrades.api.component;
 
 import com.mojang.serialization.Codec;
-import dev.compactmods.machines.api.room.upgrade.RoomUpgradeComponent;
-import dev.compactmods.machines.api.room.upgrade.RoomUpgradeCodecs;
+import dev.compactmods.machines.upgrades.api.RoomUpgradeComponent;
+import dev.compactmods.machines.upgrades.api.RoomUpgradeCodecs;
 import net.minecraft.core.component.DataComponentGetter;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;

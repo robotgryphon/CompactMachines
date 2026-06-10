@@ -11,7 +11,7 @@ import dev.compactmods.machines.shrinking.api.capability.IPlayerHistoryApi;
 import dev.compactmods.machines.api.room.registry.RoomRegistry;
 import dev.compactmods.machines.api.room.spatial.RoomChunkManager;
 import dev.compactmods.machines.api.room.spawn.IRoomSpawnManagers;
-import dev.compactmods.machines.api.room.upgrade.data.IRoomUpgradeDataAttachmentAccessor;
+import dev.compactmods.machines.upgrades.api.data.IRoomUpgradeDataAttachmentAccessor;
 import dev.compactmods.machines.room.registry.ServerRoomRegistry;
 import dev.compactmods.machines.room.spatial.MemoryGraphChunkManager;
 import dev.compactmods.machines.room.spawn.RoomSpawnManagers;

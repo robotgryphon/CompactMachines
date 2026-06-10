@@ -12,9 +12,9 @@ import java.nio.file.Path;
 
 public class RoomUpgradeDataAttachments extends AttachmentBasedDataFile<RoomUpgradeDataAttachments, RoomUpgradeDataAttachments.RoomUpgradeMetadata> {
 
-    private final RoomUpgradeInstanceKey upgradeId;
+    private final RoomUpgradeIdentifier upgradeId;
 
-    public RoomUpgradeDataAttachments(MinecraftServer server, RoomUpgradeInstanceKey upgradeId) {
+    public RoomUpgradeDataAttachments(MinecraftServer server, RoomUpgradeIdentifier upgradeId) {
         super(server, RoomUpgradeMetadata.CODEC, RoomUpgradeDataAttachments::new);
         this.upgradeId = upgradeId;
     }
@@ -41,9 +41,9 @@ public class RoomUpgradeDataAttachments extends AttachmentBasedDataFile<RoomUpgr
         return new RoomUpgradeMetadata(instance.upgradeId);
     }
 
-    public record RoomUpgradeMetadata(RoomUpgradeInstanceKey upgradeId) {
+    public record RoomUpgradeMetadata(RoomUpgradeIdentifier upgradeId) {
         public static MapCodec<RoomUpgradeMetadata> CODEC = RecordCodecBuilder.mapCodec(i -> i.group(
-                RoomUpgradeInstanceKey.CODEC.fieldOf("instance_id").forGetter(RoomUpgradeMetadata::upgradeId)
+                RoomUpgradeIdentifier.CODEC.fieldOf("instance_id").forGetter(RoomUpgradeMetadata::upgradeId)
         ).apply(i, RoomUpgradeMetadata::new));
     }
 }

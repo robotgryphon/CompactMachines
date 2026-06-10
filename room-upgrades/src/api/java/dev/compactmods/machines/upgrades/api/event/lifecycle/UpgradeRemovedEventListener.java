@@ -1,7 +1,7 @@
-package dev.compactmods.machines.api.room.upgrade.event.lifecycle;
+package dev.compactmods.machines.upgrades.api.event.lifecycle;
 
 import dev.compactmods.machines.api.room.RoomInstance;
-import dev.compactmods.machines.api.room.upgrade.event.RoomUpgradeComponentEvent;
+import dev.compactmods.machines.upgrades.api.event.RoomUpgradeComponentEvent;
 
 @FunctionalInterface
 public interface UpgradeRemovedEventListener extends RoomUpgradeComponentEvent {

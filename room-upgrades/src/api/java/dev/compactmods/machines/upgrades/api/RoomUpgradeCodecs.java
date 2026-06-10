@@ -1,4 +1,4 @@
-package dev.compactmods.machines.api.room.upgrade;
+package dev.compactmods.machines.upgrades.api;
 
 import com.mojang.serialization.Codec;
 import dev.compactmods.machines.core.CompactMachinesCore;

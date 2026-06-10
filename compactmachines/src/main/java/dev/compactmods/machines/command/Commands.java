@@ -11,22 +11,19 @@ public class Commands {
     // TODO: /cm create <size:RoomSize> <owner:Player> <giveMachine:true|false>
     // TODO: /cm spawn set <room> <pos>
 
-    static final LiteralArgumentBuilder<CommandSourceStack> CM_COMMAND_ROOT
-            = LiteralArgumentBuilder.literal(CompactMachinesCore.MOD_ID);
-
     public static void prepare() {
 
     }
 
     public static void onCommandsRegister(final RegisterCommandsEvent event) {
-        Commands.CM_COMMAND_ROOT.then(CMTeleportSubcommand.make());
-        Commands.CM_COMMAND_ROOT.then(CMEjectSubcommand.make());
-        Commands.CM_COMMAND_ROOT.then(CMRoomsSubcommand.make());
-        Commands.CM_COMMAND_ROOT.then(CMRoomCoreSubcommand.make());
-        Commands.CM_COMMAND_ROOT.then(SpawnSubcommand.make());
-        Commands.CM_COMMAND_ROOT.then(RoomUpgradesSubcommand.make());
-        Commands.CM_COMMAND_ROOT.then(EnableBasicTemplatesSubcommand.make());
+        CompactMachinesCore.CM_COMMAND_ROOT.then(CMTeleportSubcommand.make());
+        CompactMachinesCore.CM_COMMAND_ROOT.then(CMEjectSubcommand.make());
+        CompactMachinesCore.CM_COMMAND_ROOT.then(CMRoomsSubcommand.make());
+        CompactMachinesCore.CM_COMMAND_ROOT.then(CMRoomCoreSubcommand.make());
+        CompactMachinesCore.CM_COMMAND_ROOT.then(SpawnSubcommand.make());
+        CompactMachinesCore.CM_COMMAND_ROOT.then(dev.compactmods.machines.upgrades.command.RoomUpgradesSubcommand.make());
+        CompactMachinesCore.CM_COMMAND_ROOT.then(EnableBasicTemplatesSubcommand.make());
 
-        event.getDispatcher().register(Commands.CM_COMMAND_ROOT);
+        event.getDispatcher().register(CompactMachinesCore.CM_COMMAND_ROOT);
     }
 }

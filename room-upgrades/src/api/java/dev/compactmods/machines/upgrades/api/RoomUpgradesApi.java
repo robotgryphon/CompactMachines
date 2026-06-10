@@ -1,4 +1,4 @@
-package dev.compactmods.machines.api.room.upgrade;
+package dev.compactmods.machines.upgrades.api;
 
 import net.neoforged.neoforge.registries.DeferredRegister;
 

@@ -4,8 +4,6 @@ import dev.compactmods.machines.api.room.generation.RoomGenerator;
 import dev.compactmods.machines.api.room.registry.RoomRegistry;
 import dev.compactmods.machines.api.room.spatial.RoomChunkManager;
 import dev.compactmods.machines.api.room.spawn.IRoomSpawnManagers;
-import dev.compactmods.machines.api.room.upgrade.IRoomUpgradeAccessor;
-import dev.compactmods.machines.core.capability.ServerCapability;
 import net.neoforged.neoforge.attachment.IAttachmentHolder;
 
 import java.util.UUID;
