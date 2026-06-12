@@ -1,49 +1,69 @@
 package dev.compactmods.machines.client.room;
 
 import com.mojang.blaze3d.platform.InputConstants;
-import dev.compactmods.machines.core.CompactMachinesCore;
 import dev.compactmods.machines.client.config.ClientConfig;
-import dev.compactmods.machines.core.client.widget.ImageButtonBuilder;
-import dev.compactmods.machines.room.CMFeatureFlags;
+import dev.compactmods.machines.core.CompactMachinesCore;
 import dev.compactmods.machines.network.room.PlayerRequestedTeleportPacket;
 import dev.compactmods.machines.network.room.PlayerRequestedUpgradeUIPacket;
 import dev.compactmods.machines.network.room.PlayerStartedRoomTrackingPacket;
+import dev.compactmods.machines.room.CMFeatureFlags;
 import dev.compactmods.machines.shrinking.Shrinking;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
-import net.minecraft.client.gui.components.ImageButton;
+import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.Renderable;
+import net.minecraft.client.gui.components.SpriteIconButton;
 import net.minecraft.client.gui.components.WidgetSprites;
 import net.minecraft.client.gui.navigation.ScreenRectangle;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.core.GlobalPos;
+import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
-import net.minecraft.util.CommonColors;
 import net.minecraft.util.ARGB;
+import net.minecraft.util.CommonColors;
 import net.minecraft.world.phys.AABB;
 import net.neoforged.neoforge.client.network.ClientPacketDistributor;
+
+import java.util.Objects;
 
 public class MachineRoomScreen extends Screen {
 
     private final GlobalPos machinePos;
     private final String roomCode;
 
-//    private SpatialRenderer renderer;
+    // Features
+    private final boolean roomUpgradesEnabled;
+
+    //    private SpatialRenderer renderer;
     private AABB renderSize;
 
-    private ImageButton psdButton;
+    private SpriteIconButton psdButton;
     private ScreenRectangle screenArea;
 
     private boolean isLoadingRoomPreview;
     private boolean roomPreviewEnabled = true;
+
+    private final WidgetSprites psdBtnSprites = new WidgetSprites(
+            CompactMachinesCore.identifier("personal_shrinking_device"),
+            CompactMachinesCore.identifier("personal_shrinking_device_disabled"),
+            CompactMachinesCore.identifier("personal_shrinking_device_highlighted"),
+            CompactMachinesCore.identifier("personal_shrinking_device_disabled"));
+
+    private final WidgetSprites upgradeBtnSprites = new WidgetSprites(
+            CompactMachinesCore.identifier("upgrade_btn"),
+            CompactMachinesCore.identifier("upgrade_btn")
+    );
 
     public MachineRoomScreen(Component title, GlobalPos machinePos, String roomCode) {
         super(title);
         this.machinePos = machinePos;
         this.roomCode = roomCode;
 
-        if(ClientConfig.ENABLE_ROOM_PREVIEWS.get()) {
+        final var enabledFeatures = Objects.requireNonNull(minecraft.level).enabledFeatures();
+        this.roomUpgradesEnabled = CMFeatureFlags.ROOM_UPGRADES.isSubsetOf(enabledFeatures);
+
+        if (ClientConfig.ENABLE_ROOM_PREVIEWS.get()) {
             // Send packet to server for block data
             this.isLoadingRoomPreview = true;
             ClientPacketDistributor.sendToServer(new PlayerStartedRoomTrackingPacket(roomCode));
@@ -56,26 +76,33 @@ public class MachineRoomScreen extends Screen {
     protected void init() {
         super.init();
 
-        final var psdBtnSprites = new WidgetSprites(
-                CompactMachinesCore.identifier("personal_shrinking_device"),
-                CompactMachinesCore.identifier("personal_shrinking_device_disabled"),
-                CompactMachinesCore.identifier("personal_shrinking_device_highlighted"),
-                CompactMachinesCore.identifier("personal_shrinking_device_disabled"));
-
         this.screenArea = new ScreenRectangle((width / 2) - 130, (height / 2) - 120,
                 260, 260);
 
-        this.psdButton = ImageButtonBuilder.button(psdBtnSprites)
+        this.psdButton = addRenderableWidget(SpriteIconButton.builder(CommonComponents.EMPTY, this::teleportIntoRoom, true)
                 .size(12, 12)
-                .location(screenArea.right() - 12, screenArea.bottom() + 2)
-                .onPress(btn -> {
-                    ClientPacketDistributor.sendToServer(new PlayerRequestedTeleportPacket(machinePos, roomCode));
-                }).build();
+                .sprite(psdBtnSprites, 12, 12)
+                .build());;
 
-        addRenderableWidget(psdButton);
+        this.psdButton.setPosition(screenArea.right() - 12, screenArea.bottom() + 2);
 
         // EXPERIMENTAL: Room Upgrades
-        roomUpgradesButton();
+        if (roomUpgradesEnabled) {
+            var upgradeScreenBtn = addRenderableWidget(SpriteIconButton.builder(CommonComponents.EMPTY, this::openRoomUpgradesUI, true)
+                    .size(12, 12)
+                    .sprite(upgradeBtnSprites, 12, 12)
+                    .build());
+
+            upgradeScreenBtn.setPosition(screenArea.right() - 24, screenArea.bottom() + 2);
+        }
+    }
+
+    private void teleportIntoRoom(Button ignored) {
+        ClientPacketDistributor.sendToServer(new PlayerRequestedTeleportPacket(machinePos, roomCode));
+    }
+
+    private void openRoomUpgradesUI(Button ignored) {
+        ClientPacketDistributor.sendToServer(new PlayerRequestedUpgradeUIPacket(roomCode, false));
     }
 
     @Override
@@ -90,7 +117,7 @@ public class MachineRoomScreen extends Screen {
         final var keyCode = event.key();
         final float rotateSpeed = 1 / 12f;
 
-        if(roomPreviewEnabled) {
+        if (roomPreviewEnabled) {
             if (keyCode == InputConstants.KEY_R) {
 //                renderer.camera().resetLook();
 //                renderer.recalculateTranslucency();
@@ -161,25 +188,6 @@ public class MachineRoomScreen extends Screen {
 //        }
     }
 
-    private void roomUpgradesButton() {
-        if (this.minecraft == null || this.minecraft.getConnection() == null) return;
-        if (CMFeatureFlags.ROOM_UPGRADES.isSubsetOf(minecraft.getConnection().enabledFeatures())) {
-            final var upgradeBtnSprites = new WidgetSprites(
-                    CompactMachinesCore.identifier("upgrade_btn"),
-                    CompactMachinesCore.identifier("upgrade_btn")
-            );
-
-            var upgradeScreenBtn = ImageButtonBuilder.button(upgradeBtnSprites)
-                    .size(12, 12)
-                    .location(screenArea.right() - 24, screenArea.bottom() + 2)
-                    .onPress(btn -> {
-                        ClientPacketDistributor.sendToServer(new PlayerRequestedUpgradeUIPacket(roomCode, false));
-                    }).build();
-
-            addRenderableWidget(upgradeScreenBtn);
-        }
-    }
-
     @Override
     public void extractBackground(GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY, float partialTick) {
 
@@ -204,22 +212,26 @@ public class MachineRoomScreen extends Screen {
                     screenArea.top() - font.lineHeight - 2, 0xFFDEDEDE);
         }
 
+        final var previewLoadingId = CompactMachinesCore.dotPrefix("preview.loading");
+        final var previewDisabledId = CompactMachinesCore.dotPrefix("preview.disabled");
+
+        final var previewLoading = Component
+                .translatableWithFallback(previewLoadingId, "Loading room preview...");
+
+        final var previewDisabled = Component.translatableWithFallback(previewDisabledId, "Room Preview Disabled");
+
         // Render loading
-        if(roomPreviewEnabled && isLoadingRoomPreview) {
-            final var loadingMsg = Component
-                    .translatableWithFallback("CompactMachinesCore.preview.loading", "Loading room preview...");
+        var previewState = CommonComponents.EMPTY;
+        if (roomPreviewEnabled && isLoadingRoomPreview)
+            previewState = previewLoading;
 
-            graphics.centeredText(font, loadingMsg,
+        if (!roomPreviewEnabled)
+            previewState = previewDisabled;
+
+        if(!CommonComponents.EMPTY.equals(previewState))
+            graphics.centeredText(font, previewState,
                     this.width / 2,
                     (height / 2) - (font.lineHeight / 2), 0xFFDEDEDE);
-        }
-
-        if(!roomPreviewEnabled) {
-            final var loadingMsg = Component.translatableWithFallback("CompactMachinesCore.preview.disabled", "Room Preview Disabled");
-            graphics.centeredText(font, loadingMsg,
-                    this.width / 2,
-                    (height / 2) - (font.lineHeight / 2), 0xFFDEDEDE);
-        }
 
         for (Renderable renderable : this.renderables) {
             renderable.extractRenderState(graphics, mouseX, mouseY, partialTick);
