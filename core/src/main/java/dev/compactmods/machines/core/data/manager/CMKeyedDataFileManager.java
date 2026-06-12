@@ -1,5 +1,7 @@
-package dev.compactmods.machines.core.data;
+package dev.compactmods.machines.core.data.manager;
 
+import dev.compactmods.machines.core.data.CMDataFile;
+import dev.compactmods.machines.core.data.DataFileUtil;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.MinecraftServer;
 import net.neoforged.neoforge.common.IOUtilities;
@@ -16,7 +18,7 @@ import java.util.function.BiFunction;
  * @param <Key> The key used for instance lookups.
  * @param <T>
  */
-public class CMKeyedDataFileManager<Key, T extends CMDataFile & CodecHolder<T>> implements IKeyedDataFileManager<Key, T> {
+public class CMKeyedDataFileManager<Key, T extends CMDataFile<T>> implements IKeyedDataFileManager<Key, T> {
 
     protected final MinecraftServer server;
     private final BiFunction<MinecraftServer, Key, T> creator;

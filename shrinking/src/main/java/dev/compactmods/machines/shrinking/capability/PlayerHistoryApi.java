@@ -2,7 +2,7 @@ package dev.compactmods.machines.shrinking.capability;
 
 import dev.compactmods.machines.shrinking.api.capability.PlayerEntryPointHistoryManager;
 import dev.compactmods.machines.shrinking.api.capability.IPlayerHistoryApi;
-import dev.compactmods.machines.core.data.CMSingletonDataFileManager;
+import dev.compactmods.machines.core.data.manager.CMSingletonDataFileManager;
 import dev.compactmods.machines.shrinking.history.ServerPlayerEntryPointHistoryManager;
 import net.minecraft.server.MinecraftServer;import java.util.Collections;
 

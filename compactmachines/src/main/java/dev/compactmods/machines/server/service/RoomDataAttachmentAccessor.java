@@ -1,7 +1,7 @@
 package dev.compactmods.machines.server.service;
 
 import dev.compactmods.machines.api.room.data.IRoomDataAttachmentAccessor;
-import dev.compactmods.machines.core.data.CMKeyedDataFileManager;
+import dev.compactmods.machines.core.data.manager.CMKeyedDataFileManager;
 import dev.compactmods.machines.room.attachment.RoomDataAttachments;
 import net.minecraft.server.MinecraftServer;
 import net.neoforged.neoforge.attachment.IAttachmentHolder;

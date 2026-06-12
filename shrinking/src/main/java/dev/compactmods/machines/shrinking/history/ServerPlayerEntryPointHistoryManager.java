@@ -10,7 +10,6 @@ import dev.compactmods.machines.shrinking.api.capability.PlayerEntryPointHistory
 import dev.compactmods.machines.shrinking.api.history.PlayerRoomHistoryEntry;
 import dev.compactmods.machines.shrinking.api.history.RoomEntryPoint;
 import dev.compactmods.machines.shrinking.api.history.RoomEntryResult;
-import dev.compactmods.machines.core.data.CodecHolder;
 import dev.compactmods.machines.core.data.CMDataFile;
 import dev.compactmods.machines.room.data.CMRoomDataLocations;
 import dev.compactmods.machines.room.graph.node.RoomReferenceNode;
@@ -34,7 +33,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class ServerPlayerEntryPointHistoryManager implements CodecHolder<ServerPlayerEntryPointHistoryManager>, CMDataFile, PlayerEntryPointHistoryManager {
+public class ServerPlayerEntryPointHistoryManager implements CMDataFile<ServerPlayerEntryPointHistoryManager>, PlayerEntryPointHistoryManager {
 
     private static final Logger LOGS = LogManager.getLogger();
 

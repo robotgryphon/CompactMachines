@@ -1,4 +1,4 @@
-package dev.compactmods.machines.core.data;
+package dev.compactmods.machines.core.data.attachments;
 
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.MinecraftServer;

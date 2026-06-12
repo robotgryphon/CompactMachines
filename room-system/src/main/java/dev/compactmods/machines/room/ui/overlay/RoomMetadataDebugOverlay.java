@@ -1,7 +1,7 @@
 //package dev.compactmods.machines.room.ui.overlay;
 //
 //import dev.compactmods.machines.api.dimension.CompactDimension;
-//import dev.compactmods.machines.core.client.render.CMPlayerFaceRenderer;
+//import dev.compactmods.machines.room.ui.overlay.CMPlayerFaceRenderer;
 //import dev.compactmods.machines.core.util.ProfileUtil;
 //import dev.compactmods.machines.room.Rooms;
 //import net.minecraft.client.DeltaTracker;

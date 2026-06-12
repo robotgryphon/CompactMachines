@@ -3,7 +3,7 @@ package dev.compactmods.machines.room.spawn;
 import dev.compactmods.machines.api.room.registry.RoomRegistry;
 import dev.compactmods.machines.api.room.spawn.IRoomSpawnManager;
 import dev.compactmods.machines.api.room.spawn.IRoomSpawnManagers;
-import dev.compactmods.machines.core.data.CMKeyedDataFileManager;
+import dev.compactmods.machines.core.data.manager.CMKeyedDataFileManager;
 import net.minecraft.server.MinecraftServer;
 
 public class RoomSpawnManagers implements IRoomSpawnManagers {

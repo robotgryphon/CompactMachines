@@ -1,8 +1,9 @@
-package dev.compactmods.machines.core.data;
+package dev.compactmods.machines.core.data.attachments;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import dev.compactmods.machines.core.data.CMDataFile;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.ProblemReporter;
@@ -11,12 +12,19 @@ import net.minecraft.world.level.storage.TagValueOutput;
 import net.minecraft.world.level.storage.ValueInput;
 import net.neoforged.fml.util.ObfuscationReflectionHelper;
 import net.neoforged.neoforge.attachment.AttachmentHolder;
+import net.neoforged.neoforge.attachment.IAttachmentHolder;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.function.Function;
 
-public abstract class AttachmentBasedDataFile<T extends AttachmentHolder, TAdditionalData> extends AttachmentHolder implements CMDataFile, CodecHolder<T> {
+/// An implementation of [CMDataFile] that implements [IAttachmentHolder].
+///
+/// Effectively a combination of the following systems:
+/// - [net.neoforged.neoforge.attachment.LevelAttachmentsSavedData]
+/// - [IAttachmentHolder]
+/// - [CMDataFile]
+public abstract class AttachmentBasedDataFile<T extends AttachmentHolder, TAdditionalData> extends AttachmentHolder implements CMDataFile<T>, IAttachmentHolder {
 
     protected MinecraftServer server;
     protected final Codec<T> codec;
@@ -36,8 +44,6 @@ public abstract class AttachmentBasedDataFile<T extends AttachmentHolder, TAddit
     protected abstract TAdditionalData dataSupplier(T instance);
 
     public Codec<T> makeCodec(MinecraftServer server) {
-
-
         return RecordCodecBuilder.create(i -> i.group(
                 CompoundTag.CODEC.fieldOf("attachments").forGetter(inst -> {
                     var output = TagValueOutput.createWithContext(ProblemReporter.DISCARDING, server.registryAccess());

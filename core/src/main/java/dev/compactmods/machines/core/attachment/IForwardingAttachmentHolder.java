@@ -1,7 +1,5 @@
 package dev.compactmods.machines.core.attachment;
 
-import dev.compactmods.machines.core.capability.ServerCapability;
-import net.minecraft.server.MinecraftServer;
 import net.neoforged.neoforge.attachment.AttachmentType;
 import net.neoforged.neoforge.attachment.IAttachmentHolder;
 import org.jetbrains.annotations.NotNull;

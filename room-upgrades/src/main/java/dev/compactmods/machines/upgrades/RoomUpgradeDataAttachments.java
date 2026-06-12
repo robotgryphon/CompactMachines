@@ -3,8 +3,8 @@ package dev.compactmods.machines.upgrades;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import dev.compactmods.machines.core.data.AttachmentBasedDataFile;
-import dev.compactmods.machines.core.data.AttachmentDataFileFactoryInput;
+import dev.compactmods.machines.core.data.attachments.AttachmentBasedDataFile;
+import dev.compactmods.machines.core.data.attachments.AttachmentDataFileFactoryInput;
 import dev.compactmods.machines.room.data.CMRoomDataLocations;
 import net.minecraft.server.MinecraftServer;
 

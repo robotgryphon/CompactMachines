@@ -3,7 +3,7 @@ package dev.compactmods.machines.room.registry;
 import dev.compactmods.machines.api.dimension.CompactDimension;
 import dev.compactmods.machines.api.room.RoomInstance;
 import dev.compactmods.machines.api.room.registry.RoomRegistry;
-import dev.compactmods.machines.core.data.CMSingletonDataFileManager;
+import dev.compactmods.machines.core.data.manager.CMSingletonDataFileManager;
 import dev.compactmods.machines.room.Rooms;
 import dev.compactmods.machines.room.graph.node.RoomRegistrationNode;
 import it.unimi.dsi.fastutil.objects.Object2ObjectArrayMap;

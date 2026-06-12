@@ -2,7 +2,6 @@ package dev.compactmods.machines.room.registry;
 
 import com.mojang.serialization.Codec;
 import dev.compactmods.machines.core.data.CMDataFile;
-import dev.compactmods.machines.core.data.CodecHolder;
 import dev.compactmods.machines.room.data.CMRoomDataLocations;
 import dev.compactmods.machines.room.graph.node.RoomRegistrationNode;
 import it.unimi.dsi.fastutil.objects.Object2ReferenceArrayMap;
@@ -14,7 +13,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-public class RoomRegistrarData implements CodecHolder<RoomRegistrarData>, CMDataFile {
+public class RoomRegistrarData implements CMDataFile<RoomRegistrarData> {
 
     public static final Codec<RoomRegistrarData> CODEC = RoomRegistrationNode.CODEC.listOf()
             .fieldOf("rooms")

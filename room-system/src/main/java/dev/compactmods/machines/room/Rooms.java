@@ -2,7 +2,7 @@ package dev.compactmods.machines.room;
 
 import com.mojang.serialization.Codec;
 import dev.compactmods.machines.core.CompactMachinesCore;
-import dev.compactmods.machines.core.data.CMSingletonDataFileManager;
+import dev.compactmods.machines.core.data.manager.CMSingletonDataFileManager;
 import dev.compactmods.machines.room.block.BreakableWallBlock;
 import dev.compactmods.machines.room.block.ItemBlockWall;
 import dev.compactmods.machines.room.block.SolidWallBlock;

@@ -1,10 +1,9 @@
-package dev.compactmods.machines.core.client.render;
+package dev.compactmods.machines.room.ui.overlay;
 
 import com.mojang.authlib.GameProfile;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.PlayerFaceExtractor;
-import net.minecraft.network.chat.Component;
 
 public class CMPlayerFaceRenderer {
 

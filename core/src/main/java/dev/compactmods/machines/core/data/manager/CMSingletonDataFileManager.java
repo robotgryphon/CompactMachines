@@ -1,5 +1,7 @@
-package dev.compactmods.machines.core.data;
+package dev.compactmods.machines.core.data.manager;
 
+import dev.compactmods.machines.core.data.CMDataFile;
+import dev.compactmods.machines.core.data.DataFileUtil;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.MinecraftServer;
 import net.neoforged.neoforge.common.IOUtilities;
@@ -13,7 +15,7 @@ import java.io.IOException;
  *
  * @param <T>
  */
-public class CMSingletonDataFileManager<T extends CMDataFile & CodecHolder<T>> implements IDataFileManager<T> {
+public class CMSingletonDataFileManager<T extends CMDataFile<T>> implements IDataFileManager<T> {
 
     private final Logger logger = LogManager.getLogger();
     protected final MinecraftServer server;

@@ -1,7 +1,7 @@
 package dev.compactmods.machines.upgrades.service;
 
 import dev.compactmods.machines.upgrades.api.data.IRoomUpgradeDataAttachmentAccessor;
-import dev.compactmods.machines.core.data.CMKeyedDataFileManager;
+import dev.compactmods.machines.core.data.manager.CMKeyedDataFileManager;
 import dev.compactmods.machines.upgrades.RoomUpgradeDataAttachments;
 import dev.compactmods.machines.upgrades.RoomUpgradeIdentifier;
 import net.minecraft.server.MinecraftServer;
