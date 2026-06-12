@@ -2,7 +2,6 @@ package dev.compactmods.machines.shrinking.api;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import dev.compactmods.machines.core.codec.CodecExtensions;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
@@ -54,7 +53,8 @@ public record ShrinkingDeviceConfiguration(
 
         public static final Codec<AfterUseAction> CODEC = StringRepresentable.fromValues(AfterUseAction::values);
 
-        public static final StreamCodec<ByteBuf, AfterUseAction> STREAM_CODEC = CodecExtensions.stringRepresentableStreamCodec(AfterUseAction.values());
+        public static final StreamCodec<ByteBuf, AfterUseAction> STREAM_CODEC =
+                ByteBufCodecs.fromCodecTrusted(StringRepresentable.fromValues(AfterUseAction::values));
 
         @Override
         public String getSerializedName() {
