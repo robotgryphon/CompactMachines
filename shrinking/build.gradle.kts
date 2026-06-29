@@ -10,6 +10,18 @@ base {
     version = versionMain
 }
 
+neoForge.interfaceInjectionData.from(project(":core").file("interfaces.json"))
+
+val apiSource = sourceSets.register("api")
+
+neoForge.addModdingDependenciesTo(apiSource.get())
+
+sourceSets.main {
+    java {
+        srcDir(apiSource.get().java)
+    }
+}
+
 repositories {
     maven("https://maven.pkg.github.com/compactmods/feather") {
         name = "Github PKG - Feather"
@@ -27,6 +39,10 @@ repositories {
 
 dependencies {
     compileOnly(compactmods.feather)
+
+    "apiCompileOnly"(project(":core"))
+    "apiCompileOnly"(project(":dimension-api"))
+    "apiCompileOnly"(project(":room-system"))
 
     compileOnly(project(":core"))
     compileOnly(project(":dimension-api"))

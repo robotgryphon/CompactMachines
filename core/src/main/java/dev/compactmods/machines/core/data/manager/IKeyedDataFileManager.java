@@ -9,6 +9,8 @@ public interface IKeyedDataFileManager<Key, T extends CMDataFile<T>> {
 
    Optional<T> optionalData(Key key);
 
+   void setData(Key key, T data);
+
    void save();
 
 }

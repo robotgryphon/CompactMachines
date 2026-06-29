@@ -23,10 +23,11 @@ public interface CreativeTabs {
     }
 
     static void fillItems(CreativeModeTab.ItemDisplayParameters params, CreativeModeTab.Output output) {
-        output.accept(Shrinking.PERSONAL_SHRINKING_DEVICE.get(), CreativeModeTab.TabVisibility.PARENT_AND_SEARCH_TABS);
         output.accept(Rooms.Items.BREAKABLE_WALL.get(), CreativeModeTab.TabVisibility.PARENT_AND_SEARCH_TABS);
-        output.accept(Shrinking.SHRINKING_MODULE.get(), CreativeModeTab.TabVisibility.PARENT_AND_SEARCH_TABS);
-        output.accept(Shrinking.ENLARGING_MODULE.get(), CreativeModeTab.TabVisibility.PARENT_AND_SEARCH_TABS);
+
+        output.accept(Shrinking.Items.PERSONAL_SHRINKING_DEVICE.get(), CreativeModeTab.TabVisibility.PARENT_AND_SEARCH_TABS);
+        output.accept(Shrinking.Items.SHRINKING_MODULE.get(), CreativeModeTab.TabVisibility.PARENT_AND_SEARCH_TABS);
+        output.accept(Shrinking.Items.ENLARGING_MODULE.get(), CreativeModeTab.TabVisibility.PARENT_AND_SEARCH_TABS);
         // output.accept(Shrinking.RESIZING_MODULE.get(), CreativeModeTab.TabVisibility.PARENT_AND_SEARCH_TABS);
 
         // TODO: Items with a room mapping (paper room cores?)

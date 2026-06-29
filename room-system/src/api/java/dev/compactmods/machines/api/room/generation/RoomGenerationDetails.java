@@ -6,7 +6,7 @@ import net.minecraft.core.Holder;
 
 import java.util.UUID;
 
-public record RoomGenerationDetails(String code, int spiralIndex, Holder<RoomTemplate> template,
+public record RoomGenerationDetails(int spiralIndex, Holder<RoomTemplate> template,
                                     RoomBoundaries boundaries, UUID owner) {
 
 }

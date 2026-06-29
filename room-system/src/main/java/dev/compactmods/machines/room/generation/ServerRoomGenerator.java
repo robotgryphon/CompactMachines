@@ -7,11 +7,10 @@ import dev.compactmods.machines.api.room.generation.RoomStructureInfo.RoomStruct
 import dev.compactmods.machines.api.room.registry.RoomRegistry;
 import dev.compactmods.machines.core.WallConstants;
 import dev.compactmods.machines.core.util.BlockSpaceUtil;
-import dev.compactmods.machines.room.Rooms;
-import dev.compactmods.machines.room.graph.node.RoomRegistrationNode;
 import dev.compactmods.spatial.aabb.AABBAligner;
 import dev.compactmods.spatial.aabb.AABBHelper;
 import dev.compactmods.spatial.vector.VectorUtils;
+import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -27,23 +26,22 @@ import net.minecraft.world.level.levelgen.structure.templatesystem.StructurePlac
 import net.minecraft.world.phys.AABB;
 import org.joml.Vector3d;
 
+import java.util.Map;
 import java.util.Optional;
-import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class ServerRoomGenerator implements RoomGenerator {
 
     private final MinecraftServer server;
     private final ServerLevel level;
     private final RoomRegistry roomRegistry;
-    private final ConcurrentHashMap<String, ServerNewRoomBuilder> pendingReservations;
+    private final Map<Integer, ServerNewRoomBuilder> pendingReservations;
 
     public ServerRoomGenerator(MinecraftServer server, RoomRegistry roomRegistry) {
         this.server = server;
         this.level = CompactDimension.forServer(server);
         this.roomRegistry = roomRegistry;
-        this.pendingReservations = new ConcurrentHashMap<>();
+        this.pendingReservations = new Int2ObjectOpenHashMap<>();
     }
 
     /// Generates a wall or platform in a given direction. Uses the solid wall block.
@@ -126,16 +124,15 @@ public class ServerRoomGenerator implements RoomGenerator {
     }
 
     @Override
-    public NewRoomBuilder createNew() throws RoomGenerationException {
+    public NewRoomBuilder createNew() {
 
         // Rooms generate in a spiral algorithm.
         // The next position should be the number of registered rooms plus
         // the number of rooms that are still being generated (pendingReservations)
-        final var newCode = RoomCodeGenerator.generateRoomId();
         final int spiralIndex = roomRegistry.count() + pendingReservations.size();
 
-        final var builder = new ServerNewRoomBuilder(newCode, spiralIndex);
-        pendingReservations.put(newCode, builder);
+        final var builder = new ServerNewRoomBuilder(spiralIndex);
+        pendingReservations.put(spiralIndex, builder);
         return builder;
 
 //        throw new RoomGenerationException("Failed to reserve room code [%s]; refusing to continue with generation!".formatted(newCode));
@@ -175,18 +172,17 @@ public class ServerRoomGenerator implements RoomGenerator {
         });
 
         // Assign room roomCode and return instance
-        var result = new RoomGenerationResult(details.code(), newRoomBoundaries);
+        final var result = roomRegistry.register(details.template(), details.boundaries(), details.owner());
 
-        var registrationData = server.getData(Rooms.DataAttachments.ROOM_REGISTRAR_DATA);
-        registrationData.data().put(new RoomRegistrationNode(UUID.randomUUID(), new RoomRegistrationNode.Data(details.code(), details.boundaries())));
-        registrationData.save();
+        return result.map(inst -> {
+            // Inform the chunk manager to track new room chunks
+            var chunkManager = server.getCapability(RoomCapabilities.CHUNK_MANAGER);
+            if (chunkManager != null)
+                chunkManager.calculateChunks(inst.code(), inst.boundaries());
 
-        // Inform the chunk manager to track new room chunks
-        var chunkManager = server.getCapability(RoomCapabilities.CHUNK_MANAGER);
-        if(chunkManager != null)
-            chunkManager.calculateChunks(details.code(), details.boundaries());
+            pendingReservations.remove(inst.code());
 
-        pendingReservations.remove(details.code());
-        return Optional.of(result);
+            return new RoomGenerationResult(inst.code(), newRoomBoundaries);
+        });
     }
 }

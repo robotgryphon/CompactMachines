@@ -13,9 +13,10 @@ import dev.compactmods.machines.machine.Machines;
 import dev.compactmods.machines.machine.ui.MachineUIMenu;
 import dev.compactmods.machines.network.machine.MachineColorSyncPacket;
 import dev.compactmods.machines.room.Rooms;
-import dev.compactmods.machines.shrinking.PersonalShrinkingDevice;
 import dev.compactmods.machines.shrinking.Shrinking;
+import dev.compactmods.machines.shrinking.ShrinkingHelper;
 import dev.compactmods.machines.shrinking.api.ShrinkingDeviceConfiguration;
+import dev.compactmods.machines.shrinking.history.UsedShrinkingDeviceOnMachine;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.GlobalPos;
@@ -161,7 +162,7 @@ public class CompactMachineBlock extends Block implements EntityBlock {
                         .orElse(null);
 
                 if (room != null) {
-                    tryEnterRoom(mainItem, player, serverPlayer, room, tile, config);
+                    tryEnterRoom(mainItem, player, serverPlayer, room, tile);
                 }
             }
 
@@ -196,7 +197,7 @@ public class CompactMachineBlock extends Block implements EntityBlock {
 
                         // Enter the room
                         final var instance = roomRegistry.get(room).orElseThrow();
-                        tryEnterRoom(mainItem, player, serverPlayer, instance, tile, config);
+                        tryEnterRoom(mainItem, player, serverPlayer, instance, tile);
                     });
                 } catch (RoomGenerationException e) {
                     throw new RuntimeException(e);
@@ -209,7 +210,7 @@ public class CompactMachineBlock extends Block implements EntityBlock {
         return InteractionResult.PASS;
     }
 
-    private static boolean tryEnterRoom(ItemStack mainItem, Player player, ServerPlayer serverPlayer, RoomInstance room, CompactMachineBlockEntity tile, ShrinkingDeviceConfiguration config) {
+    private static boolean tryEnterRoom(ItemStack mainItem, Player player, ServerPlayer serverPlayer, RoomInstance room, CompactMachineBlockEntity tile) {
         final var shrinkHandler = serverPlayer.getCapability(Shrinking.SHRINK, room);
         if (shrinkHandler == null) {
             CompactMachinesCore.modLog().error("Error: Could not fetch or create a shrinking handler for room roomCode [{}], player [{}].",
@@ -218,9 +219,10 @@ public class CompactMachineBlock extends Block implements EntityBlock {
             return false;
         }
 
-        shrinkHandler.tryEnter(tile.getLevelPosition(), config).thenAccept(result -> {
+        final var method = new UsedShrinkingDeviceOnMachine(serverPlayer, room, tile.getLevelPosition());
+        shrinkHandler.tryEnter(method).thenAccept(result -> {
             if (result.successful()) {
-                PersonalShrinkingDevice.handleSuccessfulAtomicShift(mainItem, serverPlayer, config);
+                ShrinkingHelper.handleSuccessfulAtomicShift(serverPlayer, mainItem);
             }
         });
 

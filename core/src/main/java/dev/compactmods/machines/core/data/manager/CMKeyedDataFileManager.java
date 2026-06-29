@@ -1,16 +1,24 @@
 package dev.compactmods.machines.core.data.manager;
 
+import com.mojang.serialization.Codec;
 import dev.compactmods.machines.core.data.CMDataFile;
 import dev.compactmods.machines.core.data.DataFileUtil;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.MinecraftServer;
 import net.neoforged.neoforge.common.IOUtilities;
+import org.apache.commons.io.FileUtils;
 import org.apache.logging.log4j.LogManager;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
+import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Optional;
 import java.util.function.BiFunction;
+import java.util.function.Supplier;
+import java.util.stream.Stream;
 
 /**
  * A codec-backed file that stores several instances of typed data, indexed by a key.
@@ -21,33 +29,33 @@ import java.util.function.BiFunction;
 public class CMKeyedDataFileManager<Key, T extends CMDataFile<T>> implements IKeyedDataFileManager<Key, T> {
 
     protected final MinecraftServer server;
-    private final BiFunction<MinecraftServer, Key, T> creator;
     private final HashMap<Key, T> cache;
 
-    public CMKeyedDataFileManager(MinecraftServer server, BiFunction<MinecraftServer, Key, T> creator) {
+    private final Path rootDirectory;
+    private final Supplier<Codec<T>> valueCodec;
+
+    public CMKeyedDataFileManager(MinecraftServer server, Supplier<Codec<T>> codec,
+                                  Path rootDirectory) {
         this.server = server;
-        this.creator = creator;
         this.cache = new HashMap<>();
+        this.valueCodec = codec;
+        this.rootDirectory = rootDirectory;
     }
 
-    /**
-     * Used to get the filename for a given item, if {@code key.toString()} is not sufficient.
-     *
-     * @param key
-     * @return
-     */
+    /// Used to get the filename for a given item, if `key.toString()` is not sufficient.
+    ///
+    /// @param key
+    /// @return
     public String getFileKey(Key key) {
         return key.toString();
     }
 
     @Override
+    @Nullable
     public T data(Key key) {
         return cache.computeIfAbsent(key, k -> {
-            var inst = creator. apply(server, k);
-            var dir = inst.getDataLocation(server);
-            DataFileUtil.ensureDirExists(dir);
-            final var file = dir.resolve(getFileKey(k) + ".dat").toFile();
-            return !file.exists() ? inst : DataFileUtil.loadFileWithCodec(file, inst.codec());
+            final var file = getDataFile(k);
+            return !file.exists() ? null : DataFileUtil.loadFileWithCodec(file, valueCodec.get());
         });
     }
 
@@ -56,22 +64,49 @@ public class CMKeyedDataFileManager<Key, T extends CMDataFile<T>> implements IKe
         return hasData(key) ? Optional.ofNullable(data(key)) : Optional.empty();
     }
 
-    public void save() {
-        cache.forEach((key, data) -> {
-            var fullData = new CompoundTag();
-            fullData.putString("version", data.getDataVersion());
-            fullData.store("data", data.codec(), data);
+    @Override
+    public void setData(Key key, @NonNull T data) {
+        cache.put(key, data);
+        save(key, data);
+    }
 
-            try {
-                IOUtilities.writeNbtCompressed(fullData, data.getDataLocation(server).resolve(getFileKey(key) + ".dat"));
-            } catch (IOException e) {
-                var logger = LogManager.getLogger();
-                logger.error("Failed to write data: {}", e.getMessage(), e);
-            }
-        });
+    public void save() {
+        cache.forEach(this::save);
+    }
+
+    private void save(Key key, T data) {
+        var fullData = new CompoundTag();
+        fullData.putString("version", data.getDataVersion());
+        fullData.store("data", data.codec(), data);
+
+        try {
+            IOUtilities.writeNbtCompressed(fullData, rootDirectory.resolve(getFileKey(key) + ".dat"));
+        } catch (IOException e) {
+            var logger = LogManager.getLogger();
+            logger.error("Failed to write data: {}", e.getMessage(), e);
+        }
+    }
+
+    public Stream<String> existingFiles() {
+        try {
+            return FileUtils
+                    .streamFiles(rootDirectory.toFile(), false)
+                    .map(File::getName);
+        } catch (IOException e) {
+            return Stream.empty();
+        }
+    }
+
+    private File getDataFile(Key key) {
+        DataFileUtil.ensureDirExists(rootDirectory);
+        return rootDirectory.resolve(getFileKey(key) + ".dat").toFile();
+    }
+
+    private boolean hasFile(Key key) {
+        return getDataFile(key).exists();
     }
 
     public boolean hasData(Key key) {
-        return cache.containsKey(key);
+        return cache.containsKey(key) || hasFile(key);
     }
 }

@@ -63,8 +63,8 @@ public class BasicRoomTemplateRecipeGenerator extends RecipeGenerator {
                 .pattern("EPS")
                 .pattern("WWW")
                 .define('W', Rooms.Items.BREAKABLE_WALL)
-                .define('E', Shrinking.ENLARGING_MODULE)
-                .define('S', Shrinking.SHRINKING_MODULE);
+                .define('E', Shrinking.Items.ENLARGING_MODULE)
+                .define('S', Shrinking.Items.SHRINKING_MODULE);
 
         configure.apply(builder);
 

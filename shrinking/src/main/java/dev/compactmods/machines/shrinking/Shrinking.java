@@ -4,13 +4,16 @@ import com.mojang.serialization.Codec;
 import dev.compactmods.machines.api.room.RoomInstance;
 import dev.compactmods.machines.core.CompactMachinesCore;
 import dev.compactmods.machines.core.GameRulesHelper;
-import dev.compactmods.machines.core.capability.ServerCapability;
+import dev.compactmods.machines.room.Rooms;
 import dev.compactmods.machines.shrinking.api.ShrinkingDeviceConfiguration;
-import dev.compactmods.machines.shrinking.api.capability.PlayerEntryPointHistoryManager;
+import dev.compactmods.machines.shrinking.api.history.PlayerTeleportHistoryManager;
 import dev.compactmods.machines.shrinking.api.capability.PlayerShrinkingHandler;
-import dev.compactmods.machines.shrinking.api.history.RoomEntryPoint;
+import dev.compactmods.machines.shrinking.api.history.RoomEntryMethod;
 import dev.compactmods.machines.shrinking.capability.ServerPlayerShrinkingHandler;
-import dev.compactmods.machines.shrinking.history.ServerPlayerEntryPointHistoryManager;
+import dev.compactmods.machines.shrinking.history.UsedShrinkingDeviceOnMachine;
+import dev.compactmods.machines.shrinking.history.ServerPlayerTeleportHistoryManager;
+import dev.compactmods.machines.shrinking.history.UsedTeleportCommand;
+import net.minecraft.core.Holder;
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
@@ -21,6 +24,7 @@ import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.gamerules.GameRule;
 import net.neoforged.bus.api.IEventBus;
+import net.neoforged.fml.common.Mod;
 import net.neoforged.neoforge.attachment.AttachmentType;
 import net.neoforged.neoforge.capabilities.EntityCapability;
 import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
@@ -28,44 +32,62 @@ import net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredItem;
 import net.neoforged.neoforge.registries.DeferredRegister;
+import net.neoforged.neoforge.registries.NeoForgeRegistries;
 
 import java.util.Collections;
 import java.util.function.Supplier;
 
-import static dev.compactmods.machines.room.Rooms.ATTACHMENT_TYPES;
-
+@Mod(CompactMachinesCore.MOD_ID)
 public class Shrinking {
 
-    private static final DeferredRegister.Items ITEMS = DeferredRegister.createItems(CompactMachinesCore.MOD_ID);
+    private static final DeferredRegister<AttachmentType<?>> ATTACHMENT_TYPES = DeferredRegister.create(NeoForgeRegistries.ATTACHMENT_TYPES, CompactMachinesCore.MOD_ID);
     private static final DeferredRegister.DataComponents DATA_COMPONENTS = DeferredRegister.createDataComponents(Registries.DATA_COMPONENT_TYPE, CompactMachinesCore.MOD_ID);
-
     private static final DeferredRegister<GameRule<?>> GAME_RULES = DeferredRegister.create(BuiltInRegistries.GAME_RULE, CompactMachinesCore.MOD_ID);
+    private static final DeferredRegister.Items ITEMS = DeferredRegister.createItems(CompactMachinesCore.MOD_ID);
+    private static final DeferredRegister<RoomEntryMethod.Type<?>> ROOM_ENTRYPOINT_TYPES = DeferredRegister.create(RoomEntryMethod.Type.REGISTRY_KEY, CompactMachinesCore.MOD_ID);
 
-    public static final DeferredItem<PersonalShrinkingDevice> PERSONAL_SHRINKING_DEVICE = ITEMS.register("personal_shrinking_device",
-            () -> new PersonalShrinkingDevice(new Item.Properties()
-                    .setId(PersonalShrinkingDevice.RESOURCE_KEY)
-                    .component(DataComponents.SHRINKING_CONFIG, ShrinkingDeviceConfiguration.DEFAULT_CONFIG)
-                    .stacksTo(1)));
-
-    public static final DeferredItem<Item> SHRINKING_MODULE = ITEMS.registerItem("shrinking_module", Item::new);
-    public static final DeferredItem<Item> ENLARGING_MODULE = ITEMS.registerItem("enlarging_module", Item::new);
 
     public static final EntityCapability<PlayerShrinkingHandler, RoomInstance> SHRINK = EntityCapability.create(CompactMachinesCore.identifier("shrink"),
             PlayerShrinkingHandler.class, RoomInstance.class);
 
-    public static final ServerCapability<PlayerEntryPointHistoryManager, Void> HISTORY_MANAGER = ServerCapability.createVoid(
-            CompactMachinesCore.identifier("shrinking_history"), PlayerEntryPointHistoryManager.class);
+    public static final EntityCapability<PlayerTeleportHistoryManager, Void> HISTORY_MANAGER = EntityCapability.createVoid(
+            CompactMachinesCore.identifier("shrinking_history"), PlayerTeleportHistoryManager.class);
 
     public static final Supplier<AttachmentType<String>> CURRENT_ROOM_CODE = ATTACHMENT_TYPES.register("current_room_code", () -> AttachmentType
-            .<String>builder(() -> null)
+            .builder(() -> "")
             .serialize(Codec.STRING.fieldOf("roomCode"))
             .build());
 
-    public static final Supplier<AttachmentType<RoomEntryPoint>> LAST_ROOM_ENTRYPOINT = ATTACHMENT_TYPES.register("last_entrypoint", () -> AttachmentType.builder(() -> RoomEntryPoint.INVALID)
-            .serialize(RoomEntryPoint.CODEC)
-            .build());
+    public Shrinking(IEventBus modBus) {
+        Items.prepare();
+        DataComponents.prepare();
+        GameRules.prepare();
+        EntryMethods.prepare();;
+
+        ROOM_ENTRYPOINT_TYPES.makeRegistry(b -> {
+            b.sync(true);
+        });
+
+        PlayerEventHandler.registerEvents();
+
+        registerContent(modBus);
+    }
 
     // public static final DeferredItem<Item> RESIZING_MODULE = Registries.ITEMS.register("resizing_module", Registries::basicItem);
+
+    public interface Items {
+
+        DeferredItem<PersonalShrinkingDevice> PERSONAL_SHRINKING_DEVICE = ITEMS.register("personal_shrinking_device",
+                () -> new PersonalShrinkingDevice(new Item.Properties()
+                        .setId(PersonalShrinkingDevice.RESOURCE_KEY)
+                        .component(DataComponents.SHRINKING_CONFIG, ShrinkingDeviceConfiguration.DEFAULT_CONFIG)
+                        .stacksTo(1)));
+
+        DeferredItem<Item> SHRINKING_MODULE = ITEMS.registerItem("shrinking_module", Item::new);
+        DeferredItem<Item> ENLARGING_MODULE = ITEMS.registerItem("enlarging_module", Item::new);
+
+        static void prepare() {}
+    }
 
     public interface GameRules {
         /// For hardcore-style packs. If a shrinking item is successfully used to LEAVE a room,
@@ -91,15 +113,27 @@ public class Shrinking {
         }
     }
 
-    public static void prepare() {
-        DataComponents.prepare();
-        GameRules.prepare();
+    public interface EntryMethods {
+
+        Holder<RoomEntryMethod.Type<?>> PERSONAL_SHRINKING_DEVICE = ROOM_ENTRYPOINT_TYPES
+                .register("shrinking_device", RoomEntryMethod.simple(UsedShrinkingDeviceOnMachine.MAP_CODEC));
+
+        Holder<RoomEntryMethod.Type<?>> TELEPORT_COMMAND = ROOM_ENTRYPOINT_TYPES.register("teleport_command",
+                RoomEntryMethod.simple(UsedTeleportCommand.MAP_CODEC));
+//
+//        Holder<RoomEntryMethod> UNKNOWN = ROOM_ENTRY_METHODS.register("unknown",
+//                i -> RoomEntryMethod.simple(i, TP_PRECISE));
+
+        static void prepare() {
+        }
     }
 
     public static void registerContent(IEventBus modBus) {
+        ATTACHMENT_TYPES.register(modBus);
         ITEMS.register(modBus);
         DATA_COMPONENTS.register(modBus);
         GAME_RULES.register(modBus);
+        ROOM_ENTRYPOINT_TYPES.register(modBus);
 
         modBus.addListener((RegisterCapabilitiesEvent caps) -> {
             caps.registerEntity(Shrinking.SHRINK, EntityType.PLAYER, (player, roomInstance) -> {
@@ -109,13 +143,13 @@ public class Shrinking {
                 return null;
             });
 
-            ServerCapability.registerVoid(HISTORY_MANAGER, (server, ctx)
-                    -> new ServerPlayerEntryPointHistoryManager(5, Collections.emptyMap()));
+            caps.registerEntity(HISTORY_MANAGER, EntityType.PLAYER, (player, _)
+                    -> new ServerPlayerTeleportHistoryManager(player.getUUID(), 5, Collections.emptyList()));
         });
 
         modBus.addListener((BuildCreativeModeTabContentsEvent addToTabs) -> {
             if (addToTabs.getTabKey() == CreativeModeTabs.TOOLS_AND_UTILITIES) {
-                addToTabs.accept(Shrinking.PERSONAL_SHRINKING_DEVICE.get());
+                addToTabs.accept(Items.PERSONAL_SHRINKING_DEVICE.get());
             }
         });
     }

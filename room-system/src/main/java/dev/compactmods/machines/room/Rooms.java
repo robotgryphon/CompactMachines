@@ -2,11 +2,9 @@ package dev.compactmods.machines.room;
 
 import com.mojang.serialization.Codec;
 import dev.compactmods.machines.core.CompactMachinesCore;
-import dev.compactmods.machines.core.data.manager.CMSingletonDataFileManager;
 import dev.compactmods.machines.room.block.BreakableWallBlock;
 import dev.compactmods.machines.room.block.ItemBlockWall;
 import dev.compactmods.machines.room.block.SolidWallBlock;
-import dev.compactmods.machines.room.registry.RoomRegistrarData;
 import net.minecraft.core.UUIDUtil;
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -14,16 +12,13 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.Util;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
-import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.attachment.AttachmentType;
-import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.registries.*;
 import org.jspecify.annotations.NullMarked;
 
@@ -83,10 +78,6 @@ public interface Rooms {
                 .serialize(UUIDUtil.CODEC.fieldOf("owner"))
                 .build());
 
-        Supplier<AttachmentType<CMSingletonDataFileManager<RoomRegistrarData>>> ROOM_REGISTRAR_DATA = ATTACHMENT_TYPES.register("room_registrar_data", () -> AttachmentType
-                .builder((server) -> new CMSingletonDataFileManager<>(((MinecraftServer) server), "room_registrations", new RoomRegistrarData()))
-                .build());
-
         static void prepare() {
         }
     }
@@ -112,22 +103,5 @@ public interface Rooms {
         Items.prepare();
         DataAttachments.prepare();
         DataComponents.prepare();
-    }
-
-    static void registerContent(IEventBus modBus) {
-        BLOCKS.register(modBus);
-        ITEMS.register(modBus);
-        CONTAINERS.register(modBus);
-        ATTACHMENT_TYPES.register(modBus);
-        DATA_COMPONENTS.register(modBus);
-    }
-
-    static void registerEvents(IEventBus modBus) {
-        NeoForge.EVENT_BUS.addListener(RoomEventHandler::checkSpawn);
-        NeoForge.EVENT_BUS.addListener(RoomEventHandler::entityChangedDimensions);
-        NeoForge.EVENT_BUS.addListener(RoomEventHandler::entityJoined);
-        NeoForge.EVENT_BUS.addListener(RoomEventHandler::entityTeleport);
-
-        NeoForge.EVENT_BUS.addListener(RoomItemHandler::handleTooltips);
     }
 }

@@ -96,9 +96,9 @@ public class EnglishLangGenerator extends dev.compactmods.machines.datagen.base.
         addBlock(Rooms.Blocks.BREAKABLE_WALL, "Compact Machine Wall");
         addBlock(Rooms.Blocks.SOLID_WALL, "Solid Compact Machine Wall");
 
-        addItem(Shrinking.PERSONAL_SHRINKING_DEVICE, "Personal Shrinking Device");
-        addItem(Shrinking.SHRINKING_MODULE, "Atom Shrinking Module");
-        addItem(Shrinking.ENLARGING_MODULE, "Atom Enlarging Module");
+        addItem(Shrinking.Items.PERSONAL_SHRINKING_DEVICE, "Personal Shrinking Device");
+        addItem(Shrinking.Items.SHRINKING_MODULE, "Atom Shrinking Module");
+        addItem(Shrinking.Items.ENLARGING_MODULE, "Atom Enlarging Module");
         add(Util.makeDescriptionId("block", CompactMachinesCore.identifier("bound_machine_fallback")), machineTranslation);
     }
 

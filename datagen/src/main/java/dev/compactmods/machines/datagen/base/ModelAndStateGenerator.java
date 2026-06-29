@@ -44,10 +44,10 @@ public class ModelAndStateGenerator extends CMModelProvider {
                 .put(TextureSlot.TOP, new Material(modLocation("block/workbench/top")))
                 .put(TextureSlot.SIDE, new Material(modLocation("block/workbench/side"))));
 
-        itemModels.generateFlatItem(Shrinking.PERSONAL_SHRINKING_DEVICE.asItem(), ModelTemplates.FLAT_HANDHELD_ITEM);
+        itemModels.generateFlatItem(Shrinking.Items.PERSONAL_SHRINKING_DEVICE.asItem(), ModelTemplates.FLAT_HANDHELD_ITEM);
 
-        itemModels.generateFlatItem(Shrinking.SHRINKING_MODULE.asItem(), ModelTemplates.FLAT_ITEM);
-        itemModels.generateFlatItem(Shrinking.ENLARGING_MODULE.asItem(), ModelTemplates.FLAT_ITEM);
+        itemModels.generateFlatItem(Shrinking.Items.SHRINKING_MODULE.asItem(), ModelTemplates.FLAT_ITEM);
+        itemModels.generateFlatItem(Shrinking.Items.ENLARGING_MODULE.asItem(), ModelTemplates.FLAT_ITEM);
     }
 
 }

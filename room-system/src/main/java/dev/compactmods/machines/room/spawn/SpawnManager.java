@@ -28,7 +28,7 @@ public class SpawnManager implements IRoomSpawnManager, CMDataFile<SpawnManager>
     private final Logger LOGS = LogManager.getLogger();
 
     private static final UnboundedMapCodec<UUID, dev.compactmods.machines.api.room.spawn.RoomSpawn> PLAYER_SPAWNS_CODEC = Codec.unboundedMap(UUIDUtil.STRING_CODEC, dev.compactmods.machines.api.room.spawn.RoomSpawn.CODEC);
-    private static final Codec<SpawnManager> CODEC = RecordCodecBuilder.create(inst -> inst.group(
+    public static final Codec<SpawnManager> CODEC = RecordCodecBuilder.create(inst -> inst.group(
             Codec.STRING.fieldOf("roomCode").forGetter(x -> x.roomCode),
             PLAYER_SPAWNS_CODEC.fieldOf("player_spawns").forGetter(x -> x.playerSpawns),
             dev.compactmods.machines.api.room.spawn.RoomSpawn.CODEC.fieldOf("default_spawn").forGetter(x -> x.defaultSpawn),
@@ -82,8 +82,7 @@ public class SpawnManager implements IRoomSpawnManager, CMDataFile<SpawnManager>
         playerSpawns.put(player, new dev.compactmods.machines.api.room.spawn.RoomSpawn(location, rotation));
     }
 
-    @Override
-    public Path getDataLocation(MinecraftServer server) {
+    private Path getDataLocation(MinecraftServer server) {
         return CMRoomDataLocations.PLAYER_SPAWNS.apply(server);
     }
 

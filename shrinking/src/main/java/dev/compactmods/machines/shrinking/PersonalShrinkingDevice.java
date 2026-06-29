@@ -78,7 +78,7 @@ public class PersonalShrinkingDevice extends Item {
                     shrink.tryExit().thenAccept(result -> {
                         // Check Result - If successful, maybe attempt to damage the PSD item
                         if (result.successful() && serverPlayer.level().getGameRules().get(Shrinking.GameRules.DAMAGE_PSD_ITEMS_ON_ROOM_EXIT.get())) {
-                            handleSuccessfulAtomicShift(stack, serverPlayer, config);
+                            ShrinkingHelper.handleSuccessfulAtomicShift(serverPlayer, stack);
                         }
                     });
                 }
@@ -88,37 +88,5 @@ public class PersonalShrinkingDevice extends Item {
         return InteractionResult.SUCCESS;
     }
 
-    public static void handleSuccessfulAtomicShift(ItemStack stack, ServerPlayer serverPlayer, ShrinkingDeviceConfiguration config) {
-        switch (config.afterUseAction()) {
-            case DAMAGE:
-                if (!serverPlayer.hasInfiniteMaterials()) {
-                    stack.hurtAndBreak(1, serverPlayer.level(), serverPlayer, item -> {
-                        // RIP, hope you have spare crafting materials nearby!
-                    });
-                }
-                break;
 
-            case BREAK:
-                if (!serverPlayer.hasInfiniteMaterials()) {
-                    stack.consume(1, serverPlayer);
-
-                    if (!serverPlayer.isSilent()) {
-
-                        var l = serverPlayer.level();
-                        var pos = serverPlayer.position();
-
-                        l.playSeededSound(
-                                null,
-                                pos.x(), pos.y(), pos.z(),
-                                stack.getOrDefault(DataComponents.BREAK_SOUND, SoundEvents.ITEM_BREAK),
-                                serverPlayer.getSoundSource(),
-                                1.0F,
-                                0.8F + l.getRandom().nextFloat() * 0.4F,
-                                serverPlayer.getRandom().nextLong()
-                        );
-                    }
-                }
-                break;
-        }
-    }
 }

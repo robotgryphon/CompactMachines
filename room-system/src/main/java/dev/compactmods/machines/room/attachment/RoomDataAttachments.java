@@ -1,52 +1,41 @@
 package dev.compactmods.machines.room.attachment;
 
-import com.mojang.serialization.Codec;
-import com.mojang.serialization.MapCodec;
-import com.mojang.serialization.codecs.RecordCodecBuilder;
-import dev.compactmods.machines.core.data.attachments.AttachmentBasedDataFile;
+import dev.compactmods.machines.core.attachment.AttachmentDataAccessor;
+import dev.compactmods.machines.core.attachment.CMAttachmentHolder;
+import dev.compactmods.machines.core.attachment.storage.AttachmentDataStorage;
+import dev.compactmods.machines.core.attachment.persistence.AttachmentIOHelper;
 import dev.compactmods.machines.room.data.CMRoomDataLocations;
-import dev.compactmods.machines.core.data.attachments.AttachmentDataFileFactoryInput;
 import net.minecraft.server.MinecraftServer;
 
-import java.nio.file.Path;
+public class RoomDataAttachments implements AutoCloseable, AttachmentDataAccessor {
 
-public class RoomDataAttachments extends AttachmentBasedDataFile<RoomDataAttachments, RoomDataAttachments.AdditionalData> implements AutoCloseable {
-
+    private final MinecraftServer server;
     private final String roomCode;
-
-    @Override
-    public void close() throws Exception {
-        // save
-    }
-
-    public record AdditionalData(String roomCode) {
-        public static final MapCodec<AdditionalData> CODEC = RecordCodecBuilder.mapCodec(i -> i.group(
-                Codec.STRING.fieldOf("room_code").forGetter(x -> x.roomCode)
-        ).apply(i, AdditionalData::new));
-    }
+    private final CMAttachmentHolder attachments;
 
     public RoomDataAttachments(MinecraftServer server, String roomCode) {
-        super(server, AdditionalData.CODEC, RoomDataAttachments::new);
+        this.server = server;
         this.roomCode = roomCode;
-    }
+        this.attachments = new CMAttachmentHolder();
 
-    public RoomDataAttachments(AttachmentDataFileFactoryInput<AdditionalData> fromCodec) {
-        super(fromCodec.server(), AdditionalData.CODEC, RoomDataAttachments::new);
-        this.roomCode = fromCodec.additionalData().roomCode();
-    }
+        final var file = CMRoomDataLocations.ROOM_DATA_ATTACHMENTS
+                .apply(server)
+                .resolve(roomCode + ".dat");
 
-    @Override
-    public Path getDataLocation(MinecraftServer server) {
-        return CMRoomDataLocations.ROOM_DATA_ATTACHMENTS.apply(server);
+        AttachmentIOHelper.load(server.registryAccess(), attachments, file);
     }
 
     @Override
-    public Codec<RoomDataAttachments> codec() {
-        return codec;
+    public AttachmentDataStorage dataStorage() {
+        return attachments.dataStorage();
     }
 
     @Override
-    protected RoomDataAttachments.AdditionalData dataSupplier(RoomDataAttachments instance) {
-        return new RoomDataAttachments.AdditionalData(instance.roomCode);
+    public void close() {
+        final var file = CMRoomDataLocations.ROOM_DATA_ATTACHMENTS
+                .apply(server)
+                .resolve(roomCode + ".dat");
+
+        AttachmentIOHelper.save(server.registryAccess(), attachments, file);
     }
 }

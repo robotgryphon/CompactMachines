@@ -3,75 +3,93 @@ package dev.compactmods.machines.room.registry;
 import dev.compactmods.machines.api.dimension.CompactDimension;
 import dev.compactmods.machines.api.room.RoomInstance;
 import dev.compactmods.machines.api.room.registry.RoomRegistry;
-import dev.compactmods.machines.core.data.manager.CMSingletonDataFileManager;
-import dev.compactmods.machines.room.Rooms;
-import dev.compactmods.machines.room.graph.node.RoomRegistrationNode;
+import dev.compactmods.machines.api.room.spatial.RoomBoundaries;
+import dev.compactmods.machines.api.room.template.RoomTemplate;
+import dev.compactmods.machines.core.data.manager.CMKeyedDataFileManager;
+import dev.compactmods.machines.room.data.CMRoomDataLocations;
+import dev.compactmods.machines.room.generation.RoomCodeGenerator;
 import it.unimi.dsi.fastutil.objects.Object2ObjectArrayMap;
+import net.minecraft.core.Holder;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.util.FileUtil;
+import org.apache.commons.io.FileUtils;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Stream;
 
 public class ServerRoomRegistry implements RoomRegistry, AutoCloseable {
 
     private final MinecraftServer server;
-    private final CMSingletonDataFileManager<RoomRegistrarData> ROOM_REGISTRAR_DATA;
+    private final CMKeyedDataFileManager<String, RoomInstanceData> ROOM_REGISTRAR_DATA;
     private final Map<String, RoomInstance> instanceCache;
 
     public ServerRoomRegistry(MinecraftServer server) {
         this.server = server;
         this.instanceCache = new Object2ObjectArrayMap<>();
 
-        ROOM_REGISTRAR_DATA = server.getData(Rooms.DataAttachments.ROOM_REGISTRAR_DATA);
-        ROOM_REGISTRAR_DATA.load();
+        ROOM_REGISTRAR_DATA = new CMKeyedDataFileManager<>(server, () -> RoomInstanceData.CODEC, CMRoomDataLocations.DATA_ROOT
+                .apply(server)
+                .resolve("registry"));
     }
 
     @Override
     public boolean isRegistered(String room) {
-        return ROOM_REGISTRAR_DATA.data().isRegistered(room);
+        return ROOM_REGISTRAR_DATA.hasData(room);
+    }
+
+    @Override
+    public Optional<RoomInstance> register(Holder<RoomTemplate> template, RoomBoundaries boundaries, UUID owner) {
+        final var newCode = RoomCodeGenerator.generateRoomId();
+        var serverData = new RoomInstanceData(newCode, boundaries);
+        ROOM_REGISTRAR_DATA.setData(newCode, serverData);
+
+        var instance = new ServerRoomInstance(server, CompactDimension.LEVEL_KEY, newCode, boundaries);
+        return Optional.of(instance);
     }
 
     @Override
     public Optional<RoomInstance> get(String room) {
-        return ROOM_REGISTRAR_DATA.data()
-                .get(room)
+        return ROOM_REGISTRAR_DATA.optionalData(room)
                 .map(this::getOrMakeRoomInstance);
     }
 
     @Override
     public int count() {
-        return Math.toIntExact(ROOM_REGISTRAR_DATA.data().count());
+        return Math.toIntExact(ROOM_REGISTRAR_DATA.existingFiles().count());
     }
 
     @Override
     public Stream<String> allRoomCodes() {
-        if(ROOM_REGISTRAR_DATA == null) return Stream.empty();
-        return ROOM_REGISTRAR_DATA.data().allRoomCodes();
+        // TODO: Filter via room code regex rather than length here
+        return ROOM_REGISTRAR_DATA.existingFiles()
+                .map(f -> f.substring(0, f.lastIndexOf('.')))
+                .filter(f -> f.length() == 14);
     }
 
     @Override
     public Stream<RoomInstance> allRooms() {
-        if(ROOM_REGISTRAR_DATA == null) return Stream.empty();
-        return ROOM_REGISTRAR_DATA.data()
-                .allRoomData()
+        return ROOM_REGISTRAR_DATA.existingFiles()
+                .map(ROOM_REGISTRAR_DATA::data)
+                .filter(Objects::nonNull)
                 .map(this::getOrMakeRoomInstance);
     }
 
     @Override
     public void save() {
-        if(ROOM_REGISTRAR_DATA == null) return;
         ROOM_REGISTRAR_DATA.save();
     }
 
     @NotNull
-    private RoomInstance getOrMakeRoomInstance(RoomRegistrationNode regNode) {
-        if (instanceCache.containsKey(regNode.code()))
-            return instanceCache.get(regNode.code());
+    private RoomInstance getOrMakeRoomInstance(RoomInstanceData instanceData) {
+        if (instanceCache.containsKey(instanceData.roomCode()))
+            return instanceCache.get(instanceData.roomCode());
 
-        final var inst = new ServerRoomInstance(server, CompactDimension.LEVEL_KEY, regNode.code(), regNode.data().boundaries());
-        instanceCache.put(regNode.code(), inst);
+        final var inst = new ServerRoomInstance(server, CompactDimension.LEVEL_KEY, instanceData.roomCode(), instanceData.boundaries());
+        instanceCache.put(instanceData.roomCode(), inst);
         return inst;
     }
 

@@ -8,21 +8,17 @@ import dev.compactmods.machines.core.machine.MachineColor;
 import dev.compactmods.machines.core.util.MathUtil;
 import dev.compactmods.spatial.aabb.AABBAligner;
 import net.minecraft.core.Holder;
-import net.minecraft.world.phys.AABB;
-import net.minecraft.world.phys.Vec3;
 
 import java.util.UUID;
 
 public class ServerNewRoomBuilder implements NewRoomBuilder {
-    private final String roomCode;
     private final int spiralIndex;
     private MachineColor color = MachineColor.DEFAULT;
 
     private Holder<RoomTemplate> template;
     UUID owner;
 
-    public ServerNewRoomBuilder(String roomCode, int spiralIndex) {
-        this.roomCode = roomCode;
+    public ServerNewRoomBuilder(int spiralIndex) {
         this.spiralIndex = spiralIndex;
     }
 
@@ -54,6 +50,6 @@ public class ServerNewRoomBuilder implements NewRoomBuilder {
     @Override
     public RoomGenerationDetails build() {
         final var bounds = calculateBoundaries(template.value());
-        return new RoomGenerationDetails(roomCode, spiralIndex, template, bounds, owner);
+        return new RoomGenerationDetails(spiralIndex, template, bounds, owner);
     }
 }

@@ -6,11 +6,11 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import dev.compactmods.machines.api.room.capability.RoomCapabilities;
 import dev.compactmods.machines.core.CompactMachinesCore;
-import dev.compactmods.machines.api.dimension.MissingDimensionException;
+import dev.compactmods.machines.core.location.GlobalPosWithRotation;
 import dev.compactmods.machines.room.RoomTranslations;
 import dev.compactmods.machines.shrinking.Shrinking;
-import dev.compactmods.machines.shrinking.api.history.RoomEntryPoint;
 import dev.compactmods.machines.command.argument.Suggestors;
+import dev.compactmods.machines.shrinking.history.UsedTeleportCommand;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.arguments.EntityArgument;
@@ -39,18 +39,20 @@ public class CMTeleportSubcommand {
     }
 
     private static void teleportToRoom(CommandSourceStack src, MinecraftServer server, ServerPlayer player, String roomCode) {
-        var registry = RoomCapabilities.REGISTRY.getCapability(server);
+
+        var registry = server.getCapability(RoomCapabilities.REGISTRY);
         if(registry == null)
             return;
 
         registry.get(roomCode).ifPresentOrElse(room -> {
             var shrinkingHandler = player.getCapability(Shrinking.SHRINK, room);
             assert shrinkingHandler != null;
-            shrinkingHandler.tryEnter(RoomEntryPoint.playerUsingCommand(player));
+            shrinkingHandler.tryEnter(new UsedTeleportCommand(GlobalPosWithRotation.fromPlayer(player)));
         }, () -> {
             LOGGER.error("Error teleporting player into room: room not found.");
             src.sendFailure(RoomTranslations.UNKNOWN_ROOM_BY_CODE.apply(roomCode));
         });
+
     }
 
     private static int teleportExecutor(CommandContext<CommandSourceStack> ctx) throws CommandSyntaxException {

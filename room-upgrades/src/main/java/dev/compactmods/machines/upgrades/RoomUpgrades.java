@@ -91,17 +91,6 @@ public class RoomUpgrades {
     }
 
     static void onRegisterCapabilities(RegisterCapabilitiesEvent r) {
-        RoomCapability.register(RoomUpgradeCapabilities.UPGRADE_DATA_ATTACHMENTS, (server, roomCode, upgradeId)
-                -> new RoomUpgradeDataAttachments(server, new RoomUpgradeIdentifier(roomCode, upgradeId)));;
 
-//        RoomCapability.register(RoomUpgradeCapabilities.UPGRADES, (server, roomCode, _) -> {
-//            var reg = server.getCapability(REGISTRY);
-//            if(reg == null)
-//                return null;
-//
-//            return reg.get(roomCode)
-//                    .map(inst -> inst.getCapability(RoomUpgradeCapabilities.UPGRADES))
-//                    .orElse(null);
-//        });
     }
 }

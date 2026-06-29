@@ -46,21 +46,21 @@ public class RecipeGenerator extends RecipeProvider {
 			.unlockedBy("picked_up_deepslate", has(Tags.Items.COBBLESTONES_DEEPSLATE))
 			.save(this.output);
 
-		shaped(RecipeCategory.TOOLS, Shrinking.PERSONAL_SHRINKING_DEVICE.get())
+		shaped(RecipeCategory.TOOLS, Shrinking.Items.PERSONAL_SHRINKING_DEVICE.get())
 			.pattern("121")
 			.pattern("345")
 			.pattern("676")
 			.define('1', Tags.Items.NUGGETS_IRON)
 			.define('2', Tags.Items.GLASS_PANES)
-			.define('3', Shrinking.ENLARGING_MODULE)
+			.define('3', Shrinking.Items.ENLARGING_MODULE)
 			.define('4', Items.ENDER_EYE)
-			.define('5', Shrinking.SHRINKING_MODULE)
+			.define('5', Shrinking.Items.SHRINKING_MODULE)
 			.define('6', Tags.Items.INGOTS_IRON)
 			.define('7', Tags.Items.INGOTS_COPPER)
 			.unlockedBy("picked_up_ender_eye", has(Items.ENDER_EYE))
 			.save(this.output);
 		
-		shaped(RecipeCategory.MISC, Shrinking.ENLARGING_MODULE)
+		shaped(RecipeCategory.MISC, Shrinking.Items.ENLARGING_MODULE)
 			.pattern("BPB")
 			.pattern("BEB")
 			.pattern("BLB")
@@ -71,7 +71,7 @@ public class RecipeGenerator extends RecipeProvider {
 			.unlockedBy("picked_up_ender_eye", has(Items.ENDER_EYE))
 			.save(this.output);
 
-		shaped(RecipeCategory.MISC, Shrinking.SHRINKING_MODULE)
+		shaped(RecipeCategory.MISC, Shrinking.Items.SHRINKING_MODULE)
 			.pattern("BPB")
 			.pattern("BEB")
 			.pattern("BLB")

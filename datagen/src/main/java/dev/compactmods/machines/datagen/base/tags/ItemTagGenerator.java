@@ -22,7 +22,7 @@ public class ItemTagGenerator extends ItemTagsProvider {
 
     @Override
     protected void addTags(HolderLookup.Provider provider) {
-        final var psd = Shrinking.PERSONAL_SHRINKING_DEVICE.get();
+        final var psd = Shrinking.Items.PERSONAL_SHRINKING_DEVICE.get();
 
         machines();
         curiosTags(psd);

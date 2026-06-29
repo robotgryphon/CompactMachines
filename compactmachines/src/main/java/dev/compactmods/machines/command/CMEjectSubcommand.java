@@ -26,11 +26,11 @@ public class CMEjectSubcommand {
     private static int execSpecificPlayer(CommandContext<CommandSourceStack> ctx) throws CommandSyntaxException {
         Collection<ServerPlayer> ent = EntityArgument.getPlayers(ctx, "player");
 
-        final var server = ctx.getSource().getServer();
-        final var history = server.getCapability(Shrinking.HISTORY_MANAGER);
-
         ent.forEach(player -> player.getExistingData(Shrinking.CURRENT_ROOM_CODE).ifPresent(_ -> {
-            history.clearHistory(player);
+            final var history = player.getCapability(Shrinking.HISTORY_MANAGER);
+            if(history != null)
+                history.clear();
+
             ShrinkingHelper.teleportPlayerToRespawnOrOverworld(ctx.getSource().getServer(), player);
         }));
 
@@ -42,8 +42,9 @@ public class CMEjectSubcommand {
         final MinecraftServer server = ctx.getSource().getServer();
 
         server.submitAsync(() -> {
-            final var history = server.getCapability(Shrinking.HISTORY_MANAGER);
-            history.clearHistory(player);
+            final var history = player.getCapability(Shrinking.HISTORY_MANAGER);
+            if(history != null)
+                history.clear();
         });
 
         ShrinkingHelper.teleportPlayerToRespawnOrOverworld(ctx.getSource().getServer(), player);

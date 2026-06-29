@@ -50,7 +50,6 @@ public class CompactMachinesServer {
     private static void serverStarted(final ServerStartedEvent started) {
         final var server = started.getServer();
         final var caps = server.getData(SERVER_CAPABILITIES);
-
         caps.chunkManager().initializeCache();
     }
 

@@ -78,16 +78,6 @@ neoForge {
 
     val cmMain = this.mods.create(modId) {
         this.modSourceSets.add(sourceSets.main)
-        // room-system is consumed as a game-library jar (FMLModType=GAMELIBRARY,
-        // see cm-module-conventions.gradle.kts). Adding it as a modSourceSet
-        // here would re-export the same packages under the `compactmachines`
-        // module identity, conflicting with the named `rooms` module that JPMS
-        // derives from the gamelibrary jar and producing:
-        //   ResolutionException: Modules rooms and compactmachines export
-        //   package dev.compactmods.machines.room.spawn to module
-        //   compactmachines.core
-        // The classes are still on the runtime classpath via
-        // implementation(project(":room-system")) and jarJar(project(":room-system")).
 
         if(System.getenv().containsKey("CI")) {
             modSourceSets.add(sourceSets.test)
