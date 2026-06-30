@@ -1,5 +1,6 @@
 package dev.compactmods.machines.api.room.capability;
 
+import dev.compactmods.machines.api.room.RoomInstance;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.MinecraftServer;
 import net.neoforged.neoforge.capabilities.BaseCapability;
@@ -38,9 +39,9 @@ public class RoomCapability<T, Ctx extends @Nullable Object> extends BaseCapabil
     }
 
     @ApiStatus.Internal
-    public @Nullable T getCapability(MinecraftServer server, String roomCode, @Nullable Ctx ctx) {
+    public @Nullable T getCapability(MinecraftServer server, RoomInstance room, @Nullable Ctx ctx) {
         for (IRoomCapabilityProvider<T, Ctx> provider : providers) {
-            T ret = provider.getCapability(server, roomCode, ctx);
+            T ret = provider.getCapability(server, room, ctx);
             if (ret != null) {
                 return ret;
             }

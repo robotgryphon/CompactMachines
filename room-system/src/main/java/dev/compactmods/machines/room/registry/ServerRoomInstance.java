@@ -24,11 +24,11 @@ public record ServerRoomInstance(
     }
 
     public <T, C> T getCapability(RoomCapability<T, C> capability) {
-        return capability.getCapability(server, code, null);
+        return capability.getCapability(server, this, null);
     }
 
     public <T, C> T getCapability(RoomCapability<T, C> capability, @Nullable C context) {
-        return capability.getCapability(server, code, context);
+        return capability.getCapability(server, this, context);
     }
 
     @Override

@@ -27,9 +27,13 @@ public class CMEjectSubcommand {
         Collection<ServerPlayer> ent = EntityArgument.getPlayers(ctx, "player");
 
         ent.forEach(player -> player.getExistingData(Shrinking.CURRENT_ROOM_CODE).ifPresent(_ -> {
-            final var history = player.getCapability(Shrinking.HISTORY_MANAGER);
-            if(history != null)
-                history.clear();
+            try (final var history = player.getCapability(Shrinking.HISTORY_MANAGER)) {
+                if (history != null)
+                    history.clear();
+
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
 
             ShrinkingHelper.teleportPlayerToRespawnOrOverworld(ctx.getSource().getServer(), player);
         }));
@@ -43,7 +47,7 @@ public class CMEjectSubcommand {
 
         server.submitAsync(() -> {
             final var history = player.getCapability(Shrinking.HISTORY_MANAGER);
-            if(history != null)
+            if (history != null)
                 history.clear();
         });
 

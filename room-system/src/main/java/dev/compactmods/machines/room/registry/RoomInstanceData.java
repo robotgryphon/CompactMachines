@@ -3,14 +3,13 @@ package dev.compactmods.machines.room.registry;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import dev.compactmods.machines.api.room.spatial.RoomBoundaries;
-import dev.compactmods.machines.core.data.CMDataFile;
 import dev.compactmods.machines.room.data.CMRoomDataLocations;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.phys.AABB;
 
 import java.nio.file.Path;
 
-public record RoomInstanceData(String roomCode, RoomBoundaries boundaries) implements CMDataFile<RoomInstanceData> {
+public record RoomInstanceData(String roomCode, RoomBoundaries boundaries) {
 
     public static final Codec<RoomInstanceData> CODEC = RecordCodecBuilder.create(i -> i.group(
             Codec.STRING.fieldOf("code").forGetter(RoomInstanceData::roomCode),
@@ -21,10 +20,5 @@ public record RoomInstanceData(String roomCode, RoomBoundaries boundaries) imple
 
     private Path getDataLocation(MinecraftServer server) {
         return CMRoomDataLocations.DATA_ROOT.apply(server).resolve("room_registrations");
-    }
-
-    @Override
-    public Codec<RoomInstanceData> codec() {
-        return CODEC;
     }
 }

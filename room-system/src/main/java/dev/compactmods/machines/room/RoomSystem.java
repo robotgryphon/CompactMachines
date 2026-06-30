@@ -1,14 +1,13 @@
 package dev.compactmods.machines.room;
 
-import dev.compactmods.machines.core.CompactMachinesCore;
 import net.neoforged.bus.api.IEventBus;
-import net.neoforged.fml.common.Mod;
 import net.neoforged.neoforge.common.NeoForge;
 
-@Mod(CompactMachinesCore.MOD_ID)
-public class RoomSystem {
+public final class RoomSystem {
 
-    public RoomSystem(IEventBus modBus) {
+    private RoomSystem() {}
+
+    public static void init(IEventBus modBus) {
         Rooms.prepare();
         registerContent(modBus);
 

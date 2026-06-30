@@ -5,7 +5,7 @@ import dev.compactmods.machines.api.room.RoomInstance;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-public interface PlayerTeleportHistoryManager {
+public interface PlayerTeleportHistoryManager extends AutoCloseable {
 
    Optional<PlayerRoomHistoryEntry> peek();
 

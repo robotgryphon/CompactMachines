@@ -8,7 +8,10 @@ import dev.compactmods.machines.feature.CMFeaturePacks;
 import dev.compactmods.machines.gamerule.CMGameRules;
 import dev.compactmods.machines.machine.Machines;
 import dev.compactmods.machines.network.CMNetworks;
+import dev.compactmods.machines.room.RoomSystem;
 import dev.compactmods.machines.shrinking.PlayerEventHandler;
+import dev.compactmods.machines.shrinking.Shrinking;
+import dev.compactmods.machines.upgrades.RoomUpgrades;
 import dev.compactmods.machines.room.block.ProtectedBlockEventHandler;
 import dev.compactmods.machines.villager.Villagers;
 import net.minecraft.util.ARGB;
@@ -36,6 +39,10 @@ public class CompactMachinesCommon {
         registerEvents(modBus);
 
         CMRegistries.setup(modBus);
+
+        RoomSystem.init(modBus);
+        RoomUpgrades.init(modBus);
+        Shrinking.init(modBus);
     }
 
     private static void registerEvents(IEventBus modBus) {

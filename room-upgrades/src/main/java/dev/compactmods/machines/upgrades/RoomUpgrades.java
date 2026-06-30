@@ -16,15 +16,15 @@ import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.tags.ItemTags;
 import net.neoforged.bus.api.IEventBus;
-import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
+import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.RegisterCommandsEvent;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
+import net.neoforged.neoforge.registries.NeoForgeRegistries;
 
-@Mod(CompactMachinesCore.MOD_ID)
-public class RoomUpgrades {
+public final class RoomUpgrades {
 
     interface RURegistries {
         DeferredRegister.DataComponents DATA_COMPONENTS = DeferredRegister.createDataComponents(Registries.DATA_COMPONENT_TYPE, CompactMachinesCore.MOD_ID);
@@ -57,7 +57,7 @@ public class RoomUpgrades {
 //        }
 //    }
 
-    public RoomUpgrades(IEventBus modBus) {
+    public static void init(IEventBus modBus) {
 
         RURegistries.ROOM_UPGRADE_DEFINITIONS.makeRegistry(builder -> {
             builder.sync(true);
@@ -74,7 +74,7 @@ public class RoomUpgrades {
     static void registerEvents(IEventBus modBus) {
         modBus.addListener(RoomUpgrades::commonSetup);
 
-        modBus.addListener(RoomUpgrades::onCommandsRegister);
+        NeoForge.EVENT_BUS.addListener(RoomUpgrades::onCommandsRegister);
         
 //        NeoForge.EVENT_BUS.addListener(RoomUpgradeEventHandlers::onLevelLoad);
 //        NeoForge.EVENT_BUS.addListener(RoomUpgradeEventHandlers::onLevelUnload);

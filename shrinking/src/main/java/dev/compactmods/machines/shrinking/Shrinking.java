@@ -2,8 +2,10 @@ package dev.compactmods.machines.shrinking;
 
 import com.mojang.serialization.Codec;
 import dev.compactmods.machines.api.room.RoomInstance;
+import dev.compactmods.machines.api.room.capability.RoomCapabilities;
 import dev.compactmods.machines.core.CompactMachinesCore;
 import dev.compactmods.machines.core.GameRulesHelper;
+import dev.compactmods.machines.core.data.DataFileUtil;
 import dev.compactmods.machines.room.Rooms;
 import dev.compactmods.machines.shrinking.api.ShrinkingDeviceConfiguration;
 import dev.compactmods.machines.shrinking.api.history.PlayerTeleportHistoryManager;
@@ -24,7 +26,6 @@ import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.gamerules.GameRule;
 import net.neoforged.bus.api.IEventBus;
-import net.neoforged.fml.common.Mod;
 import net.neoforged.neoforge.attachment.AttachmentType;
 import net.neoforged.neoforge.capabilities.EntityCapability;
 import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
@@ -37,7 +38,6 @@ import net.neoforged.neoforge.registries.NeoForgeRegistries;
 import java.util.Collections;
 import java.util.function.Supplier;
 
-@Mod(CompactMachinesCore.MOD_ID)
 public class Shrinking {
 
     private static final DeferredRegister<AttachmentType<?>> ATTACHMENT_TYPES = DeferredRegister.create(NeoForgeRegistries.ATTACHMENT_TYPES, CompactMachinesCore.MOD_ID);
@@ -58,7 +58,7 @@ public class Shrinking {
             .serialize(Codec.STRING.fieldOf("roomCode"))
             .build());
 
-    public Shrinking(IEventBus modBus) {
+    public static void init(IEventBus modBus) {
         Items.prepare();
         DataComponents.prepare();
         GameRules.prepare();
@@ -143,8 +143,10 @@ public class Shrinking {
                 return null;
             });
 
-            caps.registerEntity(HISTORY_MANAGER, EntityType.PLAYER, (player, _)
-                    -> new ServerPlayerTeleportHistoryManager(player.getUUID(), 5, Collections.emptyList()));
+            caps.registerEntity(HISTORY_MANAGER, EntityType.PLAYER, (player, _) -> {
+                final var server = player.level().getServer();
+                return new ServerPlayerTeleportHistoryManager(server, player.getUUID(), 5, Collections.emptyList());
+            });
         });
 
         modBus.addListener((BuildCreativeModeTabContentsEvent addToTabs) -> {

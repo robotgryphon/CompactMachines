@@ -123,8 +123,13 @@ public class CMRoomCoreSubcommand {
             held = held.without(Rooms.DataComponents.BOUND_ROOM_CODE);
 
             try (var tx = Transaction.openRoot()) {
-                final var swapped = access.exchange(held, 1, tx);
-                if (swapped == 1) {
+                int changed = 0;
+                if(originalHeld.isEmpty())
+                    changed = access.insert(held, 1, tx);
+                else
+                    changed = access.exchange(held, 1, tx);
+
+                if (changed == 1) {
                     tx.commit();
                     src.sendSuccess(() -> CommandTranslations.MACHINE_GIVEN.apply(player), true);
                 } else {

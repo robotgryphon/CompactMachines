@@ -180,7 +180,7 @@ public class ServerRoomGenerator implements RoomGenerator {
             if (chunkManager != null)
                 chunkManager.calculateChunks(inst.code(), inst.boundaries());
 
-            pendingReservations.remove(inst.code());
+            pendingReservations.remove(details.spiralIndex());
 
             return new RoomGenerationResult(inst.code(), newRoomBoundaries);
         });

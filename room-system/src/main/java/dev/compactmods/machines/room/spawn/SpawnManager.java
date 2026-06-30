@@ -8,51 +8,49 @@ import dev.compactmods.machines.api.room.spatial.RoomBoundaries;
 import dev.compactmods.machines.api.room.spawn.IRoomSpawnManager;
 import dev.compactmods.machines.api.room.spawn.IRoomSpawns;
 import dev.compactmods.machines.api.room.spawn.RoomSpawn;
-import dev.compactmods.machines.core.data.CMDataFile;
+import dev.compactmods.machines.core.data.DataFileUtil;
+import dev.compactmods.machines.core.data.Saveable;
+import dev.compactmods.machines.core.data.manager.CodecFileManager;
 import dev.compactmods.machines.room.data.CMRoomDataLocations;
+import it.unimi.dsi.fastutil.objects.Object2ReferenceLinkedOpenHashMap;
 import net.minecraft.core.UUIDUtil;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.phys.Vec2;
 import net.minecraft.world.phys.Vec3;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
-import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
-public class SpawnManager implements IRoomSpawnManager, CMDataFile<SpawnManager> {
+public class SpawnManager implements IRoomSpawnManager, Saveable {
 
-    private final Logger LOGS = LogManager.getLogger();
-
-    private static final UnboundedMapCodec<UUID, dev.compactmods.machines.api.room.spawn.RoomSpawn> PLAYER_SPAWNS_CODEC = Codec.unboundedMap(UUIDUtil.STRING_CODEC, dev.compactmods.machines.api.room.spawn.RoomSpawn.CODEC);
+    private static final UnboundedMapCodec<UUID, RoomSpawn> PLAYER_SPAWNS_CODEC = Codec.unboundedMap(UUIDUtil.STRING_CODEC, RoomSpawn.CODEC);
     public static final Codec<SpawnManager> CODEC = RecordCodecBuilder.create(inst -> inst.group(
             Codec.STRING.fieldOf("roomCode").forGetter(x -> x.roomCode),
             PLAYER_SPAWNS_CODEC.fieldOf("player_spawns").forGetter(x -> x.playerSpawns),
-            dev.compactmods.machines.api.room.spawn.RoomSpawn.CODEC.fieldOf("default_spawn").forGetter(x -> x.defaultSpawn),
+            RoomSpawn.CODEC.fieldOf("default_spawn").forGetter(x -> x.defaultSpawn),
             RoomBoundaries.MAP_CODEC.fieldOf("room_bounds").forGetter(x -> x.roomBoundaries)
     ).apply(inst, SpawnManager::new));
 
+    private MinecraftServer server;
+
     private final String roomCode;
-
     private final RoomBoundaries roomBoundaries;
+    private RoomSpawn defaultSpawn;
+    private final Map<UUID, RoomSpawn> playerSpawns;
 
-    private dev.compactmods.machines.api.room.spawn.RoomSpawn defaultSpawn;
-
-    private final Map<UUID, dev.compactmods.machines.api.room.spawn.RoomSpawn> playerSpawns;
-
-    public SpawnManager(RoomInstance instance) {
-        this.roomCode = instance.code();
-        this.playerSpawns = new HashMap<>();
-        this.roomBoundaries = instance.boundaries();
-        this.defaultSpawn = new RoomSpawn(instance.boundaries().defaultSpawn(), Vec2.ZERO);
+    SpawnManager(MinecraftServer server, RoomInstance roomInstance) {
+        this.server = server;
+        this.roomCode = roomInstance.code();
+        this.roomBoundaries = roomInstance.boundaries();
+        this.defaultSpawn = new RoomSpawn(roomBoundaries.defaultSpawn(), Vec2.ZERO);
+        this.playerSpawns = new Object2ReferenceLinkedOpenHashMap<>();
     }
 
-    private SpawnManager(String roomCode, Map<UUID, dev.compactmods.machines.api.room.spawn.RoomSpawn> playerSpawns, dev.compactmods.machines.api.room.spawn.RoomSpawn defaultSpawn, RoomBoundaries roomBoundaries) {
+    private SpawnManager(String roomCode, Map<UUID, RoomSpawn> playerSpawns, RoomSpawn defaultSpawn, RoomBoundaries roomBoundaries) {
         this.roomCode = roomCode;
-        this.playerSpawns = new HashMap<>(playerSpawns);
+        this.playerSpawns = new Object2ReferenceLinkedOpenHashMap<>(playerSpawns);
         this.defaultSpawn = defaultSpawn;
         this.roomBoundaries = roomBoundaries;
     }
@@ -64,12 +62,12 @@ public class SpawnManager implements IRoomSpawnManager, CMDataFile<SpawnManager>
 
     @Override
     public void setDefaultSpawn(Vec3 position, Vec2 rotation) {
-        defaultSpawn = new dev.compactmods.machines.api.room.spawn.RoomSpawn(position, rotation);
+        defaultSpawn = new RoomSpawn(position, rotation);
     }
 
     @Override
     public IRoomSpawns spawns() {
-        final var ps = new HashMap<UUID, dev.compactmods.machines.api.room.spawn.RoomSpawn>();
+        final var ps = new HashMap<UUID, RoomSpawn>();
         playerSpawns.forEach(ps::putIfAbsent);
         return new RoomSpawns(defaultSpawn, ps);
     }
@@ -79,23 +77,23 @@ public class SpawnManager implements IRoomSpawnManager, CMDataFile<SpawnManager>
         if (!roomBoundaries.innerBounds().contains(location))
             return;
 
-        playerSpawns.put(player, new dev.compactmods.machines.api.room.spawn.RoomSpawn(location, rotation));
-    }
-
-    private Path getDataLocation(MinecraftServer server) {
-        return CMRoomDataLocations.PLAYER_SPAWNS.apply(server);
+        playerSpawns.put(player, new RoomSpawn(location, rotation));
     }
 
     @Override
-    public Codec<SpawnManager> codec() {
-        return CODEC;
+    public void save() {
+        CodecFileManager.Single<SpawnManager> manager = CodecFileManager.single(CODEC)
+                .at(CMRoomDataLocations.PLAYER_SPAWNS)
+                .build(server);
+
+        manager.save();
     }
 
-    private record RoomSpawns(dev.compactmods.machines.api.room.spawn.RoomSpawn defaultSpawn,
-                              Map<UUID, dev.compactmods.machines.api.room.spawn.RoomSpawn> playerSpawnsSnapshot) implements IRoomSpawns {
+    private record RoomSpawns(RoomSpawn defaultSpawn,
+                              Map<UUID, RoomSpawn> playerSpawnsSnapshot) implements IRoomSpawns {
 
         @Override
-        public Optional<dev.compactmods.machines.api.room.spawn.RoomSpawn> forPlayer(UUID player) {
+        public Optional<RoomSpawn> forPlayer(UUID player) {
             return Optional.ofNullable(playerSpawnsSnapshot.get(player));
         }
     }

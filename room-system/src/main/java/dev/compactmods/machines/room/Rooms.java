@@ -1,10 +1,13 @@
 package dev.compactmods.machines.room;
 
 import com.mojang.serialization.Codec;
+import dev.compactmods.machines.api.room.spawn.IRoomSpawnManager;
 import dev.compactmods.machines.core.CompactMachinesCore;
 import dev.compactmods.machines.room.block.BreakableWallBlock;
 import dev.compactmods.machines.room.block.ItemBlockWall;
 import dev.compactmods.machines.room.block.SolidWallBlock;
+import dev.compactmods.machines.room.spawn.SpawnManager;
+import net.minecraft.core.Holder;
 import net.minecraft.core.UUIDUtil;
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.registries.BuiltInRegistries;

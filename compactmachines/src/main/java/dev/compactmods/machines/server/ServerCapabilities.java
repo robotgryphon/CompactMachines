@@ -12,7 +12,7 @@ import dev.compactmods.machines.api.room.spatial.RoomChunkManager;
 import dev.compactmods.machines.api.room.spawn.IRoomSpawnManagers;
 import dev.compactmods.machines.room.registry.ServerRoomRegistry;
 import dev.compactmods.machines.room.spatial.MemoryGraphChunkManager;
-import dev.compactmods.machines.room.spawn.RoomSpawnManagers;
+import dev.compactmods.machines.room.spawn.ServerRoomSpawnManagers;
 import net.minecraft.server.MinecraftServer;
 import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
 
@@ -21,13 +21,13 @@ import java.util.stream.Stream;
 class ServerCapabilities implements Saveable, IServerCapabilities {
 
     private final RoomRegistry roomRegistry;
-    private final RoomSpawnManagers spawnManagers;
+    private final ServerRoomSpawnManagers spawnManagers;
     private final RoomGenerator roomGenerator;
     private final RoomChunkManager roomChunkManager;
 
     ServerCapabilities(MinecraftServer server) {
         this.roomRegistry = new ServerRoomRegistry(server);
-        this.spawnManagers = new RoomSpawnManagers(server);
+        this.spawnManagers = new ServerRoomSpawnManagers(server);
         this.roomGenerator = new ServerRoomGenerator(server, roomRegistry);
         this.roomChunkManager = new MemoryGraphChunkManager(server);
     }
@@ -76,12 +76,12 @@ class ServerCapabilities implements Saveable, IServerCapabilities {
             return caps.chunkManager();
         });
 
-        RoomCapability.register(RoomCapabilities.SPAWN_MANAGER, (server, roomCode, _) -> {
-            var caps = server.getData(CompactMachinesServer.SERVER_CAPABILITIES);
-            return caps.spawnManagers().get(roomCode);
-        });
+        RoomCapability.register(RoomCapabilities.ROOM_DATA_ATTACHMENTS, (server, room, _)
+                -> new RoomDataAttachments(server, room.code()));
 
-        RoomCapability.register(RoomCapabilities.ROOM_DATA_ATTACHMENTS, (server, roomCode, _)
-                -> new RoomDataAttachments(server, roomCode));
+        RoomCapability.register(RoomCapabilities.SPAWN_MANAGER, (server, room, _) -> {
+            var data = server.getData(CompactMachinesServer.SERVER_CAPABILITIES);
+            return data.spawnManagers().get(room);
+        });
     }
 }
