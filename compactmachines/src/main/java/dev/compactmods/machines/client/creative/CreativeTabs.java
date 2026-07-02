@@ -17,7 +17,7 @@ public interface CreativeTabs {
     static void prepare() {
         TABS.register(MAIN_RL.getPath(), () -> CreativeModeTab.builder()
             .icon(() -> Machines.Items.MACHINE.toStack(1))
-            .title(Component.translatableWithFallback("itemGroup.CompactMachinesCore.main", "Compact Machines"))
+            .title(Component.translatableWithFallback("itemGroup.compactmachines.main", "Compact Machines"))
             .displayItems(CreativeTabs::fillItems)
             .build());
     }
@@ -25,10 +25,10 @@ public interface CreativeTabs {
     static void fillItems(CreativeModeTab.ItemDisplayParameters params, CreativeModeTab.Output output) {
         output.accept(Rooms.Items.BREAKABLE_WALL.get(), CreativeModeTab.TabVisibility.PARENT_AND_SEARCH_TABS);
 
+        output.accept(Machines.Items.MACHINE.get(), CreativeModeTab.TabVisibility.PARENT_AND_SEARCH_TABS);
         output.accept(Shrinking.Items.PERSONAL_SHRINKING_DEVICE.get(), CreativeModeTab.TabVisibility.PARENT_AND_SEARCH_TABS);
         output.accept(Shrinking.Items.SHRINKING_MODULE.get(), CreativeModeTab.TabVisibility.PARENT_AND_SEARCH_TABS);
         output.accept(Shrinking.Items.ENLARGING_MODULE.get(), CreativeModeTab.TabVisibility.PARENT_AND_SEARCH_TABS);
-        // output.accept(Shrinking.RESIZING_MODULE.get(), CreativeModeTab.TabVisibility.PARENT_AND_SEARCH_TABS);
 
         // TODO: Items with a room mapping (paper room cores?)
 //        final var lookup = params.holders().lookupOrThrow(RoomTemplate.REGISTRY_KEY);

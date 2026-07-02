@@ -4,13 +4,12 @@ import com.mojang.serialization.Codec;
 import dev.compactmods.machines.core.data.DataFileUtil;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.util.StringRepresentable;
-import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.file.PathUtils;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
-import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Optional;
@@ -129,11 +128,12 @@ public abstract sealed class CodecFileManager implements AutoCloseable {
             this.dirtyFiles.add(key);
         }
 
+        @SuppressWarnings("resource")
         public Stream<String> existingFiles() {
             try {
-                return FileUtils
-                        .streamFiles(directory.toFile(), false)
-                        .map(File::getName);
+                return Files.list(directory)
+                        .filter(Files::isRegularFile)
+                        .map(PathUtils::getBaseName);
             } catch (IOException e) {
                 return Stream.empty();
             }

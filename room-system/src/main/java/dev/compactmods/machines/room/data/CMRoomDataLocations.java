@@ -9,7 +9,9 @@ import java.util.function.Function;
 
 public interface CMRoomDataLocations {
 
-    Function<MinecraftServer, Path> DATA_ROOT = (server) -> server.getWorldPath(LevelResource.ROOT)
+    Function<MinecraftServer, Path> DATA_ROOT = (server) -> server
+            .getServerDirectory()
+            .resolve(server.getWorldPath(LevelResource.DATA))
             .resolve(CompactMachinesCore.MOD_ID);
 
     Function<MinecraftServer, Path> REGISTRY_FILES = (server) -> DATA_ROOT.apply(server)

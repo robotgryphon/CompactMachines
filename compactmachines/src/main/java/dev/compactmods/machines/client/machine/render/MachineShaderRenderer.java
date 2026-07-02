@@ -107,29 +107,29 @@ public class MachineShaderRenderer {
                 .forEach(rk -> shadersTmp.put(rk.identifier(), new LongArrayList()));
 
         var defaultFlag = Identifier.tryParse(ClientConfig.DEFAULT_PRIDE_FLAG.get());
-        if(defaultFlag == null)
+        if (defaultFlag == null)
             defaultFlag = shaders.getAny().map(r -> r.key().identifier()).orElse(DEFAULT_FLAG);
 
         // iterate positions of BEs
         Identifier finalDefaultFlag = defaultFlag;
-        e.getLevelRenderer().iterateVisibleBlockEntities(be -> {
+        e.getLevelExtractor().iterateVisibleBlockEntities(be -> {
             if (be instanceof CompactMachineBlockEntity mbe) {
                 final var core = mbe.coreHandler().getResource(0);
 
                 // If we have a core, try to pull the shader from the core item
                 if (!core.isEmpty()) {
                     final var flag = core.getOrDefault(CMDataComponents.PRIDE_FLAG, finalDefaultFlag);
-                    if(shadersTmp.containsKey(flag)) {
+                    if (shadersTmp.containsKey(flag)) {
                         final var list = shadersTmp.get(flag);
                         if (list != null)
                             list.add(mbe.getBlockPos().asLong());
                     }
                 } else {
                     // If we DO NOT have a core, and it's Pride month...
-                    if(ClientConfig.ENABLE_PRIDE.isFalse() || LocalDate.now().getMonth() != Month.JUNE)
+                    if (ClientConfig.ENABLE_PRIDE.isFalse() || LocalDate.now().getMonth() != Month.JUNE)
                         return;
 
-                    if(shadersTmp.containsKey(finalDefaultFlag)) {
+                    if (shadersTmp.containsKey(finalDefaultFlag)) {
                         final var list = shadersTmp.get(finalDefaultFlag);
                         if (list != null)
                             list.add(mbe.getBlockPos().asLong());
@@ -163,11 +163,11 @@ public class MachineShaderRenderer {
         if (state == null || state.meshes.isEmpty())
             return;
 
-        var transforms = RenderSystem.getDynamicUniforms().writeTransform(RenderSystem.getModelViewMatrix(), colorModulator, worldOffset, textureTransform);
+        var transforms = RenderSystem.getDynamicUniforms().writeTransform(RenderSystem.getModelViewMatrixCopy(), colorModulator, worldOffset, textureTransform);
 
-        var renderTarget = Minecraft.getInstance().getMainRenderTarget();
-        if (e.getLevelRenderer().getTranslucentTarget() != null)
-            renderTarget = e.getLevelRenderer().getTranslucentTarget();
+        var renderTarget = Minecraft.getInstance().gameRenderer.mainRenderTarget();
+        if (e.getLevelRenderer().translucentTarget() != null)
+            renderTarget = e.getLevelRenderer().translucentTarget();
 
         AtomicReference<RenderPipeline> shader = new AtomicReference<>(FlagShaders.PRIDE_STRIPES_PIPELINE);
 
@@ -176,7 +176,7 @@ public class MachineShaderRenderer {
             if (mesh == null)
                 continue;
 
-            if(mesh.MeshState == null || mesh.VertexBuffer == null || mesh.IndexBuffer == null)
+            if (mesh.MeshState == null || mesh.VertexBuffer == null || mesh.IndexBuffer == null)
                 continue;
 
             final var registry = state.clientLevel.registryAccess()
@@ -197,20 +197,20 @@ public class MachineShaderRenderer {
             try (var pass = RenderSystem.getDevice().createCommandEncoder().createRenderPass(
                     () -> CompactMachinesCore.dotPrefix("machines"),
                     renderTarget.getColorTextureView(),
-                    OptionalInt.empty(),
+                    Optional.empty(),
                     renderTarget.getDepthTextureView(),
                     OptionalDouble.empty())
             ) {
                 pass.setPipeline(shader.get());
                 RenderSystem.bindDefaultUniforms(pass);
-                pass.setVertexBuffer(0, mesh.VertexBuffer);
+                pass.setVertexBuffer(0, mesh.VertexBuffer.slice());
                 pass.setIndexBuffer(mesh.IndexBuffer, mesh.MeshState.indexType());
 //            pass.bindTexture("Sampler0", texture.getTextureView(), texture.getSampler());
                 pass.setUniform("DynamicTransforms", transforms);
                 if (usePride[0] && paletteBuffer != null) {
                     pass.setUniform("FlagPalette", paletteBuffer);
                 }
-                pass.drawIndexed(0, 0, mesh.MeshState.indexCount(), 1);
+                pass.drawIndexed(mesh.MeshState.indexCount(), 1, 0, 0, 0);
             }
         }
     }

@@ -23,11 +23,11 @@ public class BlockTagGenerator extends BlockTagsProvider {
 
     @Override
     protected void addTags(HolderLookup.Provider provider) {
-        final var breakableWall = Rooms.Blocks.BREAKABLE_WALL.get();
-        final var solidWall = Rooms.Blocks.SOLID_WALL.get();
-        final var machineBlock = Machines.Blocks.MACHINE.get();
-        final var voidAir = Dimension.BLOCK_MACHINE_VOID_AIR.get();
-        final var spatialWorkbench = Villagers.SPATIAL_WORKBENCH.get();
+        final var breakableWall = Rooms.Blocks.BREAKABLE_WALL.getKey();
+        final var solidWall = Rooms.Blocks.SOLID_WALL.getKey();
+        final var machineBlock = Machines.Blocks.MACHINE.getKey();
+        final var voidAir = Dimension.BLOCK_MACHINE_VOID_AIR.getKey();
+        final var spatialWorkbench = Villagers.SPATIAL_WORKBENCH.getKey();
 
         tag(MachineConstants.MACHINE_BLOCK)
                 .add(machineBlock);

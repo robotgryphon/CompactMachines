@@ -1,5 +1,6 @@
 package dev.compactmods.machines.client.machine.shader;
 
+import com.mojang.blaze3d.PrimitiveTopology;
 import com.mojang.blaze3d.pipeline.BlendFunction;
 import com.mojang.blaze3d.pipeline.ColorTargetState;
 import com.mojang.blaze3d.pipeline.DepthStencilState;
@@ -9,6 +10,7 @@ import com.mojang.blaze3d.shaders.UniformType;
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.VertexFormat;
 import dev.compactmods.machines.core.CompactMachinesCore;
+import net.minecraft.client.renderer.BindGroupLayouts;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.client.renderer.rendertype.OutputTarget;
 import net.minecraft.client.renderer.rendertype.RenderSetup;
@@ -17,9 +19,9 @@ import net.minecraft.client.renderer.rendertype.RenderType;
 public interface MachineShaders {
 
     RenderPipeline.Snippet SEMITRANSPARENT_SNIPPET = RenderPipeline.builder(RenderPipelines.GLOBALS_SNIPPET)
-            .withVertexFormat(DefaultVertexFormat.POSITION_COLOR_NORMAL, VertexFormat.Mode.QUADS)
-            .withUniform("DynamicTransforms", UniformType.UNIFORM_BUFFER)
-            .withUniform("Projection", UniformType.UNIFORM_BUFFER)
+            .withVertexBinding(0, DefaultVertexFormat.POSITION_COLOR_NORMAL)
+            .withPrimitiveTopology(PrimitiveTopology.QUADS)
+            .withBindGroupLayout(BindGroupLayouts.MATRICES_PROJECTION)
             .withCull(true)
             .withDepthStencilState(new DepthStencilState(CompareOp.LESS_THAN_OR_EQUAL, false))
             .withColorTargetState(new ColorTargetState(BlendFunction.TRANSLUCENT))

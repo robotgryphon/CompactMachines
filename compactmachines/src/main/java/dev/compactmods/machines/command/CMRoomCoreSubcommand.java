@@ -33,19 +33,19 @@ public class CMRoomCoreSubcommand {
                 .requires(Commands.hasPermission(Commands.LEVEL_GAMEMASTERS));
 
 
-        // /cm core new [template]
+        // room_core new [template]
         subRoot.then(Commands.literal("new")
                 .then(Commands.argument("template", IdentifierArgument.id())
                         .suggests(Suggestors.ROOM_TEMPLATES)
                         .executes(CMRoomCoreSubcommand::giveNewMachineExecutor)));
 
-        // /cm core bind_to [room-roomCode]
+        // room_core bind_to [room-roomCode]
         subRoot.then(Commands.literal("bind_to")
                 .then(Commands.argument("room", StringArgumentType.string())
                         .suggests(Suggestors.ROOM_CODES)
                         .executes(CMRoomCoreSubcommand::bindExistingRoomExecutor)));
 
-        // /cm give [player]
+        // room_core give [player]
         var giveSpecificPlayer = Commands.argument("player", EntityArgument.player());
 
         // /cm give [player] new [template]
@@ -54,11 +54,11 @@ public class CMRoomCoreSubcommand {
                         .suggests(Suggestors.ROOM_TEMPLATES)
                         .executes(CMRoomCoreSubcommand::giveNewMachineSpecificPlayer)));
 
-        // /cm give [player] existing [room-roomCode]
-        giveSpecificPlayer.then(Commands.literal("existing")
+        // /cm give [player] bind_to [room-roomCode]
+        giveSpecificPlayer.then(Commands.literal("bind_to")
                 .then(Commands.argument("room", StringArgumentType.string())
                         .suggests(Suggestors.ROOM_CODES)
-                        .executes(CMRoomCoreSubcommand::giveExistingRoomSpecificPlayer)));
+                        .executes(CMRoomCoreSubcommand::bindExistingRoomSpecificPlayer)));
 
         subRoot.then(giveSpecificPlayer);
 
@@ -97,7 +97,7 @@ public class CMRoomCoreSubcommand {
         return 0;
     }
 
-    private static int giveExistingRoomSpecificPlayer(CommandContext<CommandSourceStack> ctx) throws CommandSyntaxException {
+    private static int bindExistingRoomSpecificPlayer(CommandContext<CommandSourceStack> ctx) throws CommandSyntaxException {
         final var src = ctx.getSource();
         final var player = EntityArgument.getPlayer(ctx, "player");
         final var roomCode = StringArgumentType.getString(ctx, "room");
@@ -122,20 +122,7 @@ public class CMRoomCoreSubcommand {
             held = held.with(Rooms.DataComponents.ROOM_TEMPLATE_ID, templateId);
             held = held.without(Rooms.DataComponents.BOUND_ROOM_CODE);
 
-            try (var tx = Transaction.openRoot()) {
-                int changed = 0;
-                if(originalHeld.isEmpty())
-                    changed = access.insert(held, 1, tx);
-                else
-                    changed = access.exchange(held, 1, tx);
-
-                if (changed == 1) {
-                    tx.commit();
-                    src.sendSuccess(() -> CommandTranslations.MACHINE_GIVEN.apply(player), true);
-                } else {
-                    src.sendFailure(CommandTranslations.CANNOT_GIVE_MACHINE.get());
-                }
-            }
+            swapHeldItem(player, src, access, held, originalHeld);
         } else {
             src.sendFailure(CommandTranslations.CANNOT_GIVE_MACHINE.get());
         }
@@ -151,25 +138,35 @@ public class CMRoomCoreSubcommand {
             final var access = ItemAccess.forPlayerInteraction(player, InteractionHand.MAIN_HAND);
 
             var held = access.getResource();
+            var originalHeld = access.getResource();
             if (held.isEmpty())
                 held = ItemResource.of(Items.PAPER);
 
             held = held.with(Rooms.DataComponents.BOUND_ROOM_CODE, roomCode);
             held = held.without(Rooms.DataComponents.ROOM_TEMPLATE_ID);
 
-            try (var tx = Transaction.openRoot()) {
-                final var swapped = access.exchange(held, 1, tx);
-                if (swapped > 0) {
-                    tx.commit();
-                    src.sendSuccess(() -> CommandTranslations.MACHINE_GIVEN.apply(player), true);
-                } else {
-                    src.sendFailure(CommandTranslations.CANNOT_GIVE_MACHINE.get());
-                }
-            }
+            swapHeldItem(player, src, access, held, originalHeld);
         }, () -> {
             LOGGER.error("Error giving player a new machine block: room not found.");
             src.sendFailure(RoomTranslations.UNKNOWN_ROOM_BY_CODE.apply(roomCode));
         });
+    }
+
+    private static void swapHeldItem(ServerPlayer player, CommandSourceStack src, ItemAccess access, ItemResource held, ItemResource originalHeld) {
+        try (var tx = Transaction.openRoot()) {
+            int changed = 0;
+            if(originalHeld.isEmpty())
+                changed = access.insert(held, 1, tx);
+            else
+                changed = access.exchange(held, 1, tx);
+
+            if (changed == 1) {
+                tx.commit();
+                src.sendSuccess(() -> CommandTranslations.MACHINE_GIVEN.apply(player), true);
+            } else {
+                src.sendFailure(CommandTranslations.CANNOT_GIVE_MACHINE.get());
+            }
+        }
     }
 }
 

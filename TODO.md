@@ -1,21 +1,22 @@
-# 26.1 Port TODO
+# 26.2 Port TODO
 
-- [ ] Reorganize modules to split the massive core project into smaller modules
-  - [ ] Core
-  - [ ] Dimension
-    - [x] Dimension API
-    - [ ] Dimension
-  - [ ] Room System
-    - [x] Room API
-    - [ ] Room System Implementation
-  - [ ] Room Upgrade System
-    - [ ] Room Upgrade API
-    - [ ] Room Upgrade Implementation
-  - [x] Main Mod
+## Feature: Room Generation
+- 🟩 Create new room via core w/ template
+- 🟧 Create new room via command
 
+## Feature: Shrinking System 
 
-Still need to collapse the API packages into one module instead of 2:
+Enter
+- 🟩 Can enter a new room via machine (template generation)
+- 🟩 Can enter an existing room via machine 
+- ⬜ Can enter a room via command
 
-- [x] Room System
-- [ ] Dimension System
-- [ ] Room Upgrade System
+Leave
+- 🟩 Can leave a room while world is active
+- 🟩 Can leave a room after save + reload
+- ⬜ Can leave a room using keybind (quick exit)
+- 🟩 Can leave ALL rooms via eject command
+
+## Feature: Room Previews
+- ⬜ Machine Room Preview (UI)
+- ⬜ Inside Machine Block*

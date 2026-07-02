@@ -28,7 +28,7 @@ public class GenerateRoomCommand {
         // /cm rooms
         final LiteralArgumentBuilder<CommandSourceStack> subRoot = LiteralArgumentBuilder.literal("generate");
 
-        // TODO: /cm rooms create [size]
+        // TODO: /cm rooms generate [template]
 
         // generate [template]
         subRoot.then(Commands.argument("template", IdentifierArgument.id())
@@ -63,7 +63,7 @@ public class GenerateRoomCommand {
             instance.ifPresent(result -> {
                 Component preamble = Component.translatableWithFallback(CREATED_I18N_KEY, "Generated new room from template. New room ID: ");
                 Component success = Component.literal(result.newCode())
-                        .withStyle(s -> s.withClickEvent(new ClickEvent.SuggestCommand("/compactmachines give existing " + result.newCode()))
+                        .withStyle(s -> s.withClickEvent(new ClickEvent.SuggestCommand("/compactmachines room_core bind_to " + result.newCode()))
                                 .withHoverEvent(new HoverEvent.ShowText(Component.literal("Click to give a new core")))
                                 .withUnderlined(true));
 

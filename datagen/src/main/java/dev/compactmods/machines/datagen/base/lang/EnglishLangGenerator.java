@@ -17,7 +17,6 @@ import dev.compactmods.machines.room.RoomTranslations;
 import dev.compactmods.machines.room.Rooms;
 import dev.compactmods.machines.shrinking.Shrinking;
 import dev.compactmods.machines.villager.Villagers;
-import net.minecraft.resources.Identifier;
 import net.minecraft.util.Util;
 import net.minecraft.data.PackOutput;
 
@@ -95,6 +94,9 @@ public class EnglishLangGenerator extends dev.compactmods.machines.datagen.base.
 
         addBlock(Rooms.Blocks.BREAKABLE_WALL, "Compact Machine Wall");
         addBlock(Rooms.Blocks.SOLID_WALL, "Solid Compact Machine Wall");
+
+        addItem(Rooms.Items.BREAKABLE_WALL, "Compact Machine Wall");
+        addItem(Rooms.Items.SOLID_WALL, "Solid Compact Machine Wall");
 
         addItem(Shrinking.Items.PERSONAL_SHRINKING_DEVICE, "Personal Shrinking Device");
         addItem(Shrinking.Items.SHRINKING_MODULE, "Atom Shrinking Module");

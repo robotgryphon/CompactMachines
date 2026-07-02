@@ -8,7 +8,7 @@ import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemp
 public class ClientRoomPacketHandler {
     public static void handleBlockData(StructureTemplate blocks) {
         final var mc = Minecraft.getInstance();
-        if(mc.screen instanceof MachineRoomScreen) {
+        if(mc.gui.screen() instanceof MachineRoomScreen) {
 
             //            var virtualLevel = new VirtualLevel(Minecraft.getInstance().level.registryAccess(), true, level -> {
 //                level.refreshBlockEntityModels();

@@ -66,7 +66,6 @@ public class ServerRoomRegistry implements RoomRegistry, AutoCloseable {
     public Stream<String> allRoomCodes() {
         // TODO: Filter via room code regex rather than length here
         return ROOM_REGISTRAR_DATA.existingFiles()
-                .map(f -> f.substring(0, f.lastIndexOf('.')))
                 .filter(f -> f.length() == 14);
     }
 

@@ -2,6 +2,7 @@ package dev.compactmods.machines.datagen.util;
 
 import dev.compactmods.machines.dimension.Dimension;
 import net.minecraft.core.HolderSet;
+import net.minecraft.data.worldgen.DimensionTypes;
 import net.minecraft.resources.Identifier;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.TagKey;
@@ -37,7 +38,6 @@ public class DimensionTypeBuilder {
     private int minY = 0;
     private int height = 256;
     private int logicalHeight = 256;
-    private TagKey<Block> infiniburn = BlockTags.INFINIBURN_OVERWORLD;
     private Identifier effectsLocation = BuiltinDimensionTypes.OVERWORLD.identifier();
     private float ambientLight = 0;
 
@@ -123,11 +123,6 @@ public class DimensionTypeBuilder {
         return this;
     }
 
-    public DimensionTypeBuilder infiniburn(TagKey<Block> infiburn) {
-        this.infiniburn = infiburn;
-        return this;
-    }
-
     public DimensionTypeBuilder effects(Identifier effects) {
         this.effectsLocation = effects;
         return this;
@@ -142,7 +137,7 @@ public class DimensionTypeBuilder {
         // TODO: Add MonsterSettings here, right now it copies overworld
         return new DimensionType(true, hasSkylight, hasCeiling,
                 hasDragonFight, coordinateScale,
-                minY, height, logicalHeight, infiniburn, ambientLight,
+                minY, height, logicalHeight, HolderSet.empty(), ambientLight,
                 new DimensionType.MonsterSettings(UniformInt.of(0, 7), 0),
                 DimensionType.Skybox.NONE,
                 CardinalLighting.Type.DEFAULT,

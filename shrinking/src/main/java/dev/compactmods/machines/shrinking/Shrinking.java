@@ -21,7 +21,7 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.EntityTypes;
 import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.gamerules.GameRule;
@@ -136,14 +136,14 @@ public class Shrinking {
         ROOM_ENTRYPOINT_TYPES.register(modBus);
 
         modBus.addListener((RegisterCapabilitiesEvent caps) -> {
-            caps.registerEntity(Shrinking.SHRINK, EntityType.PLAYER, (player, roomInstance) -> {
+            caps.registerEntity(Shrinking.SHRINK, EntityTypes.PLAYER, (player, roomInstance) -> {
                 if (player instanceof ServerPlayer serverPlayer)
                     return new ServerPlayerShrinkingHandler(serverPlayer, roomInstance);
 
                 return null;
             });
 
-            caps.registerEntity(HISTORY_MANAGER, EntityType.PLAYER, (player, _) -> {
+            caps.registerEntity(HISTORY_MANAGER, EntityTypes.PLAYER, (player, _) -> {
                 final var server = player.level().getServer();
                 return new ServerPlayerTeleportHistoryManager(server, player.getUUID(), 5, Collections.emptyList());
             });

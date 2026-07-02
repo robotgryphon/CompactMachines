@@ -1,5 +1,6 @@
 package dev.compactmods.machines.client.machine.render;
 
+import com.mojang.blaze3d.PrimitiveTopology;
 import com.mojang.blaze3d.buffers.GpuBuffer;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.*;
@@ -40,7 +41,7 @@ public class MachineMeshHelper {
         var size = positions.size() * VERTEX_FORMAT.getVertexSize();
         if (size == 0) return null;
 
-        var builder = new BufferBuilder(meshBuffer, VertexFormat.Mode.QUADS, VERTEX_FORMAT);
+        var builder = new BufferBuilder(meshBuffer, PrimitiveTopology.QUADS, VERTEX_FORMAT);
         for (long position : positions) {
             var x = BlockPos.getX(position);
             var y = BlockPos.getY(position);

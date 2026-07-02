@@ -1,13 +1,10 @@
 package dev.compactmods.machines.room;
 
 import com.mojang.serialization.Codec;
-import dev.compactmods.machines.api.room.spawn.IRoomSpawnManager;
 import dev.compactmods.machines.core.CompactMachinesCore;
 import dev.compactmods.machines.room.block.BreakableWallBlock;
 import dev.compactmods.machines.room.block.ItemBlockWall;
 import dev.compactmods.machines.room.block.SolidWallBlock;
-import dev.compactmods.machines.room.spawn.SpawnManager;
-import net.minecraft.core.Holder;
 import net.minecraft.core.UUIDUtil;
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -62,7 +59,7 @@ public interface Rooms {
     interface Items {
         Supplier<Item.Properties> WALL_ITEM_PROPS = Item.Properties::new;
 
-        DeferredItem<ItemBlockWall> ITEM_SOLID_WALL = ITEMS.register("solid_wall", () ->
+        DeferredItem<ItemBlockWall> SOLID_WALL = ITEMS.register("solid_wall", () ->
                 new ItemBlockWall(Blocks.SOLID_WALL.get(), WALL_ITEM_PROPS.get()
                         .setId(ResourceKey.create(Registries.ITEM, CompactMachinesCore.identifier("solid_wall")))));
 
