@@ -14,13 +14,12 @@ import net.minecraft.util.Mth;
 import java.util.List;
 import java.util.stream.Stream;
 
-/// A datapack-defined room upgrade: tick-scheduling metadata plus a bundle of *configured*
-/// [RoomUpgradeComponent] instances.
+/// A datapack-defined room upgrade: tick-scheduling metadata plus a bundle of [RoomUpgradeComponent] instances.
 ///
 /// This is the single upgrade definition — there is no separate tick-system registry. A room enables upgrades by key
 /// (see `RoomSystems.ENABLED_UPGRADES`); the dispatcher ticks each enabled upgrade's [TickingRoomUpgradeComponent]s,
-/// staggered/scaled by the metadata here. "Same component type, many configurations" lives here too — e.g. a
-/// `cobble_generator` and an `ore_generator` each carry a differently-configured block-generator component.
+/// staggered/scaled by the metadata here. Components are identified purely by type id — they carry no per-instance
+/// configuration in this bundle; configuration is planned to arrive through a separate system.
 ///
 /// The window knobs form a **scaling stagger window**: the dispatcher caps how many rooms with this upgrade tick per
 /// server tick, so the window grows with the number of rooms that have it enabled and per-tick load stays bounded.
@@ -40,7 +39,7 @@ public record CompiledRoomUpgrade(
             Codec.INT.optionalFieldOf("max_rooms_per_tick", 8).forGetter(CompiledRoomUpgrade::maxRoomsPerTick),
             Codec.INT.optionalFieldOf("min_tick_window", 1).forGetter(CompiledRoomUpgrade::minTickWindow),
             Codec.INT.optionalFieldOf("max_tick_window", 200).forGetter(CompiledRoomUpgrade::maxTickWindow),
-            // Each list entry is { "type": "<component type>", <config> }, via the component dispatch codec.
+            // Each list entry is { "type": "<component type>" }, via the component dispatch codec.
             RoomUpgradeCodecs.DISPATCH_CODEC.listOf().fieldOf("components").forGetter(CompiledRoomUpgrade::components)
     ).apply(i, CompiledRoomUpgrade::new));
 

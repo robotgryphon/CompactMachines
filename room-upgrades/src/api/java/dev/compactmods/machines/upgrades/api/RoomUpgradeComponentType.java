@@ -1,43 +1,31 @@
 package dev.compactmods.machines.upgrades.api;
 
-import com.mojang.serialization.MapCodec;
 import dev.compactmods.machines.core.CompactMachinesCore;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.flag.FeatureElement;
 import net.minecraft.world.flag.FeatureFlagSet;
 import net.minecraft.world.flag.FeatureFlags;
-import net.minecraft.world.item.ItemStack;
 
-import java.util.function.Predicate;
 import java.util.function.Supplier;
 
 public record RoomUpgradeComponentType<T extends RoomUpgradeComponent>(
         Supplier<T> constructor,
-        MapCodec<T> codec,
-        FeatureFlagSet requiredFeatures,
-        Predicate<ItemStack> itemstackFilter
+        FeatureFlagSet requiredFeatures
 ) implements FeatureElement {
 
     public static final ResourceKey<Registry<RoomUpgradeComponentType<?>>> REGISTRY_KEY = ResourceKey.createRegistryKey(CompactMachinesCore.identifier("room_upgrade_component"));
 
-    public static <T extends RoomUpgradeComponent> Builder<T> builder(Supplier<T> constructor, MapCodec<T> codec) {
-        return new Builder<>(constructor, codec);
-    }
-
-    public boolean canApplyTo(ItemStack item) {
-        return itemstackFilter == null || itemstackFilter.test(item);
+    public static <T extends RoomUpgradeComponent> Builder<T> builder(Supplier<T> constructor) {
+        return new Builder<>(constructor);
     }
 
     public static class Builder<T extends RoomUpgradeComponent> {
         private final Supplier<T> constructor;
-        private final MapCodec<T> codec;
         private FeatureFlagSet requiredFeatures;
-        private Predicate<ItemStack> itemPredicate;
 
-        public Builder(Supplier<T> constructor, MapCodec<T> codec) {
+        public Builder(Supplier<T> constructor) {
             this.constructor = constructor;
-            this.codec = codec;
             this.requiredFeatures = FeatureFlags.DEFAULT_FLAGS;
         }
 
@@ -46,14 +34,8 @@ public record RoomUpgradeComponentType<T extends RoomUpgradeComponent>(
             return this;
         }
 
-        public Builder<T> itemPredicate(Predicate<ItemStack> predicate) {
-            this.itemPredicate = predicate;
-            return this;
-        }
-
         public RoomUpgradeComponentType<T> build() {
-            return new RoomUpgradeComponentType<>(constructor, codec, requiredFeatures, itemPredicate);
+            return new RoomUpgradeComponentType<>(constructor, requiredFeatures);
         }
-
     }
 }

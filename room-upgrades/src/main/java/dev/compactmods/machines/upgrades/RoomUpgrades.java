@@ -1,21 +1,15 @@
 package dev.compactmods.machines.upgrades;
 
-import com.mojang.brigadier.builder.LiteralArgumentBuilder;
-import dev.compactmods.machines.api.room.capability.RoomCapability;
 import dev.compactmods.machines.upgrades.api.RoomUpgradeComponentType;
 import dev.compactmods.machines.upgrades.api.RoomUpgradesApi;
-import dev.compactmods.machines.upgrades.api.capability.RoomUpgradeCapabilities;
-import dev.compactmods.machines.upgrades.api.component.RoomUpgradeComponentList;
 import dev.compactmods.machines.core.CompactMachinesCore;
 import dev.compactmods.machines.room.CMFeatureFlags;
-import dev.compactmods.machines.upgrades.command.RUCommands;
 import dev.compactmods.machines.upgrades.command.RoomUpgradesSubcommand;
 import dev.compactmods.machines.upgrades.example.TreeCutterUpgradeComponent;
+import dev.compactmods.machines.upgrades.storage.ResourceTypes;
+import dev.compactmods.machines.upgrades.storage.StorageCapabilities;
 import dev.compactmods.machines.upgrades.system.RoomSystems;
-import net.minecraft.commands.Commands;
-import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.tags.ItemTags;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
@@ -23,7 +17,6 @@ import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.RegisterCommandsEvent;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
-import net.neoforged.neoforge.registries.NeoForgeRegistries;
 
 public final class RoomUpgrades {
 
@@ -37,9 +30,8 @@ public final class RoomUpgrades {
     // a room's upgrades now live in CompiledRoomUpgrade bundles enabled per room (see RoomSystems.ENABLED_UPGRADES).
 
     public static final DeferredHolder<RoomUpgradeComponentType<?>, RoomUpgradeComponentType<TreeCutterUpgradeComponent>> TREECUTTER = RURegistries.ROOM_UPGRADE_DEFINITIONS
-            .register("tree_cutter", () -> RoomUpgradeComponentType.builder(TreeCutterUpgradeComponent::new, TreeCutterUpgradeComponent.CODEC)
+            .register("tree_cutter", () -> RoomUpgradeComponentType.builder(TreeCutterUpgradeComponent::new)
                     .requiredFeatures(CMFeatureFlags.ROOM_UPGRADES)
-                    .itemPredicate(stack -> stack.is(ItemTags.AXES))
                     .build());
 //
 //    DeferredHolder<RoomUpgradeComponentType<?>, RoomUpgradeComponentType<ChunkLoaderUpgradeComponent>> CHUNK_LOADER = ROOM_UPGRADE_DEFINITIONS
@@ -68,6 +60,8 @@ public final class RoomUpgrades {
         RURegistries.DATA_COMPONENTS.register(modBus);
         RURegistries.ROOM_UPGRADE_DEFINITIONS.register(modBus);
 
+        ResourceTypes.init(modBus);
+
         RoomSystems.init(modBus);
     }
 
@@ -91,6 +85,6 @@ public final class RoomUpgrades {
     }
 
     static void onRegisterCapabilities(RegisterCapabilitiesEvent r) {
-
+        StorageCapabilities.registerProviders();
     }
 }

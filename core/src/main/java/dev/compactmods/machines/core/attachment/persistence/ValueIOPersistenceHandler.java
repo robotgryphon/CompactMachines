@@ -31,6 +31,12 @@ public class ValueIOPersistenceHandler implements AttachmentHolderPersistenceHan
 
     @SuppressWarnings("unchecked")
     private <T> Optional<IAttachmentSerializer<T>> getSerializer(AttachmentType<T> type) {
+        // type is null for an unknown/unregistered attachment key in saved data; reading the
+        // instance field with a null receiver would NPE (uncaught here), so guard it. Callers
+        // already handle an empty result by logging and skipping the stale key.
+        if (type == null)
+            return Optional.empty();
+
         try {
             return Optional.ofNullable((IAttachmentSerializer<T>) SERIALIZER_FIELD.get(type));
         } catch (IllegalAccessException e) {

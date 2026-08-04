@@ -1,6 +1,7 @@
 package dev.compactmods.machines.upgrades.api;
 
 import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
 import dev.compactmods.machines.core.CompactMachinesCore;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -17,7 +18,9 @@ public interface RoomUpgradeCodecs {
 
         return (Codec<RoomUpgradeComponent>) reg
                 .map(Registry::byNameCodec)
-                .map(c -> c.dispatchStable(RoomUpgradeComponent::getType, RoomUpgradeComponentType::codec))
+                // Components carry no config, so each type dispatches to a unit codec built from its
+                // constructor; the serialized form is just { "type": "<id>" }.
+                .map(c -> c.dispatchStable(RoomUpgradeComponent::getType, type -> MapCodec.unit(type.constructor())))
                 .orElseThrow(() -> new RuntimeException("Room upgrade registry not registered yet; calling too early?"));
     });
 

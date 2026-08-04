@@ -20,12 +20,15 @@ tasks.withType<Jar>().configureEach {
 }
 
 val apiSource = sourceSets.register("api")
+val storageSource = sourceSets.register("storage")
 
 neoForge.addModdingDependenciesTo(apiSource.get())
+neoForge.addModdingDependenciesTo(storageSource.get())
 
 sourceSets.main {
     java {
         srcDir(apiSource.get().java)
+        srcDir(storageSource.get().java)
     }
 }
 
@@ -52,4 +55,7 @@ dependencies {
     
     "apiCompileOnly"(project(":core"))
     "apiCompileOnly"(project(":room-system"))
+
+    "storageCompileOnly"(project(":core"))
+    "storageCompileOnly"(project(":room-system"))
 }
