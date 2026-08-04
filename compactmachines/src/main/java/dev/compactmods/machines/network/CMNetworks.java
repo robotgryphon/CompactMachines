@@ -3,6 +3,8 @@ package dev.compactmods.machines.network;
 import dev.compactmods.machines.network.machine.MachineColorSyncPacket;
 import dev.compactmods.machines.network.machine.OpenMachinePreviewScreenPacket;
 import dev.compactmods.machines.network.room.InitialRoomBlockDataPacket;
+import dev.compactmods.machines.network.room.RoomPreviewSnapshotPacket;
+import dev.compactmods.machines.network.room.RoomPreviewSubscribePacket;
 import dev.compactmods.machines.network.room.PlayerRequestedLeavePacket;
 import dev.compactmods.machines.network.room.PlayerRequestedRoomUIPacket;
 import dev.compactmods.machines.network.room.PlayerRequestedTeleportPacket;
@@ -25,7 +27,9 @@ public class CMNetworks {
         // Rooms
         main.playToClient(SyncRoomMetadataPacket.TYPE, SyncRoomMetadataPacket.STREAM_CODEC, SyncRoomMetadataPacket.HANDLER);
         main.playToClient(InitialRoomBlockDataPacket.TYPE, InitialRoomBlockDataPacket.STREAM_CODEC, InitialRoomBlockDataPacket.HANDLER);
+        main.playToClient(RoomPreviewSnapshotPacket.TYPE, RoomPreviewSnapshotPacket.STREAM_CODEC, RoomPreviewSnapshotPacket.HANDLER);
 
+        main.playToServer(RoomPreviewSubscribePacket.TYPE, RoomPreviewSubscribePacket.STREAM_CODEC, RoomPreviewSubscribePacket.HANDLER);
         main.playToServer(PlayerStartedRoomTrackingPacket.TYPE, PlayerStartedRoomTrackingPacket.STREAM_CODEC, PlayerStartedRoomTrackingPacket.HANDLER);
         main.playToServer(PlayerRequestedTeleportPacket.TYPE, PlayerRequestedTeleportPacket.STREAM_CODEC, PlayerRequestedTeleportPacket.HANDLER);
         main.playToServer(PlayerRequestedLeavePacket.TYPE, StreamCodec.unit(new PlayerRequestedLeavePacket()), PlayerRequestedLeavePacket.HANDLER);

@@ -1,0 +1,86 @@
+package dev.compactmods.machines.preview.client;
+
+import dev.compactmods.machines.machine.block.CompactMachineBlockEntity;
+import dev.compactmods.machines.network.room.RoomPreviewSubscribePacket;
+import net.neoforged.bus.api.EventPriority;
+import net.neoforged.bus.api.IEventBus;
+import net.neoforged.neoforge.client.event.ClientPlayerNetworkEvent;
+import net.neoforged.neoforge.client.event.ExtractLevelRenderStateEvent;
+import net.neoforged.neoforge.client.event.RegisterRenderPipelinesEvent;
+import net.neoforged.neoforge.client.network.ClientPacketDistributor;
+import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.client.event.ClientTickEvent;
+
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
+
+/**
+ * Client-side driver that keeps the server informed of which rooms this client needs previews for.
+ *
+ * <p>Every frame, render-state extraction visits the visible machine block entities (the same hook
+ * the pride-flag overlay uses); we collect the room codes their cores are bound to. Once a second we
+ * compare that set to what we last told the server and, only if it changed, send a
+ * {@link RoomPreviewSubscribePacket}. Subscribing to just the <em>visible</em> machines keeps the
+ * server's scan set tight, and the whole-set-replaces-previous packet shape makes the debounce
+ * trivial and idempotent.
+ *
+ * <p>This is the demand side of the preview pipeline; the actual mesh build and in-block rendering
+ * (which consume {@link ClientRoomPreviews}) are registered separately by the machine renderer.
+ */
+public final class RoomPreviewClient {
+
+    /** How often (in client ticks) we reconcile our subscription with the server. 20 ticks ≈ 1 s. */
+    private static final int SUBSCRIBE_INTERVAL_TICKS = 20;
+
+    /** Room codes bound to currently-visible machines, republished each frame by the render thread. */
+    private static volatile Set<String> visibleRooms = Set.of();
+    /** The last set we sent to the server (client-thread only). */
+    private static Set<String> lastSent = Set.of();
+    private static int tickCounter;
+
+    private RoomPreviewClient() {}
+
+    public static void registerEvents(IEventBus modBus) {
+        modBus.addListener(RoomPreviewRenderType::registerPipelines);
+
+        NeoForge.EVENT_BUS.addListener(RoomPreviewClient::collectVisibleRooms);
+        NeoForge.EVENT_BUS.addListener(RoomPreviewClient::onClientTick);
+        NeoForge.EVENT_BUS.addListener(RoomPreviewClient::onLoggingOut);
+
+        // Batched in-world preview rendering (manual pass, like the flag shaders).
+        NeoForge.EVENT_BUS.addListener(EventPriority.HIGH, RoomPreviewRenderer::extract);
+        NeoForge.EVENT_BUS.addListener(RoomPreviewRenderer::afterSolidBlocks);
+    }
+
+    /** Render thread: gather the room codes of visible machines and publish them for the tick loop. */
+    private static void collectVisibleRooms(final ExtractLevelRenderStateEvent event) {
+        final Set<String> found = new HashSet<>();
+        event.getLevelExtractor().iterateVisibleBlockEntities(be -> {
+            if (be instanceof CompactMachineBlockEntity machine)
+                machine.connectedRoom().ifPresent(found::add);
+        });
+        visibleRooms = found;
+    }
+
+    /** Client thread: once per interval, push the current subscription set if it changed. */
+    private static void onClientTick(final ClientTickEvent.Post event) {
+        if (++tickCounter < SUBSCRIBE_INTERVAL_TICKS) return;
+        tickCounter = 0;
+
+        final Set<String> current = visibleRooms;
+        if (current.equals(lastSent)) return;
+
+        lastSent = current;
+        dev.compactmods.machines.core.CompactMachinesCore.modLog().info("[RoomPreview] client subscribing to {}", current);
+        ClientPacketDistributor.sendToServer(new RoomPreviewSubscribePacket(new ArrayList<>(current)));
+    }
+
+    private static void onLoggingOut(final ClientPlayerNetworkEvent.LoggingOut event) {
+        visibleRooms = Set.of();
+        lastSent = Set.of();
+        tickCounter = 0;
+        ClientRoomPreviews.clear();
+        RoomPreviewMeshCache.clear();
+    }
+}

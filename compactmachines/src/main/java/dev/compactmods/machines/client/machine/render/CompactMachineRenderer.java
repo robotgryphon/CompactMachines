@@ -63,7 +63,7 @@ public class CompactMachineRenderer implements BlockEntityRenderer<CompactMachin
         // gameTime stays on the state for future shaders that might want a frame-
         // stamped tick value; the current pride shader reads the Globals UBO directly.
         state.gameTime = be.getLevel() != null ? be.getLevel().getGameTime() + partialTick : 0f;
-        extractCoreItem(be, state);
+//        extractCoreItem(be, state);
     }
 
     /**

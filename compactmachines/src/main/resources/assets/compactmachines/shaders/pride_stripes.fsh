@@ -21,7 +21,7 @@ in vec3 faceNormal; // outward normal of the pane.
 
 out vec4 fragColor;
 
-const float OPACITY = 0.4;
+const float OPACITY = 0.3;
 const int MAX_STRIPES = 10;
 
 // std140-laid-out palette block. Java side mirrors the field order exactly

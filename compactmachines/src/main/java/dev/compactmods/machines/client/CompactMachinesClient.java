@@ -6,6 +6,7 @@ import dev.compactmods.machines.client.config.ClientConfig;
 import dev.compactmods.machines.client.creative.CreativeTabs;
 import dev.compactmods.machines.client.machine.MachinesClient;
 import dev.compactmods.machines.client.room.RoomsClient;
+import dev.compactmods.machines.preview.client.RoomPreviewClient;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModContainer;
@@ -29,6 +30,7 @@ public class CompactMachinesClient {
    public static void registerEvents(IEventBus modBus) {
 	  MachinesClient.registerEvents(modBus);
 	  RoomsClient.registerEvents(modBus);
+	  RoomPreviewClient.registerEvents(modBus);
 
 	  NeoForge.EVENT_BUS.addListener(CMClientCommands::registerClientCommands);
    }

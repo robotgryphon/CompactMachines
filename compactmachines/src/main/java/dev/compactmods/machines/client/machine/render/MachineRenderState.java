@@ -2,8 +2,6 @@ package dev.compactmods.machines.client.machine.render;
 
 import net.minecraft.client.renderer.blockentity.state.BlockEntityRenderState;
 import net.minecraft.client.renderer.item.ItemStackRenderState;
-import net.minecraft.resources.Identifier;
-import org.jspecify.annotations.Nullable;
 
 /**
  * Snapshot taken from a {@link dev.compactmods.machines.machine.block.CompactMachineBlockEntity}

@@ -8,6 +8,7 @@ import dev.compactmods.machines.feature.CMFeaturePacks;
 import dev.compactmods.machines.gamerule.CMGameRules;
 import dev.compactmods.machines.machine.Machines;
 import dev.compactmods.machines.network.CMNetworks;
+import dev.compactmods.machines.preview.server.RoomPreviewService;
 import dev.compactmods.machines.room.RoomSystem;
 import dev.compactmods.machines.shrinking.PlayerEventHandler;
 import dev.compactmods.machines.shrinking.Shrinking;
@@ -54,5 +55,10 @@ public class CompactMachinesCommon {
 
         NeoForge.EVENT_BUS.addListener(Commands::onCommandsRegister);
         NeoForge.EVENT_BUS.addListener(ProtectedBlockEventHandler::leftClickBlock);
+
+        // Room preview pipeline: capture loaded-room interiors and push snapshots to subscribed clients.
+        NeoForge.EVENT_BUS.addListener(RoomPreviewService::onLevelTick);
+        NeoForge.EVENT_BUS.addListener(RoomPreviewService::onPlayerLoggedOut);
+        NeoForge.EVENT_BUS.addListener(RoomPreviewService::onServerStopping);
     }
 }
