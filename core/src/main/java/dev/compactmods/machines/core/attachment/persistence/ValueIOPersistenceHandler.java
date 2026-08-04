@@ -13,15 +13,14 @@ import net.neoforged.neoforge.registries.NeoForgeRegistries;
 import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
+import java.lang.reflect.Field;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class ValueIOPersistenceHandler implements AttachmentHolderPersistenceHandler {
     private static final Logger LOGGER = LogUtils.getLogger();
-    // final Function<IAttachmentHolder, T> defaultValueSupplier;
-    private static final Method SERIALIZER_SUPPLIER = ObfuscationReflectionHelper.findMethod(AttachmentType.class, "serializer");
+    // AttachmentType exposes its serializer as a package-private field (no public accessor), so read it reflectively.
+    private static final Field SERIALIZER_FIELD = ObfuscationReflectionHelper.findField(AttachmentType.class, "serializer");
     protected final IAttachmentHolder holder;
     protected final AttachmentDataStorage attachmentData;
 
@@ -33,8 +32,8 @@ public class ValueIOPersistenceHandler implements AttachmentHolderPersistenceHan
     @SuppressWarnings("unchecked")
     private <T> Optional<IAttachmentSerializer<T>> getSerializer(AttachmentType<T> type) {
         try {
-            return (Optional<IAttachmentSerializer<T>>) SERIALIZER_SUPPLIER.invoke(type);
-        } catch (IllegalAccessException | InvocationTargetException e) {
+            return Optional.ofNullable((IAttachmentSerializer<T>) SERIALIZER_FIELD.get(type));
+        } catch (IllegalAccessException e) {
             return Optional.empty();
         }
     }

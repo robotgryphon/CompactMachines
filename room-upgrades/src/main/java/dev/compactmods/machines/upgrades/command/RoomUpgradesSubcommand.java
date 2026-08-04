@@ -3,20 +3,31 @@ package dev.compactmods.machines.upgrades.command;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
-import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import dev.compactmods.machines.upgrades.api.RoomUpgradeComponentType;
-import dev.compactmods.machines.upgrades.api.component.RoomUpgradeComponentList;
+import com.mojang.brigadier.suggestion.SuggestionProvider;
+import com.mojang.brigadier.suggestion.Suggestions;
+import com.mojang.brigadier.suggestion.SuggestionsBuilder;
+import dev.compactmods.machines.api.room.RoomInstance;
+import dev.compactmods.machines.api.room.capability.RoomCapabilities;
+import dev.compactmods.machines.api.room.registry.RoomRegistry;
 import dev.compactmods.machines.room.CMFeatureFlags;
-import dev.compactmods.machines.upgrades.RoomUpgrades;
+import dev.compactmods.machines.upgrades.api.system.CompiledRoomUpgrade;
+import dev.compactmods.machines.upgrades.system.RoomSystems;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
+import net.minecraft.commands.SharedSuggestionProvider;
 import net.minecraft.commands.arguments.IdentifierArgument;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceKey;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
 
+/// `/compactmachines upgrades enable|disable|list <room> [<compiled_upgrade>]`
+///
+/// Toggles which [CompiledRoomUpgrade] bundles are enabled on a room (stored in `RoomSystems.ENABLED_UPGRADES`).
 public class RoomUpgradesSubcommand {
 
     public static LiteralArgumentBuilder<CommandSourceStack> make() {
@@ -24,78 +35,96 @@ public class RoomUpgradesSubcommand {
                 .requires(cs -> CMFeatureFlags.ROOM_UPGRADES.isSubsetOf(cs.enabledFeatures()))
                 .requires(Commands.hasPermission(Commands.LEVEL_GAMEMASTERS));
 
-        // /cm upgrades add [id]
-        subRoot.then(Commands.literal("add")
-                .then(Commands.argument("upgrade", IdentifierArgument.id())
-                        .suggests(RUCommands.ROOM_UPGRADE_TYPES)
-                        .executes(RoomUpgradesSubcommand::applyUpgrade)));
-
-        // /cm upgrades remove [id]
-        subRoot.then(Commands.literal("remove")
+        subRoot.then(Commands.literal("enable")
                 .then(Commands.argument("room", StringArgumentType.string())
-                        .suggests(RUCommands.ROOM_UPGRADE_TYPES)
-                        .executes(RoomUpgradesSubcommand::removeUpgrade)));
+                        .suggests(RoomUpgradesSubcommand::suggestRooms)
+                        .then(Commands.argument("upgrade", IdentifierArgument.id())
+                                .suggests(RoomUpgradesSubcommand::suggestCompiledUpgrades)
+                                .executes(ctx -> toggle(ctx, true)))));
+
+        subRoot.then(Commands.literal("disable")
+                .then(Commands.argument("room", StringArgumentType.string())
+                        .suggests(RoomUpgradesSubcommand::suggestRooms)
+                        .then(Commands.argument("upgrade", IdentifierArgument.id())
+                                .suggests(RoomUpgradesSubcommand::suggestCompiledUpgrades)
+                                .executes(ctx -> toggle(ctx, false)))));
+
+        subRoot.then(Commands.literal("list")
+                .then(Commands.argument("room", StringArgumentType.string())
+                        .suggests(RoomUpgradesSubcommand::suggestRooms)
+                        .executes(RoomUpgradesSubcommand::list)));
 
         return subRoot;
     }
 
-    private static Optional<RoomUpgradeComponentType<?>> getTargetedUpgradeType(CommandContext<CommandSourceStack> ctx) {
-        final var src = ctx.getSource();
-
-        final var upgradeType = IdentifierArgument.getId(ctx, "upgrade");
-        return src.getServer()
-                .registryAccess()
-                .lookupOrThrow(RoomUpgradeComponentType.REGISTRY_KEY)
-                .getOptional(upgradeType);
+    private static Optional<RoomInstance> room(CommandContext<CommandSourceStack> ctx) {
+        final RoomRegistry rooms = RoomCapabilities.REGISTRY.getCapability(ctx.getSource().getServer());
+        if (rooms == null) return Optional.empty();
+        return rooms.get(StringArgumentType.getString(ctx, "room"));
     }
 
-    private static int applyUpgrade(CommandContext<CommandSourceStack> ctx) throws CommandSyntaxException {
-        final var player = ctx.getSource().getPlayerOrException();
-        var realUpgradeType = getTargetedUpgradeType(ctx);
-        if(realUpgradeType.isEmpty()) return 0;
-
-        var upgradeType = realUpgradeType.get();
-
-        var heldItem = player.getMainHandItem();
-        var currentUpgrades = heldItem.get(RoomUpgrades.UPGRADE_LIST_COMPONENT);
-
-        if(!upgradeType.canApplyTo(heldItem)) {
-            ctx.getSource().sendFailure(Component.literal("That upgrade cannot be applied to the held item."));
+    private static int toggle(CommandContext<CommandSourceStack> ctx, boolean enable) {
+        final var src = ctx.getSource();
+        final var roomOpt = room(ctx);
+        if (roomOpt.isEmpty()) {
+            src.sendFailure(Component.literal("No such room: " + StringArgumentType.getString(ctx, "room")));
             return 0;
         }
 
-        if (currentUpgrades != null) {
-            var addedList = new ArrayList<>(currentUpgrades.components());
-
-            // TODO: Room Upgrade context (level, itemstack, etc)
-            addedList.add(upgradeType.constructor().get());
-
-            var newList = new RoomUpgradeComponentList(addedList);
-            heldItem.set(RoomUpgrades.UPGRADE_LIST_COMPONENT, newList);
-        } else {
-            // TODO: Room Upgrade context (level, itemstack, etc)
-            var newList = new RoomUpgradeComponentList(List.of(upgradeType.constructor().get()));
-            heldItem.set(RoomUpgrades.UPGRADE_LIST_COMPONENT, newList);
+        final Identifier id = IdentifierArgument.getId(ctx, "upgrade");
+        final ResourceKey<CompiledRoomUpgrade> key = ResourceKey.create(CompiledRoomUpgrade.REGISTRY_KEY, id);
+        final var registry = src.getServer().registryAccess().lookupOrThrow(CompiledRoomUpgrade.REGISTRY_KEY);
+        if (registry.getValue(key) == null) {
+            src.sendFailure(Component.literal("Unknown compiled room upgrade: " + id));
+            return 0;
         }
 
-        return 0;
+        final RoomInstance room = roomOpt.get();
+        final var enabled = new HashSet<>(room.getData(RoomSystems.ENABLED_UPGRADES));
+        final boolean changed = enable ? enabled.add(key) : enabled.remove(key);
+        room.setData(RoomSystems.ENABLED_UPGRADES, enabled);
+
+        final RoomRegistry rooms = RoomCapabilities.REGISTRY.getCapability(src.getServer());
+        if (rooms != null) rooms.save();
+
+        if (!changed) {
+            src.sendSuccess(() -> Component.literal((enable ? "Already enabled: " : "Not enabled: ") + id), false);
+            return 0;
+        }
+        src.sendSuccess(() -> Component.literal((enable ? "Enabled " : "Disabled ") + id + " on room " + room.code()), true);
+        return 1;
     }
 
-    private static int removeUpgrade(CommandContext<CommandSourceStack> ctx) throws CommandSyntaxException {
-        final var player = ctx.getSource().getPlayerOrException();
-        var realUpgradeType = getTargetedUpgradeType(ctx);
-
-        var heldItem = player.getMainHandItem();
-        var currentUpgrades = heldItem.get(RoomUpgrades.UPGRADE_LIST_COMPONENT);
-
-        if (currentUpgrades != null) {
-            var newList = new RoomUpgradeComponentList(currentUpgrades.components());
-            newList.components().removeIf(ru -> ru.getType().equals(realUpgradeType));
-
-            heldItem.set(RoomUpgrades.UPGRADE_LIST_COMPONENT, newList);
+    private static int list(CommandContext<CommandSourceStack> ctx) {
+        final var src = ctx.getSource();
+        final var roomOpt = room(ctx);
+        if (roomOpt.isEmpty()) {
+            src.sendFailure(Component.literal("No such room: " + StringArgumentType.getString(ctx, "room")));
+            return 0;
         }
 
-        return 0;
+        final var enabled = roomOpt.get().getData(RoomSystems.ENABLED_UPGRADES);
+        if (enabled.isEmpty()) {
+            src.sendSuccess(() -> Component.literal("No room upgrades enabled."), false);
+            return 0;
+        }
+
+        final String joined = enabled.stream()
+                .map(k -> k.identifier().toString())
+                .sorted()
+                .collect(Collectors.joining(", "));
+        src.sendSuccess(() -> Component.literal("Enabled room upgrades (" + enabled.size() + "): " + joined), false);
+        return enabled.size();
+    }
+
+    private static CompletableFuture<Suggestions> suggestRooms(CommandContext<CommandSourceStack> ctx, SuggestionsBuilder builder) {
+        final RoomRegistry rooms = RoomCapabilities.REGISTRY.getCapability(ctx.getSource().getServer());
+        if (rooms == null) return builder.buildFuture();
+        return SharedSuggestionProvider.suggest(rooms.allRoomCodes(), builder);
+    }
+
+    private static CompletableFuture<Suggestions> suggestCompiledUpgrades(CommandContext<CommandSourceStack> ctx, SuggestionsBuilder builder) {
+        final var registry = ctx.getSource().getServer().registryAccess().lookupOrThrow(CompiledRoomUpgrade.REGISTRY_KEY);
+        return SharedSuggestionProvider.suggestResource(registry.keySet(), builder);
     }
 }
-

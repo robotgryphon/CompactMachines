@@ -6,6 +6,8 @@ import dev.compactmods.machines.client.machine.shader.flag.FlagShader;
 import dev.compactmods.machines.core.CompactMachinesCore;
 import dev.compactmods.machines.datagen.util.DimensionTypeBuilder;
 import dev.compactmods.machines.dimension.Dimension;
+import dev.compactmods.machines.upgrades.api.system.CompiledRoomUpgrade;
+import dev.compactmods.machines.upgrades.example.TreeCutterUpgradeComponent;
 import net.minecraft.core.RegistrySetBuilder;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.data.worldgen.BootstrapContext;
@@ -36,7 +38,14 @@ public class DatapackRegisteredStuff {
             .add(Registries.LEVEL_STEM, DatapackRegisteredStuff::generateDimensions)
             .add(RoomTemplate.REGISTRY_KEY, (ctx) -> {
             })
-            .add(FlagShader.REGISTRY_KEY, DatapackRegisteredStuff::generateFlagDefinitions);
+            .add(FlagShader.REGISTRY_KEY, DatapackRegisteredStuff::generateFlagDefinitions)
+            .add(CompiledRoomUpgrade.REGISTRY_KEY, DatapackRegisteredStuff::generateCompiledRoomUpgrades);
+
+    private static void generateCompiledRoomUpgrades(BootstrapContext<CompiledRoomUpgrade> ctx) {
+        ctx.register(
+                ResourceKey.create(CompiledRoomUpgrade.REGISTRY_KEY, CompactMachinesCore.identifier("tree_cutter")),
+                new CompiledRoomUpgrade(8, 1, 200, List.of(new TreeCutterUpgradeComponent())));
+    }
 
     private static void generateFlagDefinitions(BootstrapContext<FlagShader> ctx) {
         generateFlag(ctx, "baker", 0xE50000, 0xFF8D00, 0xFFEE00,

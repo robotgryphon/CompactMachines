@@ -1,6 +1,7 @@
 package dev.compactmods.machines.api.room.registry;
 
 import dev.compactmods.machines.api.room.spatial.RoomBoundaries;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;
 
 /// Represents a room that has been registered with the room registry.
@@ -9,7 +10,7 @@ public interface RoomRegistration {
 
     String code();
 
-    Level level();
+    ServerLevel level();
 
     RoomBoundaries boundaries();
 

@@ -30,12 +30,16 @@ public class RoomDataAttachments implements AutoCloseable, AttachmentDataAccesso
         return attachments.dataStorage();
     }
 
-    @Override
-    public void close() {
+    public void save() {
         final var file = CMRoomDataLocations.ROOM_DATA_ATTACHMENTS
                 .apply(server)
                 .resolve(roomCode + ".dat");
 
         AttachmentIOHelper.save(server.registryAccess(), attachments, file);
+    }
+
+    @Override
+    public void close() {
+        save();
     }
 }

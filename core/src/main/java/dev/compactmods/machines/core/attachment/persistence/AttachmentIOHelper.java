@@ -10,6 +10,7 @@ import net.minecraft.world.level.storage.TagValueOutput;
 import net.neoforged.neoforge.common.IOUtilities;
 
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 
 public final class AttachmentIOHelper {
@@ -21,6 +22,8 @@ public final class AttachmentIOHelper {
                     .serialize(dataOut);
 
             final var tag = dataOut.buildResult();
+            if (file.getParent() != null)
+                Files.createDirectories(file.getParent());
             IOUtilities.writeNbtCompressed(tag, file);
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -28,6 +31,10 @@ public final class AttachmentIOHelper {
     }
 
     public static void load(RegistryAccess registryAccess, CMAttachmentHolder attachments, Path file) {
+        // No persisted data yet (e.g. a freshly generated room) — start empty rather than throwing.
+        if (!Files.exists(file))
+            return;
+
         try {
             final var data = NbtIo.readCompressed(file, NbtAccounter.defaultQuota());
             var dataIn = TagValueInput.create(ProblemReporter.DISCARDING, registryAccess, data);

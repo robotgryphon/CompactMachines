@@ -7,7 +7,7 @@ import dev.compactmods.machines.api.room.RoomInstance;
 import dev.compactmods.machines.upgrades.api.RoomUpgradeComponent;
 import dev.compactmods.machines.upgrades.api.RoomUpgradeComponentType;
 import dev.compactmods.machines.upgrades.api.event.RoomUpgradeComponentEvent;
-import dev.compactmods.machines.upgrades.api.event.lifecycle.UpgradeTickedEventListener;
+import dev.compactmods.machines.upgrades.api.event.lifecycle.TickingRoomUpgradeComponent;
 import dev.compactmods.machines.room.Rooms;
 import dev.compactmods.machines.upgrades.RoomUpgrades;
 import dev.compactmods.spatial.aabb.AABBHelper;
@@ -42,7 +42,7 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class TreeCutterUpgradeComponent implements RoomUpgradeComponent {
+public class TreeCutterUpgradeComponent implements RoomUpgradeComponent, TickingRoomUpgradeComponent {
 
     public static final MapCodec<TreeCutterUpgradeComponent> CODEC = MapCodec.unit(TreeCutterUpgradeComponent::new);
 
@@ -63,17 +63,11 @@ public class TreeCutterUpgradeComponent implements RoomUpgradeComponent {
     }
 
     @Override
-    public Stream<RoomUpgradeComponentEvent> gatherEvents() {
-        final UpgradeTickedEventListener ticker = TreeCutterUpgradeComponent::onTick;
-        return Stream.of(ticker);
-    }
-
-    @Override
     public RoomUpgradeComponentType<TreeCutterUpgradeComponent> getType() {
         return RoomUpgrades.TREECUTTER.get();
     }
 
-    public static void onTick(RoomInstance instance) {
+    public void tick(RoomInstance instance) {
         final var data = instance.getData(TREECUTTER_DATA);
 
         if (data.cooldown > 0) {

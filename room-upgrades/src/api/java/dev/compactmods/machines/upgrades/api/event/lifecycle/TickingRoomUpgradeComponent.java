@@ -4,8 +4,7 @@ import dev.compactmods.machines.api.room.RoomInstance;
 import dev.compactmods.machines.upgrades.api.event.RoomUpgradeComponentEvent;
 
 @FunctionalInterface
-public interface UpgradeTickedEventListener extends RoomUpgradeComponentEvent {
+public interface TickingRoomUpgradeComponent {
 
-    @Override
-    void handle(RoomInstance instance);
+    void tick(RoomInstance instance);
 }

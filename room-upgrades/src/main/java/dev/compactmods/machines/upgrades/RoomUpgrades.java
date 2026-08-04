@@ -11,6 +11,7 @@ import dev.compactmods.machines.room.CMFeatureFlags;
 import dev.compactmods.machines.upgrades.command.RUCommands;
 import dev.compactmods.machines.upgrades.command.RoomUpgradesSubcommand;
 import dev.compactmods.machines.upgrades.example.TreeCutterUpgradeComponent;
+import dev.compactmods.machines.upgrades.system.RoomSystems;
 import net.minecraft.commands.Commands;
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.registries.Registries;
@@ -32,11 +33,8 @@ public final class RoomUpgrades {
         DeferredRegister<RoomUpgradeComponentType<?>> ROOM_UPGRADE_DEFINITIONS = RoomUpgradesApi.roomUpgradeDR(CompactMachinesCore.MOD_ID);
     }
 
-    public static final DeferredHolder<DataComponentType<?>, DataComponentType<RoomUpgradeComponentList>> UPGRADE_LIST_COMPONENT = RoomUpgrades.RURegistries.DATA_COMPONENTS
-            .registerComponentType("room_upgrades", (builder) -> builder
-                    .persistent(RoomUpgradeComponentList.CODEC)
-                    .networkSynchronized(RoomUpgradeComponentList.STREAM_CODEC));
-
+    // The old item-stored RoomUpgradeComponentList (UPGRADE_LIST_COMPONENT data component) is scrapped:
+    // a room's upgrades now live in CompiledRoomUpgrade bundles enabled per room (see RoomSystems.ENABLED_UPGRADES).
 
     public static final DeferredHolder<RoomUpgradeComponentType<?>, RoomUpgradeComponentType<TreeCutterUpgradeComponent>> TREECUTTER = RURegistries.ROOM_UPGRADE_DEFINITIONS
             .register("tree_cutter", () -> RoomUpgradeComponentType.builder(TreeCutterUpgradeComponent::new, TreeCutterUpgradeComponent.CODEC)
@@ -69,6 +67,8 @@ public final class RoomUpgrades {
 
         RURegistries.DATA_COMPONENTS.register(modBus);
         RURegistries.ROOM_UPGRADE_DEFINITIONS.register(modBus);
+
+        RoomSystems.init(modBus);
     }
 
     static void registerEvents(IEventBus modBus) {
