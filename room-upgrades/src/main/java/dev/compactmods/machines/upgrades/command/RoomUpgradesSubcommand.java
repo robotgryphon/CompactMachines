@@ -12,6 +12,7 @@ import dev.compactmods.machines.api.room.registry.RoomRegistry;
 import dev.compactmods.machines.room.CMFeatureFlags;
 import dev.compactmods.machines.upgrades.api.system.CompiledRoomUpgrade;
 import dev.compactmods.machines.upgrades.system.RoomSystems;
+import dev.compactmods.machines.upgrades.system.UpgradeLifecycle;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.SharedSuggestionProvider;
@@ -74,7 +75,8 @@ public class RoomUpgradesSubcommand {
         final Identifier id = IdentifierArgument.getId(ctx, "upgrade");
         final ResourceKey<CompiledRoomUpgrade> key = ResourceKey.create(CompiledRoomUpgrade.REGISTRY_KEY, id);
         final var registry = src.getServer().registryAccess().lookupOrThrow(CompiledRoomUpgrade.REGISTRY_KEY);
-        if (registry.getValue(key) == null) {
+        final CompiledRoomUpgrade upgrade = registry.getValue(key);
+        if (upgrade == null) {
             src.sendFailure(Component.literal("Unknown compiled room upgrade: " + id));
             return 0;
         }
@@ -91,6 +93,11 @@ public class RoomUpgradesSubcommand {
             src.sendSuccess(() -> Component.literal((enable ? "Already enabled: " : "Not enabled: ") + id), false);
             return 0;
         }
+
+        // Fire the non-ticking lifecycle hooks for the bundle's components (e.g. chunk-loader force-load).
+        if (enable) UpgradeLifecycle.onEnabled(room, upgrade);
+        else UpgradeLifecycle.onDisabled(room, upgrade);
+
         src.sendSuccess(() -> Component.literal((enable ? "Enabled " : "Disabled ") + id + " on room " + room.code()), true);
         return 1;
     }
