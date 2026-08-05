@@ -62,8 +62,11 @@ public final class RoomPreviewClient {
         visibleRooms = found;
     }
 
-    /** Client thread: once per interval, push the current subscription set if it changed. */
+    /** Client thread: tick preview entities every tick; reconcile the subscription set periodically. */
     private static void onClientTick(final ClientTickEvent.Post event) {
+        // Every tick: advance preview entities' animation via their own tick().
+        RoomPreviewEntities.tickAll();
+
         if (++tickCounter < SUBSCRIBE_INTERVAL_TICKS) return;
         tickCounter = 0;
 

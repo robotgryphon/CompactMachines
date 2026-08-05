@@ -159,11 +159,18 @@ public final class RoomPreviewService {
         final int ox = Mth.floor(inner.minX), oy = Mth.floor(inner.minY), oz = Mth.floor(inner.minZ);
 
         final List<RoomEntitySnapshot> snaps = new ArrayList<>();
-        for (Entity e : level.getEntities((Entity) null, inner, entity -> !(entity instanceof Player))) {
+        for (Entity e : level.getEntities((Entity) null, inner, entity -> !entity.isSpectator())) {
+            // While previewed, keep mobs "awake" as if a player were nearby, so their wander/stroll
+            // AI (which bails out once noActionTime ≥ 100 with no player around) keeps running.
+            if (e instanceof net.minecraft.world.entity.Mob mob)
+                mob.setNoActionTime(0);
+
             final float headYaw = e instanceof LivingEntity le ? le.getYHeadRot() : e.getYRot();
+            final java.util.UUID playerId = e instanceof Player p ? p.getUUID() : null;
+            final String playerName = e instanceof Player p ? p.getGameProfile().name() : null;
             snaps.add(new RoomEntitySnapshot(e.getId(), e.getType(),
                     (float) (e.getX() - ox), (float) (e.getY() - oy), (float) (e.getZ() - oz),
-                    e.getYRot(), e.getXRot(), headYaw));
+                    e.getYRot(), e.getXRot(), headYaw, e.onGround(), playerId, playerName));
         }
 
         final int previous = state.lastEntityCount.getOrDefault(code, 0);

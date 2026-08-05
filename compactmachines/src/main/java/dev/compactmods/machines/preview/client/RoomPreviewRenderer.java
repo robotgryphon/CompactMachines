@@ -18,6 +18,7 @@ import net.minecraft.client.renderer.entity.state.EntityRenderState;
 import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.core.BlockPos;
 import net.minecraft.util.LightCoordsUtil;
+import net.minecraft.util.Mth;
 import net.minecraft.util.context.ContextKey;
 import net.minecraft.world.entity.Entity;
 import net.neoforged.neoforge.client.event.ExtractLevelRenderStateEvent;
@@ -169,13 +170,18 @@ public final class RoomPreviewRenderer {
             final float scale = FIT / entry.mesh.maxDimension();
 
             for (RoomEntitySnapshot snapshot : snapshots) {
-                final Entity entity = RoomPreviewEntities.prepareForRender(entry.roomCode, snapshot.entityId());
+                final Entity entity = RoomPreviewEntities.get(entry.roomCode, snapshot.entityId());
                 if (entity == null) continue;
 
                 final EntityRenderState rs = dispatcher.extractEntity(entity, partialTick);
                 rs.lightCoords = LightCoordsUtil.FULL_BRIGHT;
                 rs.shadowPieces.clear();
                 rs.shadowRadius = 0f;
+
+                // The entity is ticked at 20 Hz; interpolate its room-local feet by partial tick.
+                final double ex = Mth.lerp((double) partialTick, entity.xOld, entity.getX());
+                final double ey = Mth.lerp((double) partialTick, entity.yOld, entity.getY());
+                final double ez = Mth.lerp((double) partialTick, entity.zOld, entity.getZ());
 
                 // Camera-relative machine transform (camera view is applied by the level), then the
                 // entity's room-local feet — matching the block mesh placement.
@@ -184,7 +190,7 @@ public final class RoomPreviewRenderer {
                 pose.translate(0.5f, FLOOR_Y, 0.5f);
                 pose.scale(scale, scale, scale);
                 pose.translate(-entry.mesh.sizeX / 2f, 0f, -entry.mesh.sizeZ / 2f);
-                pose.translate(snapshot.x(), snapshot.y(), snapshot.z());
+                pose.translate(ex, ey, ez);
                 dispatcher.submit(rs, camera, 0, 0, 0, pose, collector);
                 pose.popPose();
             }
