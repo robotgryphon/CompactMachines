@@ -34,9 +34,6 @@ import java.util.stream.Collectors;
 
 public class TreeCutterUpgradeComponent implements RoomUpgradeComponent, TickingRoomUpgradeComponent {
 
-    public static void prepare() {
-    }
-
     @Override
     public void addToTooltip(Item.TooltipContext tooltipContext, Consumer<Component> consumer, TooltipFlag tooltipFlag, DataComponentGetter dataComponentGetter) {
         final var c = Component.literal("Tree Cutter")
@@ -52,9 +49,6 @@ public class TreeCutterUpgradeComponent implements RoomUpgradeComponent, Ticking
 
     public void tick(RoomInstance instance) {
         final var level = instance.level();
-        if(level.isClientSide() || !(level instanceof ServerLevel serverLevel))
-            return;
-
         final var everythingLoaded = instance.boundaries()
                 .innerChunkPositions()
                 .allMatch(cp -> level.shouldTickBlocksAt(cp.pack()));
@@ -64,21 +58,7 @@ public class TreeCutterUpgradeComponent implements RoomUpgradeComponent, Ticking
 
         final var innerBounds = instance.boundaries().innerBounds();
 
-//        final var upgradeItem = instance.upgradeItem();
-//        var energyHandler = ItemAccess.forStack(upgradeItem).getCapability(Capabilities.Energy.ITEM);
-
         int maxAllowed = 5;
-//        if (upgradeItem.isDamageableItem()) {
-//            behavior = SuccessfulActionBehavior.DamageItem;
-//            var durabilityLeft = upgradeItem.getMaxDamage() - upgradeItem.getDamageValue();
-//            maxAllowed = Math.clamp(durabilityLeft, 0, 5);
-//        }
-
-//        if (energyHandler != null) {
-//            behavior = SuccessfulActionBehavior.DrainEnergy;
-//            maxAllowed = Math.clamp(energyHandler.getAmountAsLong() / 10, 0, 10);
-//        }
-
         final var treeBlocks = BlockPos.betweenClosedStream(innerBounds)
                 .map(pos -> {
                     final var state = level.getBlockState(pos);
@@ -97,21 +77,19 @@ public class TreeCutterUpgradeComponent implements RoomUpgradeComponent, Ticking
                 .limit(maxAllowed)
                 .collect(Collectors.toUnmodifiableSet());
 
-        final var numLogs = treeBlocks.size();
-
         if (!treeBlocks.isEmpty()) {
+
             final var storageCache = instance.getCapability(StorageCapabilities.ROOM_STORAGE);
             if (storageCache == null)
                 return;
 
-            final var inventories = storageCache.resources(instance, ResourceTypes.ITEM_BLOCK.get()).toList();
-
             // If we have no valid inventories, do nothing
+            final var inventories = storageCache.resources(instance, ResourceTypes.ITEM_BLOCK.get()).toList();
             if (inventories.isEmpty())
                 return;
 
             for (Pair<BlockPos, BlockState> pos : treeBlocks) {
-                breakSingleBlock(pos, serverLevel, inventories);
+                breakSingleBlock(pos, level, inventories);
             }
         }
     }
