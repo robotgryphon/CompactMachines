@@ -42,8 +42,6 @@ public final class RoomPreviewClient {
     private RoomPreviewClient() {}
 
     public static void registerEvents(IEventBus modBus) {
-        modBus.addListener(RoomPreviewRenderType::registerPipelines);
-
         NeoForge.EVENT_BUS.addListener(RoomPreviewClient::collectVisibleRooms);
         NeoForge.EVENT_BUS.addListener(RoomPreviewClient::onClientTick);
         NeoForge.EVENT_BUS.addListener(RoomPreviewClient::onLoggingOut);
@@ -51,6 +49,7 @@ public final class RoomPreviewClient {
         // Batched in-world preview rendering (manual pass, like the flag shaders).
         NeoForge.EVENT_BUS.addListener(EventPriority.HIGH, RoomPreviewRenderer::extract);
         NeoForge.EVENT_BUS.addListener(RoomPreviewRenderer::afterSolidBlocks);
+        NeoForge.EVENT_BUS.addListener(RoomPreviewRenderer::onSubmitCustomGeometry);
     }
 
     /** Render thread: gather the room codes of visible machines and publish them for the tick loop. */
@@ -82,5 +81,7 @@ public final class RoomPreviewClient {
         tickCounter = 0;
         ClientRoomPreviews.clear();
         RoomPreviewMeshCache.clear();
+        ClientRoomEntities.clear();
+        RoomPreviewEntities.clear();
     }
 }

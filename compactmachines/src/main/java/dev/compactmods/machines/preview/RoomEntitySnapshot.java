@@ -1,0 +1,51 @@
+package dev.compactmods.machines.preview;
+
+import net.minecraft.core.registries.Registries;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.world.entity.EntityType;
+
+/**
+ * A lightweight, per-frame-ish snapshot of one entity inside a tracked room, for the live preview.
+ *
+ * <p>Only what the preview needs to place and draw the entity: a stable {@link #entityId} (so the
+ * client can match it frame-to-frame for interpolation), its {@link #type}, its position in
+ * <em>room-local</em> space (relative to the room's inner-bounds minimum corner — the same local
+ * frame the block mesh uses), and its rotation. Sent frequently on its own packet, separate from the
+ * (much slower) block snapshot.
+ */
+public record RoomEntitySnapshot(int entityId, EntityType<?> type,
+                                 float x, float y, float z,
+                                 float yaw, float pitch, float headYaw) {
+
+    private static final StreamCodec<RegistryFriendlyByteBuf, EntityType<?>> TYPE_CODEC =
+            ByteBufCodecs.registry(Registries.ENTITY_TYPE);
+
+    public static final StreamCodec<RegistryFriendlyByteBuf, RoomEntitySnapshot> STREAM_CODEC =
+            new StreamCodec<>() {
+                @Override
+                public RoomEntitySnapshot decode(RegistryFriendlyByteBuf buf) {
+                    final int id = ByteBufCodecs.VAR_INT.decode(buf);
+                    final EntityType<?> type = TYPE_CODEC.decode(buf);
+                    return new RoomEntitySnapshot(id, type,
+                            buf.readFloat(), buf.readFloat(), buf.readFloat(),
+                            buf.readFloat(), buf.readFloat(), buf.readFloat());
+                }
+
+                @Override
+                public void encode(RegistryFriendlyByteBuf buf, RoomEntitySnapshot v) {
+                    ByteBufCodecs.VAR_INT.encode(buf, v.entityId);
+                    TYPE_CODEC.encode(buf, v.type);
+                    buf.writeFloat(v.x);
+                    buf.writeFloat(v.y);
+                    buf.writeFloat(v.z);
+                    buf.writeFloat(v.yaw);
+                    buf.writeFloat(v.pitch);
+                    buf.writeFloat(v.headYaw);
+                }
+            };
+
+    public static final StreamCodec<RegistryFriendlyByteBuf, java.util.List<RoomEntitySnapshot>> LIST_STREAM_CODEC =
+            STREAM_CODEC.apply(ByteBufCodecs.list());
+}

@@ -116,9 +116,18 @@ public class MachineShaderRenderer {
             if (be instanceof CompactMachineBlockEntity mbe) {
                 final var core = mbe.coreHandler().getResource(0);
 
-                // If we have a core, try to pull the shader from the core item
+                // If we have a core, only shade its panes when the core explicitly names a flag,
+                // or it's Pride month — otherwise leave the panes unshaded.
                 if (!core.isEmpty()) {
-                    final var flag = core.getOrDefault(CMDataComponents.PRIDE_FLAG, finalDefaultFlag);
+                    final Identifier flag;
+                    if (core.has(CMDataComponents.PRIDE_FLAG)) {
+                        flag = core.get(CMDataComponents.PRIDE_FLAG);
+                    } else if (ClientConfig.ENABLE_PRIDE.isFalse() || LocalDate.now().getMonth() != Month.JUNE) {
+                        return;
+                    } else {
+                        flag = finalDefaultFlag;
+                    }
+
                     if (shadersTmp.containsKey(flag)) {
                         final var list = shadersTmp.get(flag);
                         if (list != null)

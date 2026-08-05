@@ -5,12 +5,20 @@ import dev.compactmods.machines.api.room.RoomInstance;
 import dev.compactmods.machines.api.room.capability.RoomCapabilities;
 import dev.compactmods.machines.api.room.registry.RoomRegistry;
 import dev.compactmods.machines.core.CompactMachinesCore;
+import dev.compactmods.machines.network.room.RoomEntitiesPacket;
 import dev.compactmods.machines.network.room.RoomPreviewSnapshotPacket;
+import dev.compactmods.machines.preview.RoomEntitySnapshot;
 import dev.compactmods.machines.preview.RoomPreviewSnapshot;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.level.TicketType;
+import net.minecraft.util.Mth;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.phys.AABB;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.event.server.ServerStoppingEvent;
 import net.neoforged.neoforge.event.tick.LevelTickEvent;
@@ -44,15 +52,22 @@ public final class RoomPreviewService {
     /** How often (in ticks) loaded rooms are rescanned. 40 ticks ≈ 2 s — "every few ticks", not every tick. */
     public static final int GATHER_INTERVAL_TICKS = 40;
 
+    /** How often (in ticks) live entities are captured — every tick, so clients see real per-tick motion. */
+    public static final int ENTITY_INTERVAL_TICKS = 1;
+
     /**
-     * The chunk ticket that keeps a watched room's interior loaded so it can be read.
-     *
-     * <p>{@link TicketType#FLAG_LOADING} only — no {@code FLAG_SIMULATION} (the room never ticks: no
-     * mobs, redstone, or block ticks run just because someone is looking at it) and no
-     * {@code FLAG_PERSIST} (the ticket is transient, never written to the save). Added with radius 0
-     * it holds the chunk at the "full/loaded, non-ticking" level, which is all a block read needs.
+     * The chunk ticket that keeps a watched room loaded <em>and ticking</em> so the preview shows live
+     * motion. {@code FLAG_LOADING | FLAG_SIMULATION | FLAG_KEEP_DIMENSION_ACTIVE} (like vanilla's
+     * player-simulation ticket) and non-persistent (never written to the save). Added with
+     * {@link #PREVIEW_TICKET_RADIUS radius 2} it reaches the entity-ticking level (33 − 2 = 31), so
+     * entities in the room actually move — which does mean the room fully simulates (AI, redstone,
+     * random ticks, spawning) while it's being previewed.
      */
-    private static final TicketType PREVIEW_TICKET = new TicketType(TicketType.NO_TIMEOUT, TicketType.FLAG_LOADING);
+    private static final TicketType PREVIEW_TICKET = new TicketType(TicketType.NO_TIMEOUT,
+            TicketType.FLAG_LOADING | TicketType.FLAG_SIMULATION | TicketType.FLAG_KEEP_DIMENSION_ACTIVE);
+
+    /** Radius that brings the ticketed chunk to the entity-ticking level (33 − radius = 31). */
+    private static final int PREVIEW_TICKET_RADIUS = 2;
 
     private static final Map<MinecraftServer, ServerState> STATES = new WeakHashMap<>();
 
@@ -90,7 +105,6 @@ public final class RoomPreviewService {
     public static void onLevelTick(final LevelTickEvent.Post event) {
         if (!(event.getLevel() instanceof ServerLevel level)) return;
         if (!level.dimension().equals(CompactDimension.LEVEL_KEY)) return;
-        if (level.getGameTime() % GATHER_INTERVAL_TICKS != 0L) return;
 
         final MinecraftServer server = level.getServer();
         final ServerState state = STATES.get(server);
@@ -103,32 +117,59 @@ public final class RoomPreviewService {
         reconcilePreviewTickets(level, rooms, state);
         if (state.byRoom.isEmpty()) return;
 
+        final long now = level.getGameTime();
+        final boolean doBlocks = now % GATHER_INTERVAL_TICKS == 0L;
+        final boolean doEntities = now % ENTITY_INTERVAL_TICKS == 0L;
+        if (!doBlocks && !doEntities) return;
+
         // Snapshot the subscribed-room set so a subscription change mid-loop can't disturb iteration.
         for (String code : new ArrayList<>(state.byRoom.keySet())) {
             final Set<UUID> subscribers = state.byRoom.get(code);
             if (subscribers == null || subscribers.isEmpty()) continue;
 
             final RoomInstance room = rooms.get(code).orElse(null);
-            if (room == null) {
-                CompactMachinesCore.modLog().info("[RoomPreview] gather {}: no room instance", code);
-                continue;
-            }
-            if (!isLoaded(level, room)) {
-                CompactMachinesCore.modLog().info("[RoomPreview] gather {}: room NOT loaded (chunks absent) — skipping", code);
-                continue;
-            }
+            if (room == null || !isLoaded(level, room)) continue;
 
-            final RoomPreviewSnapshot snapshot = RoomPreviewSnapshot.capture(level, room.boundaries().innerBounds());
-            final int hash = snapshot.contentHash();
-
-            final CachedSnapshot cached = state.cache.get(code);
-            if (cached != null && cached.hash == hash) continue; // unchanged — don't resend
-
-            state.cache.put(code, new CachedSnapshot(hash, snapshot));
-            CompactMachinesCore.modLog().info("[RoomPreview] gather {}: sending {}x{}x{} palette={} empty={} to {} player(s)",
-                    code, snapshot.sizeX(), snapshot.sizeY(), snapshot.sizeZ(), snapshot.palette().size(), snapshot.isEmpty(), subscribers.size());
-            broadcast(server, subscribers, new RoomPreviewSnapshotPacket(code, snapshot));
+            if (doBlocks) gatherBlocks(server, level, room, code, subscribers, state);
+            if (doEntities) gatherEntities(server, level, room, code, subscribers, state);
         }
+    }
+
+    /** Captures the room's blocks and sends a snapshot only when the contents changed. */
+    private static void gatherBlocks(MinecraftServer server, ServerLevel level, RoomInstance room,
+                                     String code, Set<UUID> subscribers, ServerState state) {
+        final RoomPreviewSnapshot snapshot = RoomPreviewSnapshot.capture(level, room.boundaries().innerBounds());
+        final int hash = snapshot.contentHash();
+
+        final CachedSnapshot cached = state.cache.get(code);
+        if (cached != null && cached.hash == hash) return; // unchanged — don't resend
+
+        state.cache.put(code, new CachedSnapshot(hash, snapshot));
+        broadcast(server, subscribers, new RoomPreviewSnapshotPacket(code, snapshot));
+    }
+
+    /**
+     * Captures the (non-player) entities in the room, in room-local space, and sends them live. Skips
+     * sending repeated empties: an empty is sent only once, to clear the client when the last entity
+     * leaves.
+     */
+    private static void gatherEntities(MinecraftServer server, ServerLevel level, RoomInstance room,
+                                       String code, Set<UUID> subscribers, ServerState state) {
+        final AABB inner = room.boundaries().innerBounds();
+        final int ox = Mth.floor(inner.minX), oy = Mth.floor(inner.minY), oz = Mth.floor(inner.minZ);
+
+        final List<RoomEntitySnapshot> snaps = new ArrayList<>();
+        for (Entity e : level.getEntities((Entity) null, inner, entity -> !(entity instanceof Player))) {
+            final float headYaw = e instanceof LivingEntity le ? le.getYHeadRot() : e.getYRot();
+            snaps.add(new RoomEntitySnapshot(e.getId(), e.getType(),
+                    (float) (e.getX() - ox), (float) (e.getY() - oy), (float) (e.getZ() - oz),
+                    e.getYRot(), e.getXRot(), headYaw));
+        }
+
+        final int previous = state.lastEntityCount.getOrDefault(code, 0);
+        if (snaps.isEmpty() && previous == 0) return; // nothing there and nothing to clear
+        state.lastEntityCount.put(code, snaps.size());
+        broadcast(server, subscribers, new RoomEntitiesPacket(code, snaps));
     }
 
     /** {@return true if every chunk the room's interior spans is already loaded} */
@@ -162,12 +203,12 @@ public final class RoomPreviewService {
     private static void setPreviewTickets(ServerLevel level, RoomInstance room, boolean add) {
         final var chunkSource = level.getChunkSource();
         room.boundaries().innerChunkPositions().forEach(cp -> {
-            if (add) chunkSource.addTicketWithRadius(PREVIEW_TICKET, cp, 0);
-            else chunkSource.removeTicketWithRadius(PREVIEW_TICKET, cp, 0);
+            if (add) chunkSource.addTicketWithRadius(PREVIEW_TICKET, cp, PREVIEW_TICKET_RADIUS);
+            else chunkSource.removeTicketWithRadius(PREVIEW_TICKET, cp, PREVIEW_TICKET_RADIUS);
         });
     }
 
-    private static void broadcast(MinecraftServer server, Set<UUID> subscribers, RoomPreviewSnapshotPacket packet) {
+    private static void broadcast(MinecraftServer server, Set<UUID> subscribers, CustomPacketPayload packet) {
         for (UUID id : subscribers) {
             final ServerPlayer player = server.getPlayerList().getPlayer(id);
             if (player != null)
@@ -203,6 +244,8 @@ public final class RoomPreviewService {
         private final Map<String, CachedSnapshot> cache = new HashMap<>();
         /** Rooms currently held loaded by a preview ticket (see {@link #reconcilePreviewTickets}). */
         private final Set<String> ticketed = new HashSet<>();
+        /** Last entity count sent per room, so repeated empties aren't re-sent. */
+        private final Map<String, Integer> lastEntityCount = new HashMap<>();
 
         void subscribe(UUID player, Set<String> rooms) {
             unsubscribe(player);
@@ -222,6 +265,7 @@ public final class RoomPreviewService {
                 if (subs.isEmpty()) {
                     byRoom.remove(code);
                     cache.remove(code); // no one watching — drop the cached snapshot too
+                    lastEntityCount.remove(code);
                 }
             }
         }

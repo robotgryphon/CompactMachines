@@ -1,144 +1,125 @@
 package dev.compactmods.machines.preview.client;
 
-import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.VertexConsumer;
+import com.mojang.blaze3d.PrimitiveTopology;
+import com.mojang.blaze3d.buffers.GpuBuffer;
+import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.BufferBuilder;
+import com.mojang.blaze3d.vertex.ByteBufferBuilder;
+import com.mojang.blaze3d.vertex.MeshData;
+import dev.compactmods.machines.core.CompactMachinesCore;
 import dev.compactmods.machines.preview.RoomPreviewSnapshot;
-import it.unimi.dsi.fastutil.floats.FloatArrayList;
-import it.unimi.dsi.fastutil.ints.IntArrayList;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.block.BlockQuadOutput;
+import net.minecraft.client.renderer.block.ModelBlockRenderer;
+import net.minecraft.client.renderer.chunk.ChunkSectionLayer;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
-import net.minecraft.world.level.EmptyBlockGetter;
+import net.minecraft.world.level.block.RenderShape;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.material.MapColor;
+import org.jspecify.annotations.Nullable;
+
+import java.util.EnumMap;
+import java.util.Map;
 
 /**
- * A precomputed, face-culled voxel mesh for one {@link RoomPreviewSnapshot}, in room-local space
- * (a cube per non-air cell, spanning {@code [x,x+1] × [y,y+1] × [z,z+1]}).
+ * A baked, textured preview of a room: the room's real block models tessellated (via
+ * {@link ModelBlockRenderer}) into GPU vertex buffers, one per {@link ChunkSectionLayer}
+ * (SOLID/CUTOUT/TRANSLUCENT), in <em>room-local</em> space (unit cubes at {@code (x,y,z)}). The
+ * per-machine placement transform is applied at draw time by {@link RoomPreviewRenderer}, so one
+ * baked mesh serves every machine bound to that room.
  *
- * <p>Only faces that border an air cell (or the snapshot edge) are emitted, so solid interiors cost
- * nothing — the result is the room's visible surface. Each face's colour is the block's
- * {@link MapColor} multiplied by a fixed per-direction brightness (the classic top-bright /
- * bottom-dark voxel look), baked into the vertex colour so the render pipeline needs no lighting.
- *
- * <p>Building walks the whole volume once and is done off the hot path (only when a room's snapshot
- * version changes — see {@link RoomPreviewMeshCache}); {@link #emit} just streams the cached vertices
- * each frame.
+ * <p>Baking runs on the render thread (it touches the model manager and GPU) and is cached per room
+ * version by {@link RoomPreviewMeshCache}; {@link #close()} frees the GPU buffers when a newer
+ * snapshot supersedes it.
  */
 public final class RoomPreviewMesh {
 
-    // Vanilla-style directional shading: up brightest, bottom darkest, sides between.
-    private static final float SHADE_DOWN = 0.5f;
-    private static final float SHADE_UP = 1.0f;
-    private static final float SHADE_NORTH_SOUTH = 0.8f;
-    private static final float SHADE_EAST_WEST = 0.6f;
-
-    /** Fallback colour for blocks whose map colour is {@link MapColor#NONE} (glass, etc.). */
-    private static final int FALLBACK_RGB = 0x8891A0;
-
-    private final float[] positions; // x,y,z per vertex
-    private final int[] colors;      // one packed 0xAARRGGBB per vertex
     public final int sizeX, sizeY, sizeZ;
+    private final Map<ChunkSectionLayer, LayerMesh> layers;
 
-    private RoomPreviewMesh(float[] positions, int[] colors, int sizeX, int sizeY, int sizeZ) {
-        this.positions = positions;
-        this.colors = colors;
+    /** One layer's uploaded geometry: a vertex buffer plus the index count for the shared quad indices. */
+    public record LayerMesh(GpuBuffer vertexBuffer, int indexCount) {}
+
+    private RoomPreviewMesh(int sizeX, int sizeY, int sizeZ, Map<ChunkSectionLayer, LayerMesh> layers) {
         this.sizeX = sizeX;
         this.sizeY = sizeY;
         this.sizeZ = sizeZ;
+        this.layers = layers;
     }
 
-    /** The number of vertices; a mesh with none should be skipped by the renderer. */
-    public int vertexCount() {
-        return colors.length;
-    }
-
-    public boolean isEmpty() {
-        return colors.length == 0;
-    }
-
-    /** {@return the largest of the room's three dimensions in blocks} (for uniform-fit scaling). */
     public int maxDimension() {
         return Math.max(sizeX, Math.max(sizeY, sizeZ));
     }
 
-    /** Streams the cached quads into {@code buffer} at {@code pose}. Room-local coords, origin at corner. */
-    public void emit(PoseStack.Pose pose, VertexConsumer buffer) {
-        for (int v = 0; v < colors.length; v++) {
-            final int c = colors[v];
-            buffer.addVertex(pose, positions[v * 3], positions[v * 3 + 1], positions[v * 3 + 2])
-                    .setColor(c >> 16 & 0xFF, c >> 8 & 0xFF, c & 0xFF, c >>> 24);
-        }
+    public boolean isEmpty() {
+        return layers.isEmpty();
     }
 
-    /** Builds the surface mesh for {@code snapshot}. */
+    public @Nullable LayerMesh layer(ChunkSectionLayer layer) {
+        return layers.get(layer);
+    }
+
+    /** Frees the GPU buffers. Call when this mesh is evicted/superseded. */
+    public void close() {
+        for (LayerMesh mesh : layers.values())
+            mesh.vertexBuffer().close();
+        layers.clear();
+    }
+
+    /** Bakes {@code snapshot}'s block models into per-layer GPU buffers. Render thread only. */
     public static RoomPreviewMesh build(RoomPreviewSnapshot snapshot) {
         final int sx = snapshot.sizeX(), sy = snapshot.sizeY(), sz = snapshot.sizeZ();
-        final FloatArrayList positions = new FloatArrayList();
-        final IntArrayList colors = new IntArrayList();
 
+        final var mc = Minecraft.getInstance();
+        final var modelSet = mc.getModelManager().getBlockStateModelSet();
+        final var level = new SnapshotBlockGetter(snapshot);
+        final var renderer = new ModelBlockRenderer(true /*AO*/, true /*cull internal faces*/, mc.getBlockColors());
+
+        final Map<ChunkSectionLayer, ByteBufferBuilder> scratch = new EnumMap<>(ChunkSectionLayer.class);
+        final Map<ChunkSectionLayer, BufferBuilder> builders = new EnumMap<>(ChunkSectionLayer.class);
+
+        // Route each baked quad to its own layer's buffer (a block may emit into several layers).
+        final BlockQuadOutput out = (x, y, z, quad, instance) ->
+                layerBuilder(scratch, builders, quad.materialInfo().layer()).putBlockBakedQuad(x, y, z, quad, instance);
+        final BlockQuadOutput forcedSolid = (x, y, z, quad, instance) ->
+                layerBuilder(scratch, builders, ChunkSectionLayer.SOLID).putBlockBakedQuad(x, y, z, quad, instance);
+
+        final BlockPos.MutableBlockPos pos = new BlockPos.MutableBlockPos();
         for (int y = 0; y < sy; y++) {
             for (int z = 0; z < sz; z++) {
                 for (int x = 0; x < sx; x++) {
                     final BlockState state = snapshot.blockAt(x, y, z);
-                    if (state.isAir()) continue;
-
-                    final int base = colorOf(state);
-                    for (Direction dir : Direction.values()) {
-                        // Cull the face unless the neighbour cell is empty (air or off the edge).
-                        if (!snapshot.blockAt(x + dir.getStepX(), y + dir.getStepY(), z + dir.getStepZ()).isAir())
-                            continue;
-                        emitFace(positions, colors, x, y, z, dir, shade(base, dir));
-                    }
+                    if (state.isAir() || state.getRenderShape() != RenderShape.MODEL) continue;
+                    pos.set(x, y, z);
+                    renderer.tesselateBlock(
+                            ModelBlockRenderer.forceOpaque(false, state) ? forcedSolid : out,
+                            x, y, z, level, pos, state, modelSet.get(state), state.getSeed(pos));
                 }
             }
         }
 
-        return new RoomPreviewMesh(positions.toFloatArray(), colors.toIntArray(), sx, sy, sz);
-    }
-
-    // --- geometry --------------------------------------------------------------------
-
-    private static void emitFace(FloatArrayList pos, IntArrayList col, int x, int y, int z, Direction dir, int color) {
-        final float x0 = x, y0 = y, z0 = z, x1 = x + 1, y1 = y + 1, z1 = z + 1;
-        switch (dir) {
-            case DOWN -> quad(pos, x0, y0, z0, x1, y0, z0, x1, y0, z1, x0, y0, z1);
-            case UP -> quad(pos, x0, y1, z0, x0, y1, z1, x1, y1, z1, x1, y1, z0);
-            case NORTH -> quad(pos, x0, y0, z0, x0, y1, z0, x1, y1, z0, x1, y0, z0);
-            case SOUTH -> quad(pos, x0, y0, z1, x1, y0, z1, x1, y1, z1, x0, y1, z1);
-            case WEST -> quad(pos, x0, y0, z0, x0, y0, z1, x0, y1, z1, x0, y1, z0);
-            case EAST -> quad(pos, x1, y0, z0, x1, y1, z0, x1, y1, z1, x1, y0, z1);
+        final Map<ChunkSectionLayer, LayerMesh> result = new EnumMap<>(ChunkSectionLayer.class);
+        for (var entry : builders.entrySet()) {
+            final MeshData mesh = entry.getValue().build();
+            if (mesh == null) continue;
+            try (mesh) {
+                final GpuBuffer vb = RenderSystem.getDevice().createBuffer(
+                        () -> CompactMachinesCore.dotPrefix("room_preview_verts"),
+                        GpuBuffer.USAGE_COPY_DST | GpuBuffer.USAGE_VERTEX, mesh.vertexBuffer());
+                result.put(entry.getKey(), new LayerMesh(vb, mesh.drawState().indexCount()));
+            }
         }
-        for (int i = 0; i < 4; i++) col.add(color);
+        for (ByteBufferBuilder b : scratch.values())
+            b.close();
+
+        return new RoomPreviewMesh(sx, sy, sz, result);
     }
 
-    private static void quad(FloatArrayList pos,
-                             float ax, float ay, float az, float bx, float by, float bz,
-                             float cx, float cy, float cz, float dx, float dy, float dz) {
-        pos.add(ax); pos.add(ay); pos.add(az);
-        pos.add(bx); pos.add(by); pos.add(bz);
-        pos.add(cx); pos.add(cy); pos.add(cz);
-        pos.add(dx); pos.add(dy); pos.add(dz);
-    }
-
-    // --- colour ----------------------------------------------------------------------
-
-    private static int colorOf(BlockState state) {
-        final MapColor mapColor = state.getMapColor(EmptyBlockGetter.INSTANCE, BlockPos.ZERO);
-        int rgb = mapColor.calculateARGBColor(MapColor.Brightness.NORMAL) & 0xFFFFFF;
-        if (rgb == 0) rgb = FALLBACK_RGB;
-        return rgb;
-    }
-
-    private static int shade(int rgb, Direction dir) {
-        final float f = switch (dir) {
-            case DOWN -> SHADE_DOWN;
-            case UP -> SHADE_UP;
-            case NORTH, SOUTH -> SHADE_NORTH_SOUTH;
-            case WEST, EAST -> SHADE_EAST_WEST;
-        };
-        final int r = Math.round((rgb >> 16 & 0xFF) * f);
-        final int g = Math.round((rgb >> 8 & 0xFF) * f);
-        final int b = Math.round((rgb & 0xFF) * f);
-        return 0xFF000000 | (r << 16) | (g << 8) | b;
+    private static BufferBuilder layerBuilder(Map<ChunkSectionLayer, ByteBufferBuilder> scratch,
+                                              Map<ChunkSectionLayer, BufferBuilder> builders, ChunkSectionLayer layer) {
+        return builders.computeIfAbsent(layer, l -> {
+            final var bb = new ByteBufferBuilder(l.bufferSize());
+            scratch.put(l, bb);
+            return new BufferBuilder(bb, PrimitiveTopology.QUADS, l.vertexFormat());
+        });
     }
 }
