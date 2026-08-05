@@ -128,12 +128,14 @@ public abstract sealed class CodecFileManager implements AutoCloseable {
             this.dirtyFiles.add(key);
         }
 
-        @SuppressWarnings("resource")
         public Stream<String> existingFiles() {
-            try {
-                return Files.list(directory)
-                        .filter(Files::isRegularFile)
-                        .map(PathUtils::getBaseName);
+            // try-with-resources so the directory stream (a file descriptor) is always closed — a lazy
+            // Files.list(...) returned unclosed leaks an fd on every call, and this is hit every tick.
+            try (var list = Files.list(directory)) {
+                return list.filter(Files::isRegularFile)
+                        .map(PathUtils::getBaseName)
+                        .toList()
+                        .stream();
             } catch (IOException e) {
                 return Stream.empty();
             }
