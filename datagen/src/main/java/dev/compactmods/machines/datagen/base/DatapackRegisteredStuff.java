@@ -7,6 +7,7 @@ import dev.compactmods.machines.core.CompactMachinesCore;
 import dev.compactmods.machines.datagen.util.DimensionTypeBuilder;
 import dev.compactmods.machines.dimension.Dimension;
 import dev.compactmods.machines.upgrades.api.system.CompiledRoomUpgrade;
+import dev.compactmods.machines.upgrades.example.ChunkLoaderUpgradeComponent;
 import dev.compactmods.machines.upgrades.example.TreeCutterUpgradeComponent;
 import net.minecraft.core.RegistrySetBuilder;
 import net.minecraft.core.registries.Registries;
@@ -45,6 +46,10 @@ public class DatapackRegisteredStuff {
         ctx.register(
                 ResourceKey.create(CompiledRoomUpgrade.REGISTRY_KEY, CompactMachinesCore.identifier("tree_cutter")),
                 new CompiledRoomUpgrade(8, 1, 200, List.of(new TreeCutterUpgradeComponent())));
+
+        ctx.register(
+                ResourceKey.create(CompiledRoomUpgrade.REGISTRY_KEY, CompactMachinesCore.identifier("chunk_loader")),
+                new CompiledRoomUpgrade(8, 1, 200, List.of(new ChunkLoaderUpgradeComponent())));
     }
 
     private static void generateFlagDefinitions(BootstrapContext<FlagShader> ctx) {

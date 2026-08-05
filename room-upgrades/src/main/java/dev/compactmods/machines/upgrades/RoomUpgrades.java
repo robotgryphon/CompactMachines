@@ -5,6 +5,8 @@ import dev.compactmods.machines.upgrades.api.RoomUpgradesApi;
 import dev.compactmods.machines.core.CompactMachinesCore;
 import dev.compactmods.machines.room.CMFeatureFlags;
 import dev.compactmods.machines.upgrades.command.RoomUpgradesSubcommand;
+import dev.compactmods.machines.upgrades.example.ChunkLoaderTickets;
+import dev.compactmods.machines.upgrades.example.ChunkLoaderUpgradeComponent;
 import dev.compactmods.machines.upgrades.example.TreeCutterUpgradeComponent;
 import dev.compactmods.machines.upgrades.storage.ResourceTypes;
 import dev.compactmods.machines.upgrades.storage.StorageCapabilities;
@@ -33,11 +35,11 @@ public final class RoomUpgrades {
             .register("tree_cutter", () -> RoomUpgradeComponentType.builder(TreeCutterUpgradeComponent::new)
                     .requiredFeatures(CMFeatureFlags.ROOM_UPGRADES)
                     .build());
-//
-//    DeferredHolder<RoomUpgradeComponentType<?>, RoomUpgradeComponentType<ChunkLoaderUpgradeComponent>> CHUNK_LOADER = ROOM_UPGRADE_DEFINITIONS
-//            .register("chunk_loader", () -> RoomUpgradeComponentType.builder(ChunkLoaderUpgradeComponent::new, ChunkLoaderUpgradeComponent.CODEC)
-//                    .requiredFeatures(CMFeatureFlags.ROOM_UPGRADES)
-//                    .build());
+
+    public static final DeferredHolder<RoomUpgradeComponentType<?>, RoomUpgradeComponentType<ChunkLoaderUpgradeComponent>> CHUNK_LOADER = RURegistries.ROOM_UPGRADE_DEFINITIONS
+            .register("chunk_loader", () -> RoomUpgradeComponentType.builder(ChunkLoaderUpgradeComponent::new)
+                    .requiredFeatures(CMFeatureFlags.ROOM_UPGRADES)
+                    .build());
 
     //    interface Menus {
 //        DeferredHolder<MenuType<?>, MenuType<RoomUpgradeMenu>> ROOM_UPGRADES = Rooms.CONTAINERS.register("room_upgrades",
@@ -56,6 +58,7 @@ public final class RoomUpgrades {
         registerEvents(modBus);
 
         modBus.addListener(RoomUpgrades::onRegisterCapabilities);
+        modBus.addListener(ChunkLoaderTickets::register);
 
         RURegistries.DATA_COMPONENTS.register(modBus);
         RURegistries.ROOM_UPGRADE_DEFINITIONS.register(modBus);
