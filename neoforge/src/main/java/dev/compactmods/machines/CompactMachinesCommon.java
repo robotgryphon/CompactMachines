@@ -27,11 +27,7 @@ public class CompactMachinesCommon {
 
     @SuppressWarnings("unused")
     public CompactMachinesCommon(IEventBus modBus) {
-        Dimension.prepare();
         Commands.prepare();
-        CMGameRules.prepare();
-
-        Villagers.prepare();
 
         CMDataComponents.prepare();
         CMDataAttachments.prepare();
@@ -40,6 +36,9 @@ public class CompactMachinesCommon {
 
         CMRegistries.setup(modBus);
 
+        Dimension.init(modBus);
+        CMGameRules.init(modBus);
+        Villagers.init(modBus);
         Machines.init(modBus);
         RoomSystem.init(modBus);
         RoomUpgrades.init(modBus);
@@ -47,8 +46,6 @@ public class CompactMachinesCommon {
     }
 
     private static void registerEvents(IEventBus modBus) {
-        Villagers.registerEvents();
-
         modBus.addListener(CMFeaturePacks::addFeaturePacks);
         modBus.addListener(CMNetworks::onPacketRegistration);
         modBus.addListener(InterModCompat::enqueueCompatMessages);

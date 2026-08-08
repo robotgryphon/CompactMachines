@@ -43,7 +43,11 @@ val roomUpgradesSrc = sourceSets.register("roomUpgrades")
 val storageSrc = sourceSets.register("storage")
 val machinesSrc = sourceSets.register("machines")
 
-listOf(roomsSrc, shrinkingSrc, roomUpgradesSrc, storageSrc, machinesSrc)
+// Data-generation sources: their own source set, NOT folded into `main` (the
+// generators must not ship in the mod jar). Driven by the `data` run below.
+val datagenSrc = sourceSets.register("datagen")
+
+listOf(roomsSrc, shrinkingSrc, roomUpgradesSrc, storageSrc, machinesSrc, datagenSrc)
     .forEach { neoForge.addModdingDependenciesTo(it.get()) }
 
 sourceSets.main {
@@ -151,6 +155,19 @@ neoForge {
             server()
             gameDirectory.set(file("runs/server"))
             programArgument("nogui")
+        }
+
+        register("data") {
+            clientData()
+            gameDirectory.set(file("runs/data"))
+
+            programArguments.addAll("--mod", modId)
+            programArguments.addAll("--all")
+            programArguments.addAll("--output", file("src/generated/resources").absolutePath)
+            programArguments.addAll("--existing", file("src/main/resources").absolutePath)
+
+            loadedMods.add(cmMain)
+            sourceSet.set(sourceSets["datagen"])
         }
 
         register("gameTestServer") {
@@ -263,15 +280,24 @@ dependencies {
     "machinesCompileOnly"(roomsSrc.get().output)
     "machinesCompileOnly"(shrinkingSrc.get().output)
 
+    // Datagen sees :api + the whole mod (main folds every feature source set).
+    "datagenCompileOnly"(project(":api"))
+    "datagenImplementation"(sourceSets.main.get().output)
+
     testImplementation(neoforged.testframework)
     testImplementation("org.junit.jupiter:junit-jupiter:5.7.1")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 
 
-    compileOnly(compactmods.feather)
+    // `implementation` (not `compileOnly`) so feather/spatial are on the dev-run
+    // runtime classpath. Before the restructure they arrived transitively via
+    // :room-system's implementation(feather); now the feature code is folded in
+    // here, so this module must put them on the runtime classpath itself.
+    // jarJar still bundles them into the production jar.
+    implementation(compactmods.feather)
     jarJar(compactmods.feather) { isTransitive = false }
 
-    compileOnly(compactmods.spatial)
+    implementation(compactmods.spatial)
     jarJar(compactmods.spatial) { isTransitive = false }
 
     // Gander

@@ -2,8 +2,8 @@ package dev.compactmods.machines.villager;
 
 import com.google.common.collect.ImmutableSet;
 import dev.compactmods.machines.core.CompactMachinesCore;
-import dev.compactmods.machines.CMRegistries;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
+import net.neoforged.bus.api.IEventBus;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -31,11 +31,15 @@ public class Villagers {
     public static final DeferredRegister<VillagerProfession> VILLAGERS = DeferredRegister
             .create(BuiltInRegistries.VILLAGER_PROFESSION, CompactMachinesCore.MOD_ID);
 
-    public static final DeferredBlock<Block> SPATIAL_WORKBENCH = CMRegistries.BLOCKS.registerSimpleBlock("spatial_workbench", () -> BlockBehaviour
+    private static final DeferredRegister.Blocks BLOCKS = DeferredRegister.createBlocks(CompactMachinesCore.MOD_ID);
+    private static final DeferredRegister.Items ITEMS = DeferredRegister.createItems(CompactMachinesCore.MOD_ID);
+    private static final DeferredRegister<PoiType> POINTS_OF_INTEREST = DeferredRegister.create(BuiltInRegistries.POINT_OF_INTEREST_TYPE, CompactMachinesCore.MOD_ID);
+
+    public static final DeferredBlock<Block> SPATIAL_WORKBENCH = BLOCKS.registerSimpleBlock("spatial_workbench", () -> BlockBehaviour
             .Properties.of()
             .mapColor(MapColor.NONE));
 
-    public static final DeferredItem<BlockItem> SPATIAL_WORKBENCH_ITEM = CMRegistries.ITEMS.registerSimpleBlockItem(SPATIAL_WORKBENCH);
+    public static final DeferredItem<BlockItem> SPATIAL_WORKBENCH_ITEM = ITEMS.registerSimpleBlockItem(SPATIAL_WORKBENCH);
 
     public static final Holder<VillagerProfession> TINKERER = VILLAGERS.register("tinkerer",
             () -> new VillagerProfession(
@@ -64,13 +68,17 @@ public class Villagers {
 //            () -> new BasicItemListing(3, Shrinking.ENLARGING_MODULE.toStack(4), 5, 100));
 
     static {
-        CMRegistries.POINTS_OF_INTEREST.register("tinkerer", () -> new PoiType(
+        POINTS_OF_INTEREST.register("tinkerer", () -> new PoiType(
                 ImmutableSet.of(SPATIAL_WORKBENCH.get().defaultBlockState()), 1, 1)
         );
     }
 
-    public static void prepare() {
-
+    public static void init(IEventBus modBus) {
+        BLOCKS.register(modBus);
+        ITEMS.register(modBus);
+        POINTS_OF_INTEREST.register(modBus);
+        VILLAGERS.register(modBus);
+        registerEvents();
     }
 
     public static void registerEvents() {

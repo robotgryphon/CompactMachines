@@ -35,7 +35,7 @@ plugins {
 
 include(":api")
 include(":neoforge")
-include(":datagen")
+include(":compat")
 
 fun addVersionCatalog(dependencyResolutionManagement: DependencyResolutionManagement, name: String) {
     dependencyResolutionManagement.versionCatalogs.create(name) {

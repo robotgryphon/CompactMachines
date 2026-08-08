@@ -506,14 +506,38 @@ stays), so most consumer imports are untouched — the churn is build files +
    `roomUpgrades`/`storage` impl absorbed as isolated source sets folded into
    `main`; `:room-system`/`:room-upgrades`/`:shrinking`/`:machines` deleted.
    **Now 3 Gradle projects: `:api`, `:neoforge`, `:datagen`.**
-3. ⏳ **`:neoforge` glue + datagen** — fold `:datagen` in as a source set; carve
-   the flat glue in `main` into source sets (`command, villager, gamerule,
-   dimension, server, feature, i18n, util`) and distribute
-   `network`/`preview`/`client` into their feature source sets + `main`.
-5. **`:compat`** — move jei/jade/curios; stub `theoneprobe`.
-6. **Delete** the eight old modules; update `settings.gradle.kts`, publishing,
-   jarJar wiring, `buildSrc` conventions.
-7. **Verify** full `compileJava`, then a run/gametest to confirm registrations.
+3. ✅ **`:datagen` folded in (done, build green).** Absorbed as a `datagen`
+   source set in `:neoforge` (NOT folded into `main` — generators don't ship);
+   the `data` run moved into `:neoforge`'s runs block (`loadedMods(cmMain)` +
+   `sourceSet=datagen`). `:datagen` module deleted.
+4. ✅ **`:compat` extracted (done, build green).** `compat/jei|jade|curios`
+   moved out of `:neoforge` into the new `:compat` project (source sets
+   `jei, jade, curios, theoneprobe` folded into `main`). `InterModCompat` stays
+   in `:neoforge` (loader glue). All four plugins are dormant stubs, so `:compat`
+   is not yet jarJar-bundled into the mod (would need a neoforge↔compat cycle
+   resolved when a plugin is reactivated). **Target reached: 3 projects —
+   `:api`, `:neoforge`, `:compat`.**
+
+### Remaining (internal to `:neoforge`, no project-count change)
+
+5. **Aggregator split** (in progress) — ✅ registry aggregators for the
+   register-owning concerns done: `gamerule` (own `GAME_RULES`), `villager`
+   (own `BLOCKS`/`ITEMS`/`POINTS_OF_INTEREST` + `VILLAGERS`), `dimension` (own
+   `BLOCKS`) now self-register via `init(modBus)`; removed from `CMRegistries`,
+   which is down to `TABS` + `DATA_COMPONENTS` (only the unused
+   `UPGRADE_INSTANCE_ID`) + `FLAG_SHADERS` + the `RoomTemplate`/`FlagShader`
+   datapack registries. Dead registers (`CONTAINERS`, `COMMAND_ARGUMENT_TYPES`)
+   dropped. ⏳ remaining: `CMNetworks` (per-feature packet registration),
+   `CompactMachinesClient`, `CreativeTabs`, and the leftover dead members
+   (`UPGRADE_INSTANCE_ID` → `roomUpgrades`, `MACHINE_SHADER` → `machines`).
+6. ⏳ **Glue source sets** — carve `command, villager, gamerule, dimension,
+   server, feature, i18n, util` into source sets (7 of 8 now free of
+   main-aggregator refs; `server` still uses `CMDataAttachments`) and distribute
+   `network`/`preview`/`client` into their feature source sets. Snag:
+   `RoomClientEvents`, `RoomPreviewRenderer`, `RoomPreviewClient` use machine
+   **impl** while `machines`→`rooms` — fix by switching the two preview classes
+   to `ICompactMachineBlockEntity` (api) and splitting `RoomClientEvents`.
+7. ⏳ **Verify** — full `compileJava` (green now) + a `data`/gametest run.
 
 This is a whole-codebase change; it should land phase-by-phase with a green build
 at each checkpoint, not in one commit.
