@@ -16,35 +16,16 @@ tasks.withType<Jar>().configureEach {
     }
 }
 
-// The `api` source set holds the public machine surface (block-entity
-// interfaces, machine constants) — mirrors :room-system's api/main split.
-// It is compiled in isolation and folded back into `main` via srcDir so the
-// whole module still ships as a single jar.
-val apiSource = sourceSets.register("api")
-
 neoForge {
-    addModdingDependenciesTo(apiSource.get())
+    // In-source siblings can't rely on moddev auto-propagating the published
+    // interface-injection metadata across project deps, so read it explicitly.
     interfaceInjectionData {
-        from(project(":core").file("interfaces.json"))
-    }
-}
-
-sourceSets.main {
-    java {
-        srcDir(apiSource.get().java)
-        srcDir("src/main/java")
+        from(project(":api").file("interfaces.json"))
     }
 }
 
 dependencies {
-    compileOnly(project(":core"))
-    compileOnly(project(":dimension-api"))
+    compileOnly(project(":api"))
     compileOnly(project(":room-system"))
     compileOnly(project(":shrinking"))
-
-    // The `api` source set gets its own parallel configuration chain
-    // (apiCompileOnly / …). Anything imported from src/api/java must be listed
-    // here explicitly — the plain compileOnly(...) above only feeds `main`.
-    // See room-system/build.gradle.kts for the full rationale.
-    "apiCompileOnly"(project(":core"))
 }

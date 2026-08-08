@@ -16,37 +16,18 @@ tasks.withType<Jar>().configureEach {
     }
 }
 
-val apiSource = sourceSets.register("api")
-
 neoForge {
-    addModdingDependenciesTo(apiSource.get())
+    // In-source siblings can't rely on moddev auto-propagating the published
+    // interface-injection metadata across project deps, so read it explicitly.
     interfaceInjectionData {
-        from(project(":core").file("interfaces.json"))
-    }
-}
-
-sourceSets.main {
-    java {
-        srcDir(apiSource.get().java)
-        srcDir("src/main/java")
+        from(project(":api").file("interfaces.json"))
     }
 }
 
 dependencies {
-    compileOnly(project(":core"))
-    compileOnly(project(":dimension-api"))
-
-    // The `api` source set is compiled in isolation by Gradle and gets its own
-    // parallel configuration chain (apiCompileOnly / apiImplementation / …).
-    // Every project consumed from a source file under src/api/java must be
-    // listed here explicitly — `compileOnly(...)` above only feeds the `main`
-    // source set. The IDE flattens source-set classpaths so unqualified
-    // imports look fine in the editor but fail in `./gradlew compileApiJava`.
-    "apiCompileOnly"(project(":core"))
-    "apiCompileOnly"(project(":dimension-api"))
+    compileOnly(project(":api"))
 
     implementation(libs.jnanoid)
-
     implementation(compactmods.feather)
     implementation(compactmods.spatial)
 }

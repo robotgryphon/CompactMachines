@@ -33,11 +33,10 @@ plugins {
     id("org.gradle.toolchains.foojay-resolver-convention") version ("1.0.0")
 }
 
-include(":core")
+include(":api")
 include(":compactmachines")
 include(":datagen")
 include(":shrinking")
-include(":dimension-api")
 include(":room-system")
 include(":room-upgrades")
 include(":machines")

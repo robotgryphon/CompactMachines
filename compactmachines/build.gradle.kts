@@ -10,7 +10,7 @@ if (envVersion.startsWith("v"))
 
 val modId: String = "compactmachines"
 
-val core = project(":core")
+val core = project(":api")
 val roomSystem = project(":room-system")
 
 plugins {
@@ -221,15 +221,13 @@ dependencies {
         testImplementation(libs.jnanoid)
         jarJar(libs.jnanoid)
 
-        implementation(project(":core"))
-        implementation(project(":dimension-api"))
+        implementation(project(":api"))
         implementation(project(":room-system"))
         implementation(project(":room-upgrades"))
         implementation(project(":shrinking"))
         implementation(project(":machines"))
 
-        jarJar(project(":core"))
-        jarJar(project(":dimension-api"))
+        jarJar(project(":api"))
         jarJar(project(":room-system"))
         jarJar(project(":room-upgrades"))
         jarJar(project(":shrinking"))

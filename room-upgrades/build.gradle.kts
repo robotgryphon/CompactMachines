@@ -19,15 +19,12 @@ tasks.withType<Jar>().configureEach {
     }
 }
 
-val apiSource = sourceSets.register("api")
 val storageSource = sourceSets.register("storage")
 
-neoForge.addModdingDependenciesTo(apiSource.get())
 neoForge.addModdingDependenciesTo(storageSource.get())
 
 sourceSets.main {
     java {
-        srcDir(apiSource.get().java)
         srcDir(storageSource.get().java)
     }
 }
@@ -48,14 +45,10 @@ repositories {
 }
 
 dependencies {
-    compileOnly(project(":core"))
+    compileOnly(project(":api"))
     compileOnly(project(":room-system"))
-    compileOnly(project(":dimension-api"))
     compileOnly(compactmods.spatial)
-    
-    "apiCompileOnly"(project(":core"))
-    "apiCompileOnly"(project(":room-system"))
 
-    "storageCompileOnly"(project(":core"))
+    "storageCompileOnly"(project(":api"))
     "storageCompileOnly"(project(":room-system"))
 }

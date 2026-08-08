@@ -494,10 +494,13 @@ stays), so most consumer imports are untouched — the churn is build files +
 
 ## Phased sequence (each phase must compile)
 
-1. **Scaffold** `:api`, `:neoforge`, `:compat` (empty, source sets + build files,
-   registered in `settings.gradle.kts`); resolve the core decision.
-2. **`:api`** — move all api source sets (+ `base`/`core` per decision) in;
-   point old modules' `apiCompileOnly`/`compileOnly` at `:api`.
+1. ✅ **`:api` (done, build green).** `:core` renamed to `:api`; `core.*` +
+   all five API surfaces consolidated as isolated source sets (`core`,
+   `dimension`, `machines`, `rooms`, `roomUpgrades`, `shrinking`) folded into
+   `main`. `:dimension-api` deleted. Interface-injection `interfaces.json` +
+   `compactmachines.mixins.json` moved with `core`. Every consumer repointed
+   `:core`/`:dimension-api` → `:api`; the library modules dropped their own
+   `api` source sets. Full `compileJava` passes.
 3. **`:neoforge` core + features** — move `core`, then `machines`/`rooms`/
    `roomUpgrades`/`shrinking` impl + `datagen` into `:neoforge` source sets.
 4. **`:neoforge` glue** — move the cross-cutting concerns + `@Mod` main in.
