@@ -4,9 +4,7 @@ import com.mojang.blaze3d.platform.InputConstants;
 import dev.compactmods.machines.client.config.ClientConfig;
 import dev.compactmods.machines.core.CompactMachinesCore;
 import dev.compactmods.machines.network.room.PlayerRequestedTeleportPacket;
-import dev.compactmods.machines.network.room.PlayerRequestedUpgradeUIPacket;
 import dev.compactmods.machines.network.room.PlayerStartedRoomTrackingPacket;
-import dev.compactmods.machines.room.CMFeatureFlags;
 import dev.compactmods.machines.shrinking.Shrinking;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
@@ -32,9 +30,6 @@ public class MachineRoomScreen extends Screen {
     private final GlobalPos machinePos;
     private final String roomCode;
 
-    // Features
-    private final boolean roomUpgradesEnabled;
-
     //    private SpatialRenderer renderer;
     private AABB renderSize;
 
@@ -50,18 +45,10 @@ public class MachineRoomScreen extends Screen {
             CompactMachinesCore.identifier("personal_shrinking_device_highlighted"),
             CompactMachinesCore.identifier("personal_shrinking_device_disabled"));
 
-    private final WidgetSprites upgradeBtnSprites = new WidgetSprites(
-            CompactMachinesCore.identifier("upgrade_btn"),
-            CompactMachinesCore.identifier("upgrade_btn")
-    );
-
     public MachineRoomScreen(Component title, GlobalPos machinePos, String roomCode) {
         super(title);
         this.machinePos = machinePos;
         this.roomCode = roomCode;
-
-        final var enabledFeatures = Objects.requireNonNull(minecraft.level).enabledFeatures();
-        this.roomUpgradesEnabled = CMFeatureFlags.ROOM_UPGRADES.isSubsetOf(enabledFeatures);
 
         if (ClientConfig.ENABLE_ROOM_PREVIEWS.get()) {
             // Send packet to server for block data
@@ -85,24 +72,10 @@ public class MachineRoomScreen extends Screen {
                 .build());;
 
         this.psdButton.setPosition(screenArea.right() - 12, screenArea.bottom() + 2);
-
-        // EXPERIMENTAL: Room Upgrades
-        if (roomUpgradesEnabled) {
-            var upgradeScreenBtn = addRenderableWidget(SpriteIconButton.builder(CommonComponents.EMPTY, this::openRoomUpgradesUI, true)
-                    .size(12, 12)
-                    .sprite(upgradeBtnSprites, 12, 12)
-                    .build());
-
-            upgradeScreenBtn.setPosition(screenArea.right() - 24, screenArea.bottom() + 2);
-        }
     }
 
     private void teleportIntoRoom(Button ignored) {
         ClientPacketDistributor.sendToServer(new PlayerRequestedTeleportPacket(machinePos, roomCode));
-    }
-
-    private void openRoomUpgradesUI(Button ignored) {
-        ClientPacketDistributor.sendToServer(new PlayerRequestedUpgradeUIPacket(roomCode, false));
     }
 
     @Override

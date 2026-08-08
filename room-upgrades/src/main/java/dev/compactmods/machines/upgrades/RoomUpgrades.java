@@ -41,14 +41,6 @@ public final class RoomUpgrades {
                     .requiredFeatures(CMFeatureFlags.ROOM_UPGRADES)
                     .build());
 
-    //    interface Menus {
-//        DeferredHolder<MenuType<?>, MenuType<RoomUpgradeMenu>> ROOM_UPGRADES = Rooms.CONTAINERS.register("room_upgrades",
-//                () -> IMenuTypeExtension.create(RoomUpgradeMenu::createClientMenu));
-//
-//        static void prepare() {
-//        }
-//    }
-
     public static void init(IEventBus modBus) {
 
         RURegistries.ROOM_UPGRADE_DEFINITIONS.makeRegistry(builder -> {

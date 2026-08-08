@@ -9,7 +9,6 @@ import dev.compactmods.machines.network.room.RoomPreviewSubscribePacket;
 import dev.compactmods.machines.network.room.PlayerRequestedLeavePacket;
 import dev.compactmods.machines.network.room.PlayerRequestedRoomUIPacket;
 import dev.compactmods.machines.network.room.PlayerRequestedTeleportPacket;
-import dev.compactmods.machines.network.room.PlayerRequestedUpgradeUIPacket;
 import dev.compactmods.machines.network.room.PlayerStartedRoomTrackingPacket;
 import dev.compactmods.machines.shrinking.network.SyncRoomMetadataPacket;
 import net.minecraft.network.codec.StreamCodec;
@@ -36,6 +35,5 @@ public class CMNetworks {
         main.playToServer(PlayerRequestedTeleportPacket.TYPE, PlayerRequestedTeleportPacket.STREAM_CODEC, PlayerRequestedTeleportPacket.HANDLER);
         main.playToServer(PlayerRequestedLeavePacket.TYPE, StreamCodec.unit(new PlayerRequestedLeavePacket()), PlayerRequestedLeavePacket.HANDLER);
         main.playToServer(PlayerRequestedRoomUIPacket.TYPE, PlayerRequestedRoomUIPacket.STREAM_CODEC, PlayerRequestedRoomUIPacket.HANDLER);
-        main.playToServer(PlayerRequestedUpgradeUIPacket.TYPE, PlayerRequestedUpgradeUIPacket.STREAM_CODEC, PlayerRequestedUpgradeUIPacket.HANDLER);
     }
 }

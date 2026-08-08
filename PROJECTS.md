@@ -1,5 +1,9 @@
 # Project & Source-Set Layout
 
+> **⇢ Active plan:** the per-feature vertical modules are being consolidated into
+> **three horizontal projects** — see [Three-project restructure](#planned-three-project-restructure)
+> at the bottom. Everything above that section describes the *current* layout.
+
 Working notes for the multi-module Gradle build, kept as a reference while we
 plan pulling a dedicated `:machines` project out of `:compactmachines`.
 
@@ -376,3 +380,131 @@ graph TD
 that must be resolved first: the `MachineColor` cycle from `:room-system`, and
 the sibling-wiring back-references (`CM*` aggregators, `network.machine`,
 `i18n`).
+
+---
+
+# PLANNED: three-project restructure
+
+**Motivation:** the codebase has outgrown per-feature *vertical* modules
+(`:machines`, `:room-system`, `:shrinking`, … each shipping its own api+impl).
+We are switching to three *horizontal* projects, split by role.
+
+## Target: three Gradle subprojects, each with source sets folded into `main`
+
+```
+:api        — public API surfaces only (no impl)
+   base*    — shared primitives the API needs (see "core decision" below)
+   dimension, machines, rooms, roomUpgrades, shrinking
+:neoforge   — the NeoForge implementation + the @Mod assembly
+   core, machines, rooms, roomUpgrades, shrinking, datagen
+   + one source set per cross-cutting concern:
+     client, network, command, preview, villager, gamerule,
+     dimension, server, feature, i18n, util
+   + main/java — @Mod entrypoint & assembly (CompactMachinesCommon,
+     CMRegistries, CMDataComponents, CMDataAttachments, Advancements)
+:compat     — external-mod integration
+   jei, jade, theoneprobe (new), curios
+```
+
+Each nested item is a **source set** compiled in isolation (its own
+`<name>CompileOnly` chain) and `srcDir`-folded into `main`, exactly as
+`:room-system` does today with `api`. One published jar per project.
+
+**Project dependencies:** `:api` ← nothing internal · `:neoforge` → `:api` ·
+`:compat` → `:api` + `:neoforge`. No cycles at the project level; source-set
+isolation enforces the finer boundaries inside `:neoforge`.
+
+## ⚠️ Open decision: the `core` package (blocks sequencing)
+
+The `:api` source sets depend on 5 types currently in `:core`:
+
+| Type | api-layer uses | repo-wide importers |
+| --- | --- | --- |
+| `core.CompactMachinesCore` (MOD_ID + `identifier()`) | 9 | **95** |
+| `core.data.Saveable` | 4 | 8 |
+| `core.machine.MachineColor` | 3 | 11 |
+| `core.capability.ServerCapability` | 1 | 3 |
+| `core.util.KeyHelper` | 1 | 2 |
+
+All 5 are api-safe (only vanilla/NeoForge deps). But the outline puts `core`
+**under `:neoforge`**, and `:api` cannot depend on `:neoforge`. A Java package
+also cannot be split across two jars (automatic-module rule). So one of:
+
+- **A — `core` → `:api` in full.** Move the whole `core` package (incl. mixin,
+  interface-injection holders) into `:api`. Zero FQCN churn. Deviates from
+  "core under neoforge" (core becomes the API foundation instead).
+- **B — extract the 5 types to `:api`, rest of `core` stays in `:neoforge`.**
+  Honors the outline, but the 5 types get new packages (e.g.
+  `api.base.*`) → **~119 import rewrites** (95 for `CompactMachinesCore` alone),
+  all mechanical.
+- **C — keep `:core` as a 4th shared foundation** below `:api`/`:neoforge`.
+  Zero churn, no split, but that's four projects, not three.
+
+*Recommendation: **A*** — least churn while keeping three projects; `core` is in
+practice the API's foundation, so housing it with `:api` is coherent. (If "core
+must live under neoforge" is firm, **C** is the next-least-disruptive.)
+
+## Current → target mapping
+
+| Current | → Target project / source set |
+| --- | --- |
+| `dimension-api` (`api.dimension`) | `:api` / `dimension` |
+| `machines/src/api` (`api.machine`) | `:api` / `machines` |
+| `room-system/src/api` (`api.room`) | `:api` / `rooms` |
+| `room-upgrades/src/api` (`upgrades.api`) | `:api` / `roomUpgrades` |
+| `shrinking/src/api` (`shrinking.api`) | `:api` / `shrinking` |
+| `core` (api-safe subset, per decision) | `:api` / `base` *(or all of core → :api under option A)* |
+| `core` (mixin, attachment/capability injection, location, data utils, GameRulesHelper, WallConstants, Translations) | `:neoforge` / `core` |
+| `machines/src/main` (impl + `machine.client`) | `:neoforge` / `machines` |
+| `room-system/src/main` (`room.*`) | `:neoforge` / `rooms` |
+| `room-upgrades/src/main` + `storage` | `:neoforge` / `roomUpgrades` |
+| `shrinking/src/main` | `:neoforge` / `shrinking` |
+| `datagen` | `:neoforge` / `datagen` |
+| `compactmachines`: `command`, `villager`, `gamerule`, `dimension`, `server`, `feature`, `i18n`, `util` | `:neoforge` / one source set each (acyclic) |
+| `compactmachines`: `network`, `preview`, `client` | **distributed into feature source sets** (see below) — these are not standalone concerns; `client`/`network`/`preview` were mutually circular |
+| `compactmachines`: `@Mod` + `CMData*` + `Advancements` + `incubating` | `:neoforge` / `main` |
+
+### Finalized `network` / `preview` / `client` distribution
+
+The `client`/`network`/`preview` packages formed a dependency cycle
+(`client↔network↔preview`). Resolution: they are **feature code grouped by
+technical layer**, so each class moves to the source set of the feature it
+serves.
+
+| Classes | → source set |
+| --- | --- |
+| all `preview/**` (11), all `client/room/**` (5), `client/keybinds/room/RoomExitKeyMapping`, `network/room/**` except upgrade packet (8) | `rooms` |
+| `network/machine/OpenMachinePreviewScreenPacket`, `client/machine/ClientMachinePacketHandler` | `machines` |
+| `client/command/**` (2) | `command` |
+| `PlayerRequestedUpgradeUIPacket`, `RoomUpgradeUIMapping`, `upgrades/ui/RoomUpgrade{Menu,Screen}` + registration | ✅ **DELETED** — dead feature, removed |
+
+**Aggregators split per feature** (not kept central): `CMNetworks`,
+`CompactMachinesClient`, `ClientConfig`, `CreativeTabs` are decomposed so each
+feature registers its own packets / client events / config / creative-tab
+entries (the `Shrinking.init` pattern), rather than one mod-wide registrar.
+| `compactmachines`: `compat/jei` | `:compat` / `jei` |
+| `compactmachines`: `compat/jade` | `:compat` / `jade` |
+| `compactmachines`: `compat/curios` | `:compat` / `curios` |
+| *(new)* TheOneProbe | `:compat` / `theoneprobe` |
+| `compactmachines`: `compat/InterModCompat` | `:neoforge` / `main` (compat enqueue is loader glue) |
+
+FQCN policy: impl packages keep their names (e.g. `dev.compactmods.machines.room.*`
+stays), so most consumer imports are untouched — the churn is build files +
+`git mv`s + (under option B) the core-type rename.
+
+## Phased sequence (each phase must compile)
+
+1. **Scaffold** `:api`, `:neoforge`, `:compat` (empty, source sets + build files,
+   registered in `settings.gradle.kts`); resolve the core decision.
+2. **`:api`** — move all api source sets (+ `base`/`core` per decision) in;
+   point old modules' `apiCompileOnly`/`compileOnly` at `:api`.
+3. **`:neoforge` core + features** — move `core`, then `machines`/`rooms`/
+   `roomUpgrades`/`shrinking` impl + `datagen` into `:neoforge` source sets.
+4. **`:neoforge` glue** — move the cross-cutting concerns + `@Mod` main in.
+5. **`:compat`** — move jei/jade/curios; stub `theoneprobe`.
+6. **Delete** the eight old modules; update `settings.gradle.kts`, publishing,
+   jarJar wiring, `buildSrc` conventions.
+7. **Verify** full `compileJava`, then a run/gametest to confirm registrations.
+
+This is a whole-codebase change; it should land phase-by-phase with a green build
+at each checkpoint, not in one commit.
