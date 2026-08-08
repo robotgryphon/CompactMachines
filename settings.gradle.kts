@@ -40,6 +40,7 @@ include(":shrinking")
 include(":dimension-api")
 include(":room-system")
 include(":room-upgrades")
+include(":machines")
 
 fun addVersionCatalog(dependencyResolutionManagement: DependencyResolutionManagement, name: String) {
     dependencyResolutionManagement.versionCatalogs.create(name) {

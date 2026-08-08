@@ -9,7 +9,7 @@ import dev.compactmods.machines.gamerule.CMGameRules;
 import dev.compactmods.machines.core.Translations;
 import dev.compactmods.machines.Advancements;
 import dev.compactmods.machines.i18n.CommandTranslations;
-import dev.compactmods.machines.i18n.MachineTranslations;
+import dev.compactmods.machines.machine.i18n.MachineTranslations;
 import dev.compactmods.machines.client.keybinds.room.RoomExitKeyMapping;
 import dev.compactmods.machines.client.creative.CreativeTabs;
 import dev.compactmods.machines.client.keybinds.room.RoomUpgradeUIMapping;

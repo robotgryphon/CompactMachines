@@ -1,7 +1,7 @@
 package dev.compactmods.machines.datagen.base;
 
 
-import dev.compactmods.machines.client.machine.MachineColors;
+import dev.compactmods.machines.machine.client.MachineColors;
 import dev.compactmods.machines.core.CompactMachinesCore;
 import dev.compactmods.machines.datagen.models.CMBlockModelGenerators;
 import dev.compactmods.machines.datagen.models.CMItemModelGenerators;

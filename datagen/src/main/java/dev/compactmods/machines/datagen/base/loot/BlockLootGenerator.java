@@ -45,7 +45,7 @@ public class BlockLootGenerator extends BlockLootSubProvider {
             .when(ExplosionCondition.survivesExplosion())
             .apply(CopyComponentsFunction.copyComponentsFromBlockEntity(LootContextParams.BLOCK_ENTITY)
                 .include(DataComponents.CUSTOM_NAME)
-                .include(CMDataComponents.MACHINE_COLOR.get())
+                .include(Machines.DataComponents.MACHINE_COLOR.get())
                 .include(Rooms.DataComponents.BOUND_ROOM_CODE.get()))
             .add(LootItem.lootTableItem(Machines.Items.MACHINE.get()))));
     }

@@ -27,7 +27,6 @@ public class CompactMachinesCommon {
 
     @SuppressWarnings("unused")
     public CompactMachinesCommon(IEventBus modBus) {
-        Machines.prepare();
         Dimension.prepare();
         Commands.prepare();
         CMGameRules.prepare();
@@ -41,6 +40,7 @@ public class CompactMachinesCommon {
 
         CMRegistries.setup(modBus);
 
+        Machines.init(modBus);
         RoomSystem.init(modBus);
         RoomUpgrades.init(modBus);
         Shrinking.init(modBus);

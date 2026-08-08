@@ -1,6 +1,6 @@
 package dev.compactmods.machines.network;
 
-import dev.compactmods.machines.network.machine.MachineColorSyncPacket;
+import dev.compactmods.machines.machine.network.MachineColorSyncPacket;
 import dev.compactmods.machines.network.machine.OpenMachinePreviewScreenPacket;
 import dev.compactmods.machines.network.room.InitialRoomBlockDataPacket;
 import dev.compactmods.machines.network.room.RoomEntitiesPacket;

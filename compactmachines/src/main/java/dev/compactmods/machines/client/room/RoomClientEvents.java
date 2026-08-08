@@ -3,7 +3,7 @@ package dev.compactmods.machines.client.room;
 import dev.compactmods.machines.core.CompactMachinesCore;
 import dev.compactmods.machines.client.keybinds.room.RoomExitKeyMapping;
 import dev.compactmods.machines.client.keybinds.room.RoomUpgradeUIMapping;
-import dev.compactmods.machines.client.machine.MachineUI;
+import dev.compactmods.machines.machine.client.MachineUI;
 import dev.compactmods.machines.machine.Machines;
 import net.neoforged.neoforge.client.event.ClientTickEvent;
 import net.neoforged.neoforge.client.event.RegisterGuiLayersEvent;

@@ -2,7 +2,7 @@ package dev.compactmods.machines.datagen.base;
 
 import dev.compactmods.machines.api.room.template.RoomTemplate;
 import dev.compactmods.machines.api.dimension.CompactDimension;
-import dev.compactmods.machines.client.machine.shader.flag.FlagShader;
+import dev.compactmods.machines.machine.client.shader.flag.FlagShader;
 import dev.compactmods.machines.core.CompactMachinesCore;
 import dev.compactmods.machines.datagen.util.DimensionTypeBuilder;
 import dev.compactmods.machines.dimension.Dimension;

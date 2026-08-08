@@ -1,30 +1,12 @@
 package dev.compactmods.machines.client.machine;
 
-import dev.compactmods.machines.core.machine.MachineColor;
-import dev.compactmods.machines.core.machine.block.ICompactMachineBlockEntity;
 import dev.compactmods.machines.client.config.ClientConfig;
 import dev.compactmods.machines.client.room.MachineRoomScreen;
 import dev.compactmods.machines.network.machine.OpenMachinePreviewScreenPacket;
 import net.minecraft.client.Minecraft;
-import net.minecraft.core.GlobalPos;
 import net.minecraft.network.chat.Component;
-import net.minecraft.world.level.block.Block;
 
 public class ClientMachinePacketHandler {
-    public static void setMachineColor(GlobalPos position, MachineColor newColor) {
-        var mc = Minecraft.getInstance();
-        assert mc.level != null;
-        if (mc.level.dimension() == position.dimension()) {
-            var state = mc.level.getBlockState(position.pos());
-            var blockEntity = mc.level.getBlockEntity(position.pos());
-
-            // state.is(MachineConstants.MACHINE_BLOCK)
-            if(blockEntity instanceof ICompactMachineBlockEntity cmbe) {
-                cmbe.setMachineColor(newColor);
-                mc.level.sendBlockUpdated(position.pos(), state, state, Block.UPDATE_ALL_IMMEDIATE);
-            }
-        }
-    }
 
     public static void openRoomPreviewScreen(OpenMachinePreviewScreenPacket pkt) {
         final var mc = Minecraft.getInstance();

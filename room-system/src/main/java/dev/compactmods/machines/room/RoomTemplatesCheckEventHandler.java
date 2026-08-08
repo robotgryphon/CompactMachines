@@ -30,14 +30,14 @@ public class RoomTemplatesCheckEventHandler {
 
         if(numTemplates == 0)
         {
-            final var displayName = Component.translatableWithFallback("CompactMachinesCore.display_name", "Compact Machines");
+            final var displayName = Component.translatableWithFallback("compactmachines.display_name", "Compact Machines");
 
-            final var action = Component.translatableWithFallback("CompactMachinesCore.warning.no_templates.action", "[click here]")
+            final var action = Component.translatableWithFallback("compactmachines.warning.no_templates.action", "[click here]")
                     .withStyle(s -> s.withColor(CommonColors.SOFT_YELLOW)
-                            .withClickEvent(new ClickEvent.RunCommand("/CompactMachinesCore enable_basic_templates"))
+                            .withClickEvent(new ClickEvent.RunCommand("/compactmachines enable_basic_templates"))
                             .withUnderlined(true));
 
-            final var warning = Component.translatableWithFallback("CompactMachinesCore.warning.no_templates_registered", "No Room Templates are registered! " +
+            final var warning = Component.translatableWithFallback("compactmachines.warning.no_templates_registered", "No Room Templates are registered! " +
                     "If you believe this is a mistake, %s to enable the built-in templates and hide this message.", action)
                     .withColor(CommonColors.SOFT_RED);
 

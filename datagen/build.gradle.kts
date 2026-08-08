@@ -63,6 +63,7 @@ dependencies {
     compileOnly(coreApi)
     implementation(mainProject) // dev.compactmods.machines.api.CompactMachines
     compileOnly(project(":dimension-api"))         // dev.compactmods.machines.api.dimension.CompactDimension
+    compileOnly(project(":machines"))              // dev.compactmods.machines.api.machine.* (block-entity interfaces, MachineConstants)
     compileOnly(project(":room-system"))           // dev.compactmods.machines.api.room.template.RoomTemplate (api source set)
     compileOnly(project(":room-upgrades"))         // room tick systems + compiled room upgrades (datapack registries)
     compileOnly(project(":shrinking"))

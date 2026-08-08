@@ -1,0 +1,378 @@
+# Project & Source-Set Layout
+
+Working notes for the multi-module Gradle build, kept as a reference while we
+plan pulling a dedicated `:machines` project out of `:compactmachines`.
+
+All modules share the Maven group `dev.compactmods.compactmachines` and the Java
+package root `dev.compactmods.machines.*`. The namespace is **partitioned across
+modules** — each module owns a disjoint slice of the package tree (see
+[Namespace ownership](#namespace-ownership)).
+
+Toolchain: Java 25, NeoForge via the `moddev` Gradle plugin. Shared conventions
+live in `buildSrc` as the `cm-module-conventions` plugin.
+
+---
+
+## Modules (Gradle subprojects)
+
+Declared in [settings.gradle.kts](settings.gradle.kts):
+
+| Project            | archivesName     | Role                                                            | Java files |
+| ------------------ | ---------------- | -------------------------------------------------------------- | ---------: |
+| `:core`            | `core`           | Shared base: registries glue, attachment/capability plumbing, interface-injection metadata | 34 |
+| `:dimension-api`   | `dimension-api`  | Compact-dimension API surface                                   | 3 |
+| `:room-system`     | `rooms`          | Room model, registry, spatial/spawn/template logic (+ `api`)   | 30 (+27 api) |
+| `:room-upgrades`   | `room-upgrades`  | Room upgrade tick systems + storage (+ `api`, `storage`)       | 13 (+17 api, +8 storage) |
+| `:shrinking`       | `shrinking-api`  | Shrinking-device API + impl (+ `api`)                          | 10 (+7 api) |
+| `:machines`        | `machines`       | Machine block/item/BE/UI, registrations, packet, i18n + client rendering (+ `api`) | 25 (+3 api) |
+| `:compactmachines` | `compactmachines`| **The mod.** Blocks/items/UI/network/compat/client + wiring    | 95 |
+| `:datagen`         | —                | Data-generation runner (not published as a lib)                | 22 |
+
+`:core`, `:dimension-api`, `:room-system`, `:room-upgrades`, `:shrinking` are
+published to GitHub Packages and **jar-in-jar bundled** into the
+`:compactmachines` artifact. `:datagen` is a build-time-only runner.
+
+---
+
+## Namespace ownership
+
+Every module writes into `dev.compactmods.machines.*`, carved up as:
+
+| Package slice                        | Owning module / source set                     |
+| ------------------------------------ | ---------------------------------------------- |
+| `.core`                              | `:core` (main) — now only `MachineColor` under `.core.machine` |
+| `.api.machine`                       | `:machines` (**api** source set)               |
+| `.machine`                           | `:machines` (main) — impl, `.machine.network[.client]`, `.machine.i18n`, `.machine.client[.render/.shader]`, `.machine.util` |
+| `.api.dimension`                     | `:dimension-api` (main)                         |
+| `.api.room`                          | `:room-system` (**api** source set)            |
+| `.room`                              | `:room-system` (main)                          |
+| `.upgrades`                          | `:room-upgrades` (api / main / storage)        |
+| `.shrinking`                         | `:shrinking` (api + main)                       |
+| `.datagen`                           | `:datagen` (main)                               |
+| everything else — `.client`, `.command`, `.compat`, `.dimension`, `.feature`, `.gamerule`, `.i18n`, `.incubating`, `.machine`, `.network`, `.player`, `.preview`, `.server`, `.util`, `.villager`, plus top-level `Advancements`, `CMRegistries`, `CMDataAttachments`, `CMDataComponents`, `CompactMachinesCommon` | `:compactmachines` (main) |
+
+> **Note:** there is no `dev.compactmods.machines.api` package in
+> `:compactmachines` today. The published API lives in the sibling `*-api`
+> modules and in the `api` source sets of `:room-system` / `:room-upgrades` /
+> `:shrinking`. The `dev.compactmods.machines.api.CompactMachines` reference in
+> [datagen/build.gradle.kts](datagen/build.gradle.kts) comments is stale — no
+> such class exists.
+
+The `:compactmachines` main slice is the monolith a future `:machines` project
+would carve out of.
+
+---
+
+## Source-set layout
+
+Most library modules apply `cm-module-conventions`, which defines `main` + `test`
+(test resources stripped). Several add extra source sets that are **folded back
+into `main`** via `srcDir`, so they compile in isolation (own
+`api`/`storage` configuration chains) but ship inside the single `main` jar.
+
+| Module            | Source sets                    | Notes |
+| ----------------- | ------------------------------ | ----- |
+| `:core`           | `main`                         | Declares `neoForge.interfaceInjectionData { from + publish }` on `interfaces.json` |
+| `:dimension-api`  | `main`, `test`                 | |
+| `:room-system`    | `main`, **`api`**, `test`      | `api` folded into `main`; interface injection consumed from `:core` |
+| `:room-upgrades`  | `main`, **`api`**, **`storage`**, `test` | `api` + `storage` folded into `main` |
+| `:shrinking`      | `main`, **`api`**, `test`      | `api` folded into `main`; interface injection from `:core` |
+| `:machines`       | `main`, **`api`**, `test`      | mirrors `:room-system`; `api` folded into `main`; interface injection from `:core`. Owns its own `DeferredRegister`s, bound via `Machines.init(modBus)` |
+| `:compactmachines`| `main`, `test`, `generated`    | `generated` resources merged into main resources; `test` only added to the mod on CI |
+| `:datagen`        | `main`                         | |
+
+**`api` source sets are compiled in isolation.** A project consumed from a file
+under `src/api/java` must be listed with the qualified config
+(`apiCompileOnly(...)`) *in addition to* the plain `compileOnly(...)` for `main`
+— the IDE flattens source-set classpaths so unqualified imports look fine in the
+editor but fail in `./gradlew compileApiJava` (see the comment in
+[room-system/build.gradle.kts](room-system/build.gradle.kts)).
+
+---
+
+## Inter-project dependency graph
+
+```mermaid
+graph TD
+    core[":core"]
+    dim[":dimension-api"]
+    rooms[":room-system"]
+    upg[":room-upgrades"]
+    shr[":shrinking"]
+    cm[":compactmachines"]
+    dg[":datagen"]
+
+    dim --> core
+    rooms --> core
+    rooms --> dim
+    upg --> core
+    upg --> rooms
+    upg --> dim
+    shr --> core
+    shr --> dim
+    shr --> rooms
+    cm --> core
+    cm --> dim
+    cm --> rooms
+    cm --> upg
+    cm --> shr
+    dg --> cm
+    dg --> core
+    dg --> dim
+    dg --> rooms
+    dg --> upg
+    dg --> shr
+```
+
+Build order (topological): **core → dimension-api → room-system →
+{room-upgrades, shrinking} → compactmachines → datagen**.
+
+### Edge detail
+
+| From \ To (config)          | core | dimension-api | room-system | room-upgrades | shrinking | compactmachines |
+| --------------------------- | ---- | ------------- | ----------- | ------------- | --------- | --------------- |
+| **:dimension-api**          | impl | — | — | — | — | — |
+| **:room-system** main       | compileOnly | compileOnly | — | — | — | — |
+| **:room-system** api        | apiCompileOnly | apiCompileOnly | — | — | — | — |
+| **:room-upgrades** main     | compileOnly | compileOnly | compileOnly | — | — | — |
+| **:room-upgrades** api      | apiCompileOnly | — | apiCompileOnly | — | — | — |
+| **:room-upgrades** storage  | storageCompileOnly | — | storageCompileOnly | — | — | — |
+| **:shrinking** main         | compileOnly | compileOnly | compileOnly | — | — | — |
+| **:shrinking** api          | apiCompileOnly | apiCompileOnly | apiCompileOnly | — | — | — |
+| **:compactmachines** main   | impl + jarJar | impl + jarJar | impl + jarJar | impl + jarJar | impl + jarJar | — |
+| **:datagen** main           | compileOnly | compileOnly | compileOnly | compileOnly | compileOnly | impl |
+
+Observations:
+- The library modules depend on each other **`compileOnly`** — they expect the
+  API/impl to be present at runtime (provided by `:compactmachines`'s jar-in-jar
+  bundle), not to bundle it themselves.
+- `:compactmachines` is the only module that pulls the libs as
+  **`implementation` + `jarJar`**, i.e. it is the assembly point.
+- `:datagen` mirrors `:compactmachines`'s dependency set but as `compileOnly`,
+  plus `implementation(:compactmachines)` to drive generation.
+
+---
+
+## External dependencies
+
+| Module            | Library (config)                                                            |
+| ----------------- | -------------------------------------------------------------------------- |
+| `:core`           | NeoForge (moddev) only                                                       |
+| `:room-system`    | `jnanoid` (impl), `feather` (impl), `spatial` (impl)                         |
+| `:room-upgrades`  | `spatial` (compileOnly)                                                      |
+| `:shrinking`      | `feather` (compileOnly)                                                      |
+| `:compactmachines`| `jnanoid` (impl + jarJar); `feather`, `spatial` (compileOnly + jarJar non-transitive); `jei`, `jade` (compileOnly). KubeJS/Rhino/Curios/Gander wired but currently commented out |
+
+Version catalogs (in [gradle/](gradle/)): `neoforged`, `mojang`, `compactmods`,
+`mods`.
+
+---
+
+## Cross-cutting mechanisms
+
+- **Interface injection** — `:core` owns
+  [core/interfaces.json](core/interfaces.json) and both `from(...)`s it (own
+  classpath) and `publish(...)`es it (Maven consumers resolve it transitively).
+  In-source siblings can't rely on moddev's auto-propagation across project
+  deps, so `:compactmachines`, `:room-system`, and `:shrinking` each re-declare
+  `interfaceInjectionData { from(core.file("interfaces.json")) }`.
+- **`FMLModType = GAMELIBRARY`** — `cm-module-conventions` stamps every library
+  jar so its classes load on NeoForge's transformer classloader (avoids
+  `LinkageError` for classes referencing game types like `MinecraftServer`).
+- **Automatic-Module-Name** — set per module (`compactmachines.core`,
+  `compactmachines.rooms`, `compactmachines.room.upgrades`,
+  `compactmachines.api.dimension`, `compactmachines.api.shrinking`) so the
+  jar-in-jar copy and the direct project-dep copy dedupe under `JarSelector`.
+
+---
+
+## Extraction: the `:machines` project (in progress)
+
+Goal: pull `machines.machine` (impl, currently in `:compactmachines`) and the
+related `machines.core.machine` (in `:core`) into a dedicated `:machines`
+project structured like `:room-system` (an `api` source set folded into `main`).
+
+### Status
+
+- ✅ **Phase 1 — scaffold + API surface (done, compiles).** Created `:machines`
+  with `api` + `main` source sets ([machines/build.gradle.kts](machines/build.gradle.kts),
+  registered in [settings.gradle.kts](settings.gradle.kts)). Moved the three
+  api-surface types out of `:core`'s `core.machine` into the `:machines` **api**
+  source set, renamed to `dev.compactmods.machines.api.machine[.block]`:
+  - `MachineConstants`
+  - `block.ICompactMachineBlockEntity`
+  - `block.IBoundCompactMachineBlockEntity`
+
+  `MachineColor` stays in `core.machine` (leaves `:room-system`'s only
+  cross-reference intact — no cycle). All importers in `:compactmachines` and
+  `:datagen` updated; both now depend on `:machines` (`:compactmachines` via
+  `implementation` + `jarJar`, `:datagen` via `compileOnly`).
+- ✅ **Phase 2 — move the impl (done, compiles).** All six impl files
+  (`Machines`, `block/*`, `item/*`, `ui/*`, `capability/*`) moved to `:machines`
+  main, keeping their FQCN `dev.compactmods.machines.machine.*` (so their ~17
+  importers were untouched). The sibling back-references were resolved by the
+  **"machine owns its registrations"** approach — see below.
+
+### How the Phase 2 cycle was resolved
+
+The impl files reached back into `:compactmachines` aggregators. Rather than
+depend upward, `:machines` now **owns** that content, following the
+`:shrinking` template (its own `DeferredRegister`s + `Machines.init(modBus)`,
+called from `CompactMachinesCommon`):
+
+| Was in `:compactmachines`                    | Now in `:machines`                                   |
+| -------------------------------------------- | ---------------------------------------------------- |
+| `CMRegistries.{BLOCKS,ITEMS,BLOCK_ENTITIES,MENUS}` (machine entries) | `Machines.{BLOCKS,ITEMS,BLOCK_ENTITIES,MENUS}` — own registers |
+| `CMDataComponents.MACHINE_COLOR`             | `Machines.DataComponents.MACHINE_COLOR`              |
+| `CMDataAttachments.OPEN_MACHINE_POS`         | `Machines.Attachments.OPEN_MACHINE_POS`             |
+| `network.machine.MachineColorSyncPacket`     | `machine.network.MachineColorSyncPacket`            |
+| `client.machine.ClientMachinePacketHandler#setMachineColor` | `machine.network.client.ClientMachinePacketHandler` |
+| `i18n.MachineTranslations`                   | `machine.i18n.MachineTranslations`                  |
+
+`CMRegistries` lost `BLOCK_ENTITIES` and `MENUS` entirely (machine was their
+only user); `BLOCKS`/`ITEMS` stay (villager, dimension still use them).
+`CMDataComponents` keeps `PRIDE_FLAG`/`UPGRADE_INSTANCE_ID`; `CMDataAttachments`
+keeps `MACHINE_SHADER`. Registry **names** were preserved (`machine`,
+`machine_color`, `open_machine`, …) so no resource/datagen output changed.
+Consumers of the relocated symbols (JEI is commented out; `client.machine`,
+`command`, `datagen`) were repointed. `CMNetworks` still registers the packet
+(it depends on `:machines`).
+
+`MachineColor` remains in `:core`'s `core.machine` (only `MachineColor.java`
+lives there now), keeping `:room-system`'s lone cross-reference cycle-free.
+
+- ✅ **Phase 3 — client rendering (done, compiles).** The `client.machine.*`
+  package moved into `:machines` as `machine.client.*` (renderers, shaders,
+  `FlagShader`, `MachineColors`, `MachineUI`, `MachinesClient`). Renamed to a
+  machine-owned namespace to avoid splitting `dev.compactmods.machines.client`
+  across two jars. Client code in a library module follows the `:shrinking`
+  precedent (`shrinking.network.client`). Alongside it:
+  - `PRIDE_FLAG` data component moved `CMDataComponents` → `Machines.DataComponents`
+    (machine-render-only). `CMDataComponents` now holds just `UPGRADE_INSTANCE_ID`.
+  - `util.SlotRangeUtil` moved to `machine.util` (its only other user, in
+    `:room-upgrades`, was commented out).
+  - **`ClientConfig` stays in `:compactmachines`** (mod-wide client config,
+    also holds the room-preview toggle). The two machine settings it defines
+    (`enablePride`, `defaultPrideShader`) are handed to a
+    `machine.client.MachineClientConfig` holder that `ClientConfig` populates
+    after building the spec — so `:machines` reads them without depending
+    upward, and **the user-facing config file is unchanged**.
+    *(Alternative not taken: give `:machines` its own config file. Say the word
+    and I'll switch to that.)*
+  - **`client.machine.ClientMachinePacketHandler` stays** in `:compactmachines`
+    — after Phase 2 it only opens the room-preview screen, a preview/room
+    feature coupled to `client.room` + `client.config`.
+  - `compat.MachineOverview` (an unused machine-domain record, misfiled under
+    `compat`) moved to `dev.compactmods.machines.machine.MachineOverview`.
+    **Note: it has no callers — a deletion candidate.**
+
+### What deliberately stays in `:compactmachines`
+
+With the machine vertical slice extracted, the remaining "machine"-named code is
+*not* machine-scoped and belongs elsewhere:
+
+| Code                                          | Why it stays |
+| --------------------------------------------- | ------------ |
+| `network.machine.OpenMachinePreviewScreenPacket` + `client.machine.ClientMachinePacketHandler` | Part of the **room-preview** feature (`preview/*`, `client.room.MachineRoomScreen`); would go to a future `:preview` module, not `:machines` |
+| `client.creative.CreativeTabs`                | Cross-cutting — aggregates items from `:machines`, `:room-system`, `:shrinking` |
+| `CMRegistries`, `CMNetworks`, `Commands`, `Advancements`, `CreativeTabs` | Mod-wide assembly/glue |
+| `compat.jei/jade/curios`                       | Mod-level third-party integration (jade/jei machine providers are currently commented out) |
+| `command.rooms.CMFindRoomSubcommand`           | A **room** command that merely inspects a machine block |
+| `server.ServerCapabilities`, `Advancements`    | Room/mod-wide, not machine-specific |
+
+The `:machines` module is now a complete vertical slice: API, impl,
+registrations, networking, i18n, and client rendering.
+
+---
+
+## (Original analysis) extraction feasibility
+
+Candidate contents: `machines.machine` (currently in `:compactmachines`) plus
+the related `machines.core.machine` (in `:core`).
+
+### `machines.machine` — in `:compactmachines` main (6 files)
+
+```
+machine/Machines.java
+machine/ui/MachineUIMenu.java
+machine/capability/MachineCapability.java
+machine/item/BoundCompactMachineItem.java
+machine/block/CompactMachineBlock.java
+machine/block/CompactMachineBlockEntity.java
+```
+
+**Inbound (who depends on it):** only `:compactmachines` itself (12 files) and
+`:datagen` (5 files). **No library module depends on it** — it sits at the top
+of the stack. The `:compactmachines` importers cluster in `client/machine*` (6),
+`preview/client` (2), `command/rooms`, `client/room`, `client/creative`.
+`Machines` (the `DeferredRegister` holder) is the most-referenced symbol.
+
+**Outbound (what it needs):**
+
+| Target module        | What `machines.machine` pulls in |
+| -------------------- | -------------------------------- |
+| `:core`              | `core.machine.*` (MachineColor, MachineConstants, `ICompactMachineBlockEntity`, `IBoundCompactMachineBlockEntity`), `core.CompactMachinesCore` |
+| `:room-system`       | `room.Rooms`, `api.room.template.{RoomTemplate,RoomTemplateHelper}`, `api.room.RoomInstance`, `api.room.capability.RoomCapabilities`, `api.room.generation.RoomGenerationException` |
+| `:shrinking`         | `shrinking.{Shrinking,ShrinkingHelper}`, `shrinking.api.ShrinkingDeviceConfiguration`, `shrinking.history.UsedShrinkingDeviceOnMachine` |
+| `:compactmachines` (siblings) | `CMRegistries`, `CMDataComponents`, `CMDataAttachments`, `network.machine.MachineColorSyncPacket`, `i18n.MachineTranslations` |
+
+The library-module deps (core / room-system / shrinking) map cleanly onto a
+`:machines` project sitting **above** those three. The awkward part is the
+**back-references into `:compactmachines` siblings** — `CMRegistries`,
+`CMDataComponents`, `CMDataAttachments`, `network.machine`, and `i18n`. Those are
+mod-wiring; extracting `machines.machine` means either moving that wiring down
+with it, inverting it (register from the mod, inject into `:machines`), or
+splitting those aggregator classes.
+
+### `machines.core.machine` — in `:core` main (4 files)
+
+```
+core/machine/MachineColor.java
+core/machine/MachineConstants.java
+core/machine/block/ICompactMachineBlockEntity.java
+core/machine/block/IBoundCompactMachineBlockEntity.java
+```
+
+**Outbound:** self-contained within `:core` (only `core.util.KeyHelper`,
+`core.CompactMachinesCore`).
+
+**Inbound (who depends on it):** `:compactmachines`, `:datagen`, **and
+`:room-system`**.
+
+> ⚠️ **Cycle risk.** `:room-system` depends on `core.machine` — but only on
+> **`MachineColor`**, and only in three files
+> (`api/room/template/RoomTemplate`, `api/room/template/RoomTemplateBuilder`,
+> `room/generation/ServerNewRoomBuilder`). Since a `:machines` project would
+> depend on `:room-system`, moving all of `core.machine` up into `:machines`
+> would create `room-system → machines → room-system` — a build cycle.
+>
+> Options: (a) leave `core.machine` in `:core`; (b) move only the
+> block-entity interfaces to `:machines` and keep `MachineColor` /
+> `MachineConstants` in `:core`; or (c) relocate `MachineColor` so `:room-system`
+> no longer reaches into a machine package at all.
+
+### Sketch of the resulting position
+
+```mermaid
+graph TD
+    core[":core"]
+    rooms[":room-system"]
+    shr[":shrinking"]
+    machines[":machines (new)"]
+    cm[":compactmachines"]
+
+    rooms --> core
+    shr --> core
+    shr --> rooms
+    machines --> core
+    machines --> rooms
+    machines --> shr
+    cm --> machines
+    cm -. wiring to resolve .-> machines
+    rooms -. MachineColor only .-> core
+```
+
+`:machines` slots between the API/system libraries and the mod. The two things
+that must be resolved first: the `MachineColor` cycle from `:room-system`, and
+the sibling-wiring back-references (`CM*` aggregators, `network.machine`,
+`i18n`).

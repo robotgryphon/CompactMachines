@@ -16,7 +16,7 @@ public class CMModelTemplates {
     /**
      * Beacon-style "glass box": six 1px tinted panes inset into the frame
      * windows, wrapped by twelve thin black edge bars. tintindex 0 is fed by
-     * {@link dev.compactmods.machines.client.machine.MachineColors#BLOCK} (and
+     * {@link dev.compactmods.machines.machine.client.MachineColors#BLOCK} (and
      * the matching item tint source). Each pane is 14x14 across the face axis
      * and 1px deep, fitting flush with the cube surface but tucked between the
      * frame bars so the pane's side faces don't share a plane with the frame —

@@ -1,5 +1,6 @@
 package dev.compactmods.machines.client.config;
 
+import dev.compactmods.machines.machine.client.MachineClientConfig;
 import net.neoforged.neoforge.common.ModConfigSpec;
 
 public class ClientConfig {
@@ -36,5 +37,10 @@ public class ClientConfig {
                 .define("defaultPrideShader", "compactmachines:pride/baker");
 
         CONFIG = builder.build();
+
+        // Hand the machine-render settings to :machines, which reads them from
+        // MachineShaderRenderer without depending on this class.
+        MachineClientConfig.ENABLE_PRIDE = ENABLE_PRIDE;
+        MachineClientConfig.DEFAULT_PRIDE_FLAG = DEFAULT_PRIDE_FLAG;
     }
 }

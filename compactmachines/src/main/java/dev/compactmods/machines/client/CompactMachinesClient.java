@@ -4,7 +4,7 @@ import dev.compactmods.machines.core.CompactMachinesCore;
 import dev.compactmods.machines.client.command.CMClientCommands;
 import dev.compactmods.machines.client.config.ClientConfig;
 import dev.compactmods.machines.client.creative.CreativeTabs;
-import dev.compactmods.machines.client.machine.MachinesClient;
+import dev.compactmods.machines.machine.client.MachinesClient;
 import dev.compactmods.machines.client.room.RoomsClient;
 import dev.compactmods.machines.preview.client.RoomPreviewClient;
 import net.neoforged.api.distmarker.Dist;

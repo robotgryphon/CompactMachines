@@ -2,7 +2,7 @@ package dev.compactmods.machines.datagen.base.tags;
 
 
 import dev.compactmods.machines.core.CompactMachinesCore;
-import dev.compactmods.machines.core.machine.MachineConstants;
+import dev.compactmods.machines.api.machine.MachineConstants;
 import dev.compactmods.machines.dimension.Dimension;
 import dev.compactmods.machines.machine.Machines;
 import dev.compactmods.machines.room.Rooms;

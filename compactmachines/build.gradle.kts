@@ -226,12 +226,14 @@ dependencies {
         implementation(project(":room-system"))
         implementation(project(":room-upgrades"))
         implementation(project(":shrinking"))
+        implementation(project(":machines"))
 
         jarJar(project(":core"))
         jarJar(project(":dimension-api"))
         jarJar(project(":room-system"))
         jarJar(project(":room-upgrades"))
         jarJar(project(":shrinking"))
+        jarJar(project(":machines"))
     }
 
     testImplementation(neoforged.testframework)
