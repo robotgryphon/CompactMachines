@@ -34,12 +34,8 @@ plugins {
 }
 
 include(":api")
-include(":compactmachines")
+include(":neoforge")
 include(":datagen")
-include(":shrinking")
-include(":room-system")
-include(":room-upgrades")
-include(":machines")
 
 fun addVersionCatalog(dependencyResolutionManagement: DependencyResolutionManagement, name: String) {
     dependencyResolutionManagement.versionCatalogs.create(name) {

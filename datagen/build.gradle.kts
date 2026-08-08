@@ -9,7 +9,7 @@ plugins {
 val modId: String = "compactmachines"
 
 val coreApi = project(":api")
-val mainProject: Project = project(":compactmachines")
+val mainProject: Project = project(":neoforge")
 
 project.evaluationDependsOn(coreApi.path)
 project.evaluationDependsOn(mainProject.path)
@@ -62,10 +62,6 @@ repositories {
 dependencies {
     compileOnly(coreApi)                           // :api — core.* + all api.* surfaces
     implementation(mainProject)
-    compileOnly(project(":machines"))              // machine impl (block/BE/item/UI)
-    compileOnly(project(":room-system"))           // room impl
-    compileOnly(project(":room-upgrades"))         // room tick systems + compiled room upgrades (datapack registries)
-    compileOnly(project(":shrinking"))
 //    implementation(libs.curios)
 }
 

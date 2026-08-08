@@ -501,9 +501,15 @@ stays), so most consumer imports are untouched — the churn is build files +
    `compactmachines.mixins.json` moved with `core`. Every consumer repointed
    `:core`/`:dimension-api` → `:api`; the library modules dropped their own
    `api` source sets. Full `compileJava` passes.
-3. **`:neoforge` core + features** — move `core`, then `machines`/`rooms`/
-   `roomUpgrades`/`shrinking` impl + `datagen` into `:neoforge` source sets.
-4. **`:neoforge` glue** — move the cross-cutting concerns + `@Mod` main in.
+2. ✅ **`:neoforge` rename + feature absorption (done, build green).**
+   `:compactmachines` → `:neoforge`; `machines`/`rooms`/`shrinking`/
+   `roomUpgrades`/`storage` impl absorbed as isolated source sets folded into
+   `main`; `:room-system`/`:room-upgrades`/`:shrinking`/`:machines` deleted.
+   **Now 3 Gradle projects: `:api`, `:neoforge`, `:datagen`.**
+3. ⏳ **`:neoforge` glue + datagen** — fold `:datagen` in as a source set; carve
+   the flat glue in `main` into source sets (`command, villager, gamerule,
+   dimension, server, feature, i18n, util`) and distribute
+   `network`/`preview`/`client` into their feature source sets + `main`.
 5. **`:compat`** — move jei/jade/curios; stub `theoneprobe`.
 6. **Delete** the eight old modules; update `settings.gradle.kts`, publishing,
    jarJar wiring, `buildSrc` conventions.
