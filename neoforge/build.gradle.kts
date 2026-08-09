@@ -47,7 +47,16 @@ val machinesSrc = sourceSets.register("machines")
 // generators must not ship in the mod jar). Driven by the `data` run below.
 val datagenSrc = sourceSets.register("datagen")
 
-listOf(roomsSrc, shrinkingSrc, roomUpgradesSrc, storageSrc, machinesSrc, datagenSrc)
+// Cross-cutting glue concerns as isolated source sets (api-only leaves), folded
+// into `main`. Each is wired to :api below.
+val gameruleSrc = sourceSets.register("gamerule")
+val villagerSrc = sourceSets.register("villager")
+val featureSrc = sourceSets.register("feature")
+val i18nSrc = sourceSets.register("i18n")
+val dimensionSrc = sourceSets.register("dimension")
+
+listOf(roomsSrc, shrinkingSrc, roomUpgradesSrc, storageSrc, machinesSrc, datagenSrc,
+       gameruleSrc, villagerSrc, featureSrc, i18nSrc, dimensionSrc)
     .forEach { neoForge.addModdingDependenciesTo(it.get()) }
 
 sourceSets.main {
@@ -58,6 +67,11 @@ sourceSets.main {
         srcDir(roomUpgradesSrc.get().java)
         srcDir(storageSrc.get().java)
         srcDir(machinesSrc.get().java)
+        srcDir(gameruleSrc.get().java)
+        srcDir(villagerSrc.get().java)
+        srcDir(featureSrc.get().java)
+        srcDir(i18nSrc.get().java)
+        srcDir(dimensionSrc.get().java)
     }
 
     resources {
@@ -263,6 +277,7 @@ dependencies {
     "roomsCompileOnly"(compactmods.feather)
     "roomsCompileOnly"(compactmods.spatial)
     "roomsCompileOnly"(libs.jnanoid)
+    "roomsCompileOnly"(i18nSrc.get().output)   // room subcommands use CommandTranslations
 
     "shrinkingCompileOnly"(project(":api"))
     "shrinkingCompileOnly"(roomsSrc.get().output)
@@ -283,6 +298,17 @@ dependencies {
     // Datagen sees :api + the whole mod (main folds every feature source set).
     "datagenCompileOnly"(project(":api"))
     "datagenImplementation"(sourceSets.main.get().output)
+
+    // api-only glue leaves.
+    "gameruleCompileOnly"(project(":api"))
+    "villagerCompileOnly"(project(":api"))
+    "featureCompileOnly"(project(":api"))
+    "i18nCompileOnly"(project(":api"))
+
+    // dimension self-registers its BLOCKS; uses gamerule (OOB rules) + shrinking helper.
+    "dimensionCompileOnly"(project(":api"))
+    "dimensionCompileOnly"(gameruleSrc.get().output)
+    "dimensionCompileOnly"(shrinkingSrc.get().output)
 
     testImplementation(neoforged.testframework)
     testImplementation("org.junit.jupiter:junit-jupiter:5.7.1")

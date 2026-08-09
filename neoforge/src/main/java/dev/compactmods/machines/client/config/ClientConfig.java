@@ -1,5 +1,6 @@
 package dev.compactmods.machines.client.config;
 
+import dev.compactmods.machines.client.room.RoomClientConfig;
 import dev.compactmods.machines.machine.client.MachineClientConfig;
 import net.neoforged.neoforge.common.ModConfigSpec;
 
@@ -38,9 +39,10 @@ public class ClientConfig {
 
         CONFIG = builder.build();
 
-        // Hand the machine-render settings to :machines, which reads them from
-        // MachineShaderRenderer without depending on this class.
+        // Hand feature-scoped settings to their features, which read them
+        // without depending on this class.
         MachineClientConfig.ENABLE_PRIDE = ENABLE_PRIDE;
         MachineClientConfig.DEFAULT_PRIDE_FLAG = DEFAULT_PRIDE_FLAG;
+        RoomClientConfig.ENABLE_ROOM_PREVIEWS = ENABLE_ROOM_PREVIEWS;
     }
 }

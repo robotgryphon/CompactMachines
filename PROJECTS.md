@@ -530,13 +530,37 @@ stays), so most consumer imports are untouched — the churn is build files +
    dropped. ⏳ remaining: `CMNetworks` (per-feature packet registration),
    `CompactMachinesClient`, `CreativeTabs`, and the leftover dead members
    (`UPGRADE_INSTANCE_ID` → `roomUpgrades`, `MACHINE_SHADER` → `machines`).
-6. ⏳ **Glue source sets** — carve `command, villager, gamerule, dimension,
-   server, feature, i18n, util` into source sets (7 of 8 now free of
-   main-aggregator refs; `server` still uses `CMDataAttachments`) and distribute
-   `network`/`preview`/`client` into their feature source sets. Snag:
-   `RoomClientEvents`, `RoomPreviewRenderer`, `RoomPreviewClient` use machine
-   **impl** while `machines`→`rooms` — fix by switching the two preview classes
-   to `ICompactMachineBlockEntity` (api) and splitting `RoomClientEvents`.
+6. **Glue source sets** (in progress) — ✅ `gamerule, villager, feature, i18n`
+   carved into isolated source sets. ✅ **Commands distributed**: single-feature
+   subcommands moved into their features and self-exposed — `rooms`
+   (`CMRoomCoreSubcommand`, `SpawnSubcommand`, `EnableBasicTemplatesSubcommand`,
+   `GenerateRoomCommand`, `Suggestors`), `shrinking` (`CMTeleportSubcommand`,
+   `CMEjectSubcommand`), `roomUpgrades` (`RoomUpgradeArgument`); the assembler
+   `Commands` + the cross-feature `CMRoomsSubcommand`/`CMFindRoomSubcommand`
+   (they touch machine impl) stay in `main`, which pulls everything in
+   (main→feature is acceptable — no perfect isolation intended). `Commands.java`
+   unchanged (main folds all source sets, FQCNs stable).
+   ✅ `util` handled; ✅ `dimension` carved (self-registers `BLOCKS`; deps
+   `:api` + `gamerule` + `shrinking`). `server` stays in `main` (too small to
+   warrant its own feature yet).
+   ⏳ **network/preview/client cluster** (in progress) — placement scheme:
+   highest feature each class touches (`rooms ← shrinking ← machines`, so
+   cross-feature code lands in the higher feature; no cycles). ✅ pure-room
+   subset moved to `rooms`: 5 room packets, the whole preview pipeline
+   (`preview/*`, `preview/server`, `preview/client/*` minus the two
+   machine-impl ones), `RoomKeyMappings`; added `RoomNetworking` handler
+   (`CMNetworks` now delegates room packets to it). ✅ **shrinking stragglers moved**: `PlayerRequestedLeavePacket`,
+   `PlayerRequestedTeleportPacket`, `MachineRoomScreen`, `ClientRoomPacketHandler`,
+   `RoomExitKeyMapping` → `shrinking`; added `ShrinkingNetworking` handler
+   (teleport/leave + the existing `SyncRoomMetadataPacket`); added
+   `RoomClientConfig` holder (`ENABLE_ROOM_PREVIEWS`, populated by `ClientConfig`)
+   and repointed `MachineRoomScreen` to it. `CMNetworks` now delegates to
+   `RoomNetworking` + `ShrinkingNetworking` (only machine packets left direct).
+   ⏳ remaining → `machines`: `OpenMachinePreviewScreenPacket`,
+   `RoomPreviewRenderer`, `RoomPreviewClient`, `RoomClientEvents` (split:
+   machine-menu reg → `MachinesClient`), `ClientMachinePacketHandler`; add
+   `MachineNetworking`; `ClientMachinePacketHandler` needs `RoomClientConfig`.
+   `RoomsClient`/`CMNetworks`/`ClientConfig`/`CreativeTabs` stay in `main`.
 7. ⏳ **Verify** — full `compileJava` (green now) + a `data`/gametest run.
 
 This is a whole-codebase change; it should land phase-by-phase with a green build

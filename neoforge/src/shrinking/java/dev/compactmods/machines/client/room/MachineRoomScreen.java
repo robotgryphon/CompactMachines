@@ -1,7 +1,7 @@
 package dev.compactmods.machines.client.room;
 
 import com.mojang.blaze3d.platform.InputConstants;
-import dev.compactmods.machines.client.config.ClientConfig;
+import dev.compactmods.machines.client.room.RoomClientConfig;
 import dev.compactmods.machines.core.CompactMachinesCore;
 import dev.compactmods.machines.network.room.PlayerRequestedTeleportPacket;
 import dev.compactmods.machines.network.room.PlayerStartedRoomTrackingPacket;
@@ -50,7 +50,7 @@ public class MachineRoomScreen extends Screen {
         this.machinePos = machinePos;
         this.roomCode = roomCode;
 
-        if (ClientConfig.ENABLE_ROOM_PREVIEWS.get()) {
+        if (RoomClientConfig.ENABLE_ROOM_PREVIEWS.get()) {
             // Send packet to server for block data
             this.isLoadingRoomPreview = true;
             ClientPacketDistributor.sendToServer(new PlayerStartedRoomTrackingPacket(roomCode));

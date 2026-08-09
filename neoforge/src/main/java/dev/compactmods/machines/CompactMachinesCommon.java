@@ -1,7 +1,6 @@
 package dev.compactmods.machines;
 
 import dev.compactmods.machines.command.Commands;
-import dev.compactmods.machines.compat.InterModCompat;
 import dev.compactmods.machines.core.CompactMachinesCore;
 import dev.compactmods.machines.dimension.Dimension;
 import dev.compactmods.machines.feature.CMFeaturePacks;
@@ -10,15 +9,18 @@ import dev.compactmods.machines.machine.Machines;
 import dev.compactmods.machines.network.CMNetworks;
 import dev.compactmods.machines.preview.server.RoomPreviewService;
 import dev.compactmods.machines.room.RoomSystem;
-import dev.compactmods.machines.shrinking.PlayerEventHandler;
 import dev.compactmods.machines.shrinking.Shrinking;
 import dev.compactmods.machines.upgrades.RoomUpgrades;
 import dev.compactmods.machines.room.block.ProtectedBlockEventHandler;
 import dev.compactmods.machines.villager.Villagers;
 import net.minecraft.util.ARGB;
 import net.neoforged.bus.api.IEventBus;
+import net.neoforged.fml.CrashReportCallables;
+import net.neoforged.fml.ICrashReportHeader;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.server.ServerLifecycleHooks;
+import org.jspecify.annotations.NonNull;
 
 @Mod(CompactMachinesCore.MOD_ID)
 public class CompactMachinesCommon {
@@ -43,12 +45,36 @@ public class CompactMachinesCommon {
         RoomSystem.init(modBus);
         RoomUpgrades.init(modBus);
         Shrinking.init(modBus);
+
+        CrashReportCallables.registerCrashCallable("Compact Machines", CompactMachinesCommon::crashReport);
+    }
+
+    private static String crashReport() {
+        final var server = ServerLifecycleHooks.getCurrentServer();
+        if(server == null)
+            return "<No Server, no game rule info for you>";
+
+        final var gameRules = server.getGameRules();
+        final var line = System.lineSeparator();
+
+        //noinspection StringBufferReplaceableByString
+        return new StringBuilder()
+            .append(line)
+            .append("\t\tAllow Survival OOB: ")
+                .append(gameRules.get(CMGameRules.ALLOW_SURVIVAL_OUT_OF_BOUNDS.value()))
+                .append(line)
+            .append("\t\tAllow Creative OOB: ")
+                .append(gameRules.get(CMGameRules.ALLOW_CREATIVE_OUT_OF_BOUNDS.value()))
+                .append(line)
+            .append("\t\tAllow Big Rooms: ")
+                .append(gameRules.get(CMGameRules.ALLOW_BIG_ROOMS.value()))
+                .append(line)
+            .toString();
     }
 
     private static void registerEvents(IEventBus modBus) {
         modBus.addListener(CMFeaturePacks::addFeaturePacks);
         modBus.addListener(CMNetworks::onPacketRegistration);
-        modBus.addListener(InterModCompat::enqueueCompatMessages);
 
         NeoForge.EVENT_BUS.addListener(Commands::onCommandsRegister);
         NeoForge.EVENT_BUS.addListener(ProtectedBlockEventHandler::leftClickBlock);

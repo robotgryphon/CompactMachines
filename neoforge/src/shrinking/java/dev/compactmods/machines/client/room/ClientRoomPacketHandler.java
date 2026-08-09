@@ -1,6 +1,5 @@
 package dev.compactmods.machines.client.room;
 
-import dev.compactmods.machines.CMDataAttachments;
 import dev.compactmods.machines.shrinking.Shrinking;
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate;

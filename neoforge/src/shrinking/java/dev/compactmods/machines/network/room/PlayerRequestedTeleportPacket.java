@@ -2,7 +2,6 @@ package dev.compactmods.machines.network.room;
 
 import dev.compactmods.machines.api.room.capability.RoomCapabilities;
 import dev.compactmods.machines.core.CompactMachinesCore;
-import dev.compactmods.machines.server.CompactMachinesServer;
 import dev.compactmods.machines.shrinking.Shrinking;
 import net.minecraft.core.GlobalPos;
 import net.minecraft.network.FriendlyByteBuf;

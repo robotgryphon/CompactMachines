@@ -29,6 +29,10 @@ public class CMGameRules {
     public static DeferredHolder<GameRule<?>, GameRule<Boolean>> DAMAGE_OOB_PLAYERS = GAME_RULES
             .register(DAMAGE_OOB_PLAYERS_KEY.getPath(), () -> GameRulesHelper.makeBooleanRule(false));
 
+    public static final Identifier ALLOW_BIG_ROOMS_KEY = CompactMachinesCore.identifier("i_do_not_care_about_performance");
+    public static DeferredHolder<GameRule<?>, GameRule<Boolean>> ALLOW_BIG_ROOMS = GAME_RULES
+            .register(ALLOW_BIG_ROOMS_KEY.getPath(), () -> GameRulesHelper.makeBooleanRule(false));
+
     public static void init(IEventBus modBus) {
         GAME_RULES.register(modBus);
     }

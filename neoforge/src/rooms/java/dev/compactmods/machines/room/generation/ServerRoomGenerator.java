@@ -7,6 +7,7 @@ import dev.compactmods.machines.api.room.generation.RoomStructureInfo.RoomStruct
 import dev.compactmods.machines.api.room.registry.RoomRegistry;
 import dev.compactmods.machines.core.WallConstants;
 import dev.compactmods.machines.core.util.BlockSpaceUtil;
+import dev.compactmods.machines.gamerule.CMGameRules;
 import dev.compactmods.spatial.aabb.AABBAligner;
 import dev.compactmods.spatial.aabb.AABBHelper;
 import dev.compactmods.spatial.vector.VectorUtils;
@@ -145,6 +146,13 @@ public class ServerRoomGenerator implements RoomGenerator {
 
         final var newRoomBoundaries = details.boundaries();
         final var template = details.template().value();
+
+        // If we are not allowing big rooms, exit
+        if(template.internalDimensions().maxDimension() > 45) {
+            final var allowingBigRooms = server.getGameRules().get(CMGameRules.ALLOW_BIG_ROOMS.value());
+            if (!allowingBigRooms)
+                return Optional.empty();
+        }
 
         // Empty Room (Box)
         generateRoom(newRoomBoundaries.outerBounds());

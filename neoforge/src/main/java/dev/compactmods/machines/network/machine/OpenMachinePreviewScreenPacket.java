@@ -3,13 +3,11 @@ package dev.compactmods.machines.network.machine;
 
 import dev.compactmods.machines.core.CompactMachinesCore;
 import dev.compactmods.machines.client.machine.ClientMachinePacketHandler;
-import dev.compactmods.machines.util.codec.VanillaCodecs;
 import net.minecraft.core.GlobalPos;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate;
 import net.neoforged.neoforge.network.handling.IPayloadHandler;
 
 public record OpenMachinePreviewScreenPacket(GlobalPos machinePos, String roomCode) implements CustomPacketPayload {
