@@ -9,7 +9,7 @@ import dev.compactmods.machines.core.CompactMachinesCore;
 import dev.compactmods.machines.core.location.GlobalPosWithRotation;
 import dev.compactmods.machines.room.RoomTranslations;
 import dev.compactmods.machines.shrinking.Shrinking;
-import dev.compactmods.machines.command.argument.Suggestors;
+import dev.compactmods.machines.room.command.argument.Suggestors;
 import dev.compactmods.machines.shrinking.history.UsedTeleportCommand;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;

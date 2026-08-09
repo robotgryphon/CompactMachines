@@ -1,10 +1,10 @@
 package dev.compactmods.machines.client.room;
 
 import com.mojang.blaze3d.platform.InputConstants;
-import dev.compactmods.machines.client.room.RoomClientConfig;
+import dev.compactmods.machines.room.client.RoomClientConfig;
 import dev.compactmods.machines.core.CompactMachinesCore;
 import dev.compactmods.machines.network.room.PlayerRequestedTeleportPacket;
-import dev.compactmods.machines.network.room.PlayerStartedRoomTrackingPacket;
+import dev.compactmods.machines.room.network.PlayerStartedRoomTrackingPacket;
 import dev.compactmods.machines.shrinking.Shrinking;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
@@ -22,8 +22,6 @@ import net.minecraft.util.ARGB;
 import net.minecraft.util.CommonColors;
 import net.minecraft.world.phys.AABB;
 import net.neoforged.neoforge.client.network.ClientPacketDistributor;
-
-import java.util.Objects;
 
 public class MachineRoomScreen extends Screen {
 

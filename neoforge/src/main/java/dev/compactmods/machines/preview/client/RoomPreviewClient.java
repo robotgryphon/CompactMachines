@@ -1,12 +1,15 @@
 package dev.compactmods.machines.preview.client;
 
 import dev.compactmods.machines.machine.block.CompactMachineBlockEntity;
-import dev.compactmods.machines.network.room.RoomPreviewSubscribePacket;
+import dev.compactmods.machines.room.network.RoomPreviewSubscribePacket;
+import dev.compactmods.machines.room.preview.client.ClientRoomEntities;
+import dev.compactmods.machines.room.preview.client.ClientRoomPreviews;
+import dev.compactmods.machines.room.preview.client.RoomPreviewEntities;
+import dev.compactmods.machines.room.preview.client.RoomPreviewMeshCache;
 import net.neoforged.bus.api.EventPriority;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.client.event.ClientPlayerNetworkEvent;
 import net.neoforged.neoforge.client.event.ExtractLevelRenderStateEvent;
-import net.neoforged.neoforge.client.event.RegisterRenderPipelinesEvent;
 import net.neoforged.neoforge.client.network.ClientPacketDistributor;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.client.event.ClientTickEvent;

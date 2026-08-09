@@ -1,6 +1,6 @@
 package dev.compactmods.machines.client.config;
 
-import dev.compactmods.machines.client.room.RoomClientConfig;
+import dev.compactmods.machines.room.client.RoomClientConfig;
 import dev.compactmods.machines.machine.client.MachineClientConfig;
 import net.neoforged.neoforge.common.ModConfigSpec;
 

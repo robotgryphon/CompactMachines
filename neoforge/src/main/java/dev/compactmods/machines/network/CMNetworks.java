@@ -2,7 +2,7 @@ package dev.compactmods.machines.network;
 
 import dev.compactmods.machines.machine.network.MachineColorSyncPacket;
 import dev.compactmods.machines.network.machine.OpenMachinePreviewScreenPacket;
-import dev.compactmods.machines.network.room.RoomNetworking;
+import dev.compactmods.machines.room.network.RoomNetworking;
 import dev.compactmods.machines.shrinking.network.ShrinkingNetworking;
 import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
 import net.neoforged.neoforge.network.registration.PayloadRegistrar;

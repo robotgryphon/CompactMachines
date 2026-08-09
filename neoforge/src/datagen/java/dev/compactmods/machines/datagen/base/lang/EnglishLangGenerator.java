@@ -3,12 +3,12 @@ package dev.compactmods.machines.datagen.base.lang;
 
 import dev.compactmods.machines.api.dimension.CompactDimension;
 import dev.compactmods.machines.api.room.template.RoomTemplate;
-import dev.compactmods.machines.client.room.RoomKeyMappings;
+import dev.compactmods.machines.room.client.RoomKeyMappings;
 import dev.compactmods.machines.core.CompactMachinesCore;
 import dev.compactmods.machines.gamerule.CMGameRules;
 import dev.compactmods.machines.core.Translations;
 import dev.compactmods.machines.Advancements;
-import dev.compactmods.machines.i18n.CommandTranslations;
+import dev.compactmods.machines.command.CommandTranslations;
 import dev.compactmods.machines.machine.i18n.MachineTranslations;
 import dev.compactmods.machines.client.keybinds.room.RoomExitKeyMapping;
 import dev.compactmods.machines.client.creative.CreativeTabs;
