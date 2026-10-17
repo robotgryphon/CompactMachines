@@ -1,13 +1,12 @@
 package dev.compactmods.machines.upgrades.system;
 
-import dev.compactmods.machines.api.room.RoomInstance;
 import dev.compactmods.machines.room.Rooms;
 import dev.compactmods.machines.upgrades.api.system.CompiledRoomUpgrade;
 import net.minecraft.resources.ResourceKey;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.attachment.AttachmentType;
 import net.neoforged.neoforge.common.NeoForge;
-import net.neoforged.neoforge.registries.DataPackRegistryEvent;
+import net.neoforged.neoforge.registries.NewDatapackRegistryEvent;
 
 import java.util.HashSet;
 import java.util.List;
@@ -35,8 +34,8 @@ public final class RoomSystems {
         NeoForge.EVENT_BUS.addListener(RoomSystemManager::onLevelTick);
     }
 
-    private static void onNewDataPackRegistry(DataPackRegistryEvent.NewRegistry event) {
+    private static void onNewDataPackRegistry(NewDatapackRegistryEvent event) {
         // Server-only (ticking never runs client-side) — no network codec / no client sync.
-        event.dataPackRegistry(CompiledRoomUpgrade.REGISTRY_KEY, CompiledRoomUpgrade.CODEC);
+        event.worldRegistry(CompiledRoomUpgrade.REGISTRY_KEY, CompiledRoomUpgrade.CODEC);
     }
 }

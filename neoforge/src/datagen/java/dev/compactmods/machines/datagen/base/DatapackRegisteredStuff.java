@@ -13,6 +13,7 @@ import net.minecraft.core.RegistrySetBuilder;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.data.worldgen.BootstrapContext;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.util.ARGB;
 import net.minecraft.util.ColorRGBA;
 import net.minecraft.world.attribute.EnvironmentAttributes;
 import net.minecraft.world.level.biome.Biome;
@@ -86,9 +87,9 @@ public class DatapackRegisteredStuff {
                 .specialEffects(new BiomeSpecialEffects.Builder()
                         .waterColor(4159204)
                         .build())
-                .setAttribute(EnvironmentAttributes.FOG_COLOR, 12638463)
-                .setAttribute(EnvironmentAttributes.WATER_FOG_COLOR, 329011)
-                .setAttribute(EnvironmentAttributes.SKY_COLOR, 0xFF000000)
+                .setAttribute(EnvironmentAttributes.FOG_COLOR, ARGB.vector3fFromRGB24(12638463))
+                .setAttribute(EnvironmentAttributes.WATER_FOG_COLOR, ARGB.vector3fFromRGB24(329011))
+                .setAttribute(EnvironmentAttributes.SKY_COLOR, ARGB.vector3fFromRGB24(0xFF000000))
                 .build();
 
         ctx.register(ResourceKey.create(Registries.BIOME, CompactDimension.COMPACT_BIOME), compactBiome);

@@ -1,16 +1,11 @@
 package dev.compactmods.machines.machine.client.shader.flag;
 
-import com.mojang.blaze3d.PrimitiveTopology;
-import com.mojang.blaze3d.pipeline.*;
-import com.mojang.blaze3d.platform.CompareOp;
-import com.mojang.blaze3d.shaders.UniformType;
+import com.mojang.renderpearl.api.pipeline.*;
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
-import com.mojang.blaze3d.vertex.VertexFormat;
+import com.mojang.renderpearl.api.vertex.VertexFormat;
 import dev.compactmods.machines.core.CompactMachinesCore;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BindGroupLayouts;
 import net.minecraft.client.renderer.RenderPipelines;
-import net.minecraft.client.renderer.rendertype.OutputTarget;
 import net.minecraft.client.renderer.rendertype.RenderSetup;
 import net.minecraft.client.renderer.rendertype.RenderType;
 import net.neoforged.neoforge.client.event.RegisterRenderPipelinesEvent;
@@ -18,9 +13,6 @@ import net.neoforged.neoforge.client.event.RegisterRenderPipelinesEvent;
 public final class FlagShaders {
 
     // Happy Pride y'all
-    public static final OutputTarget TRANSLUCENT_TARGET = new OutputTarget("trans_target",
-            () -> Minecraft.getInstance().levelRenderer.translucentTarget());
-
     public static final RenderPipeline PRIDE_STRIPES_PIPELINE;
     public static final BindGroupLayout FLAG_PALETTE;
 
@@ -40,13 +32,15 @@ public final class FlagShaders {
                 .withPrimitiveTopology(PrimitiveTopology.QUADS)
                 // Exactly the bind groups pride_stripes.{vsh,fsh} reference:
                 //   GLOBALS            — CameraBlockPos / CameraOffset (globals.glsl)
-                //   MATRICES_PROJECTION — DynamicTransforms + Projection (ModelViewMat, ProjMat)
+                //   DYNAMIC_TRANSFORMS — DynamicTransforms (ModelViewMat)
+                //   PROJECTION         — Projection (ProjMat)
                 //   FLAG_PALETTE       — the custom stripe-colour UBO
                 // Don't inherit BLOCK_SNIPPET here: it also pulls in Fog +
                 // Sampler0/Sampler2 + the core/block shader/vertex-format defaults,
                 // none of which this shader uses.
                 .withBindGroupLayout(BindGroupLayouts.GLOBALS)
-                .withBindGroupLayout(BindGroupLayouts.MATRICES_PROJECTION)
+                .withBindGroupLayout(BindGroupLayouts.DYNAMIC_TRANSFORMS)
+                .withBindGroupLayout(BindGroupLayouts.PROJECTION)
                 .withBindGroupLayout(FLAG_PALETTE)
                 .withCull(true)
                 // 26.2 uses reversed-Z depth (buffer cleared to 0.0 = far, near = 1.0),
@@ -62,7 +56,6 @@ public final class FlagShaders {
             CompactMachinesCore.id("pride_stripes"),
             RenderSetup.builder(PRIDE_STRIPES_PIPELINE)
                     .sortOnUpload()
-                    .setOutputTarget(TRANSLUCENT_TARGET)
                     .createRenderSetup());
 
 

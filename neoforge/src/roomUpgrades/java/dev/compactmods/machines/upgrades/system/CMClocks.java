@@ -24,6 +24,6 @@ public final class CMClocks {
     public static long totalTicks(ServerLevel level) {
         final var registry = level.registryAccess().lookupOrThrow(Registries.WORLD_CLOCK);
         final Holder<WorldClock> holder = registry.wrapAsHolder(registry.getValueOrThrow(TICK));
-        return level.clockManager().getTotalTicks(holder);
+        return level.clockManager().getInstance(holder).totalTicks();
     }
 }

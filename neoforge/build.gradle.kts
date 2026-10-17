@@ -58,6 +58,10 @@ listOf(roomsSrc, shrinkingSrc, roomUpgradesSrc, storageSrc, machinesSrc, datagen
        gameruleSrc, villagerSrc, featureSrc, i18nSrc, dimensionSrc)
     .forEach { neoForge.addModdingDependenciesTo(it.get()) }
 
+configurations.named(datagenSrc.get().implementationConfigurationName) {
+    extendsFrom(configurations.implementation.get())
+}
+
 sourceSets.main {
     java {
         srcDir("src/main/java")
@@ -111,6 +115,10 @@ neoForge {
 
     val cmMain = this.mods.create(modId) {
         this.modSourceSets.add(sourceSets.main)
+
+        // Datagen classes are part of this mod at runtime (only on the `data`
+        // run's classpath), so FML attributes their @EventBusSubscribers to it.
+        this.modSourceSets.add(datagenSrc)
 
         if(System.getenv().containsKey("CI")) {
             modSourceSets.add(sourceSets.test)
@@ -295,8 +303,9 @@ dependencies {
     "machinesCompileOnly"(roomsSrc.get().output)
     "machinesCompileOnly"(shrinkingSrc.get().output)
 
-    // Datagen sees :api + the whole mod (main folds every feature source set).
-    "datagenCompileOnly"(project(":api"))
+    // Datagen sees the whole mod (main folds every feature source set). It must
+    // also inherit main's `implementation` deps (:api, feather, spatial, jnanoid)
+    // so they're on the `data` run's runtime classpath, not just at compile time.
     "datagenImplementation"(sourceSets.main.get().output)
 
     // api-only glue leaves.

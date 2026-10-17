@@ -2,38 +2,18 @@ package dev.compactmods.machines.datagen.base;
 
 import dev.compactmods.machines.room.Rooms;
 import dev.compactmods.machines.shrinking.Shrinking;
-import net.minecraft.core.HolderLookup;
-import net.minecraft.data.PackOutput;
+import net.minecraft.advancements.Advancement;
 import net.minecraft.data.recipes.RecipeCategory;
-import net.minecraft.data.recipes.RecipeOutput;
 import net.minecraft.data.recipes.RecipeProvider;
+import net.minecraft.data.worldgen.BootstrapContext;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.item.crafting.Recipe;
 import net.neoforged.neoforge.common.Tags;
-
-import java.util.concurrent.CompletableFuture;
 
 public class RecipeGenerator extends RecipeProvider {
 
-    public static class Runner extends RecipeProvider.Runner {
-        private final String name;
-
-        public Runner(String name, PackOutput packOutput, CompletableFuture<HolderLookup.Provider> registries) {
-            super(packOutput, registries);
-            this.name = name;
-        }
-
-        @Override
-        protected RecipeProvider createRecipeProvider(HolderLookup.Provider provider, RecipeOutput recipeOutput) {
-            return new RecipeGenerator(provider, recipeOutput);
-        }
-
-        @Override
-        public String getName() {
-            return name;
-        }
-    }
-	public RecipeGenerator(HolderLookup.Provider holders, RecipeOutput output) {
-		super(holders, output);
+	public RecipeGenerator(BootstrapContext<Recipe<?>> recipeOutput, BootstrapContext<Advancement> advancementOutput) {
+		super(recipeOutput, advancementOutput);
 	}
 
     @Override

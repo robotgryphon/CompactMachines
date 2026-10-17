@@ -1,8 +1,10 @@
-#version 330
+#version 450
 
-#moj_import <minecraft:dynamictransforms.glsl>
-#moj_import <minecraft:projection.glsl>
-#moj_import <minecraft:globals.glsl>
+#extension GL_ARB_separate_shader_objects : require
+
+#include <minecraft:dynamictransforms.glsl>
+#include <minecraft:projection.glsl>
+#include <minecraft:globals.glsl>
 
 // POSITION_COLOR_NORMAL vertex format:
 //   Position — vertex position in camera-relative world space (the BER's pose
@@ -12,9 +14,9 @@
 //              block-local position in RGB so downstream shaders that *do*
 //              want the in-block point can still read it).
 //   Normal   — outward face normal of the pane the vertex belongs to.
-in vec3 Position;
-in vec4 Color;
-in vec3 Normal;
+layout(location = 0) in vec3 Position;
+layout(location = 1) in vec4 Color;
+layout(location = 2) in vec3 Normal;
 
 // Absolute world position — recovered by re-adding the camera position from
 // the Globals UBO. Sampling noise here means a wall of machines reads as a
@@ -27,8 +29,8 @@ in vec3 Normal;
 // is therefore `CameraBlockPos - CameraOffset`, and `Position` is already
 // camera-relative (BER dispatcher translates the pose to block-minus-camera).
 // So:  worldPos = Position + CameraBlockPos - CameraOffset.
-out vec3 worldPos;
-out vec3 faceNormal;
+layout(location = 0) out vec3 worldPos;
+layout(location = 1) out vec3 faceNormal;
 
 void main() {
     gl_Position = ProjMat * ModelViewMat * vec4(Position, 1.0);

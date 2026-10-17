@@ -6,8 +6,8 @@ import dev.compactmods.machines.core.CompactMachinesCore;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.item.CreativeModeTab;
 import net.neoforged.bus.api.IEventBus;
-import net.neoforged.neoforge.registries.DataPackRegistryEvent;
 import net.neoforged.neoforge.registries.DeferredRegister;
+import net.neoforged.neoforge.registries.NewDatapackRegistryEvent;
 
 import java.util.stream.Stream;
 
@@ -25,9 +25,9 @@ public interface CMRegistries {
 				DATA_COMPONENTS
 		).forEach(r -> r.register(modBus));
 
-		modBus.addListener((DataPackRegistryEvent.NewRegistry newRegistries) -> {
-			newRegistries.dataPackRegistry(RoomTemplate.REGISTRY_KEY, RoomTemplate.CODEC, RoomTemplate.CODEC);
-			newRegistries.dataPackRegistry(FlagShader.REGISTRY_KEY, FlagShader.CODEC, FlagShader.CODEC);
+		modBus.addListener((NewDatapackRegistryEvent newRegistries) -> {
+			newRegistries.worldRegistry(RoomTemplate.REGISTRY_KEY, RoomTemplate.CODEC, RoomTemplate.CODEC);
+			newRegistries.worldRegistry(FlagShader.REGISTRY_KEY, FlagShader.CODEC, FlagShader.CODEC);
 		});
 	}
 }

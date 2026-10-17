@@ -1,4 +1,6 @@
-#version 330
+#version 450
+
+#extension GL_ARB_separate_shader_objects : require
 
 // pride_stripes — horizontal stripes from a Java-controlled palette.
 //
@@ -12,14 +14,14 @@
 //                          (i = 0 is the top stripe).
 //   paletteColors[i].a  — currently unused; reserved for per-stripe opacity.
 
-#moj_import <minecraft:globals.glsl>
+#include <minecraft:globals.glsl>
 
-in vec3 worldPos;   // absolute world coordinates; identical at the seam
-                    // between adjacent machines, so the stripes line up
-                    // continuously across a vertical wall.
-in vec3 faceNormal; // outward normal of the pane.
+layout(location = 0) in vec3 worldPos;   // absolute world coordinates; identical at the seam
+                                         // between adjacent machines, so the stripes line up
+                                         // continuously across a vertical wall.
+layout(location = 1) in vec3 faceNormal; // outward normal of the pane.
 
-out vec4 fragColor;
+layout(location = 0) out vec4 fragColor;
 
 const float OPACITY = 0.3;
 const int MAX_STRIPES = 10;

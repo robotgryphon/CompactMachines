@@ -7,17 +7,19 @@ import dev.compactmods.machines.datagen.base.RecipeGenerator;
 import dev.compactmods.machines.machine.Machines;
 import dev.compactmods.machines.room.Rooms;
 import dev.compactmods.machines.shrinking.Shrinking;
+import net.minecraft.advancements.Advancement;
 import net.minecraft.core.Holder;
-import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.data.recipes.RecipeCategory;
 import net.minecraft.data.recipes.RecipeOutput;
 import net.minecraft.data.recipes.ShapedRecipeBuilder;
+import net.minecraft.data.worldgen.BootstrapContext;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.Identifier;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.level.ItemLike;
 import net.neoforged.neoforge.common.Tags;
 
@@ -25,8 +27,8 @@ import java.util.function.UnaryOperator;
 
 public class BasicRoomTemplateRecipeGenerator extends RecipeGenerator {
 
-    public BasicRoomTemplateRecipeGenerator(HolderLookup.Provider holders, RecipeOutput output) {
-        super(holders, output);
+    public BasicRoomTemplateRecipeGenerator(BootstrapContext<Recipe<?>> recipeOutput, BootstrapContext<Advancement> advancementOutput) {
+        super(recipeOutput, advancementOutput);
     }
 
     @Override
@@ -43,22 +45,22 @@ public class BasicRoomTemplateRecipeGenerator extends RecipeGenerator {
     }
 
     private void addMachineRecipe(Identifier id, TagKey<Item> catalyst) {
-        final var templateRef = this.registries.lookupOrThrow(RoomTemplate.REGISTRY_KEY)
+        final var templateRef = this.output.lookup(RoomTemplate.REGISTRY_KEY)
                 .getOrThrow(ResourceKey.create(RoomTemplate.REGISTRY_KEY, id));
 
         machineRecipeBuilder(this.output, templateRef, builder -> builder.define('P', catalyst));
     }
 
     private void addMachineRecipe(Identifier id, ItemLike catalyst) {
-        final var templateRef = this.registries.lookupOrThrow(RoomTemplate.REGISTRY_KEY)
+        final var templateRef = this.output.lookup(RoomTemplate.REGISTRY_KEY)
                 .getOrThrow(ResourceKey.create(RoomTemplate.REGISTRY_KEY, id));
 
         machineRecipeBuilder(this.output, templateRef, builder -> builder.define('P', catalyst));
     }
 
     protected void machineRecipeBuilder(RecipeOutput consumer, Holder.Reference<RoomTemplate> templateRef, UnaryOperator<ShapedRecipeBuilder> configure) {
-        final var builder = ShapedRecipeBuilder.shaped(this.registries.lookupOrThrow(Registries.ITEM),
-                        RecipeCategory.MISC, Machines.Items.forNewRoom(templateRef).getItem())
+        final var builder = ShapedRecipeBuilder.shaped(this.items,
+                        RecipeCategory.MISC, Machines.Items.templateForNewRoom(templateRef))
                 .pattern("WWW")
                 .pattern("EPS")
                 .pattern("WWW")
@@ -69,6 +71,9 @@ public class BasicRoomTemplateRecipeGenerator extends RecipeGenerator {
         configure.apply(builder);
 
         builder.unlockedBy("has_recipe", has(Rooms.Items.BREAKABLE_WALL));
-        builder.save(consumer);
+        // Every machine recipe has the same result item, so key it by template instead
+        final var templateId = templateRef.key().identifier();
+        builder.save(consumer, ResourceKey.create(Registries.RECIPE,
+                templateId.withPrefix("machines/")));
     }
 }

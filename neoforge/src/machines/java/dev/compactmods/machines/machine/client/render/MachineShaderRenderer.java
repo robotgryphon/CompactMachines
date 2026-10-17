@@ -1,9 +1,9 @@
 package dev.compactmods.machines.machine.client.render;
 
-import com.mojang.blaze3d.buffers.GpuBuffer;
+import com.mojang.renderpearl.api.buffers.GpuBuffer;
 import com.mojang.blaze3d.buffers.Std140Builder;
 import com.mojang.blaze3d.buffers.Std140SizeCalculator;
-import com.mojang.blaze3d.pipeline.RenderPipeline;
+import com.mojang.renderpearl.api.pipeline.RenderPipeline;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.MeshData;
 import com.mojang.blaze3d.vertex.PoseStack;
@@ -175,8 +175,6 @@ public class MachineShaderRenderer {
         var transforms = RenderSystem.getDynamicUniforms().writeTransform(RenderSystem.getModelViewMatrixCopy(), colorModulator, worldOffset, textureTransform);
 
         var renderTarget = Minecraft.getInstance().gameRenderer.mainRenderTarget();
-        if (e.getLevelRenderer().translucentTarget() != null)
-            renderTarget = e.getLevelRenderer().translucentTarget();
 
         AtomicReference<RenderPipeline> shader = new AtomicReference<>(FlagShaders.PRIDE_STRIPES_PIPELINE);
 
@@ -210,7 +208,7 @@ public class MachineShaderRenderer {
                     renderTarget.getDepthTextureView(),
                     OptionalDouble.empty())
             ) {
-                pass.setPipeline(shader.get());
+                pass.setPipeline(RenderSystem.getCompiledPipeline(shader.get()));
                 RenderSystem.bindDefaultUniforms(pass);
                 pass.setVertexBuffer(0, mesh.VertexBuffer.slice());
                 pass.setIndexBuffer(mesh.IndexBuffer, mesh.MeshState.indexType());

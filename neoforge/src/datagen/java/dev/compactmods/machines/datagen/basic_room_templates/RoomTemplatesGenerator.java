@@ -4,9 +4,7 @@ package dev.compactmods.machines.datagen.basic_room_templates;
 import dev.compactmods.machines.core.CompactMachinesCore;
 import dev.compactmods.machines.core.machine.MachineColor;
 import dev.compactmods.machines.api.room.template.RoomTemplate;
-import net.minecraft.core.HolderLookup;
 import net.minecraft.core.RegistrySetBuilder;
-import net.minecraft.data.PackOutput;
 import net.minecraft.data.worldgen.BootstrapContext;
 import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
@@ -14,18 +12,12 @@ import net.minecraft.util.ARGB;
 import net.minecraft.util.CommonColors;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.level.block.Blocks;
-import net.neoforged.neoforge.common.data.DatapackBuiltinEntriesProvider;
 
-import java.util.Set;
-import java.util.concurrent.CompletableFuture;
-
-public class RoomTemplatesGenerator extends DatapackBuiltinEntriesProvider {
-    private static final RegistrySetBuilder BUILDER = new RegistrySetBuilder()
+public final class RoomTemplatesGenerator {
+    static final RegistrySetBuilder BUILDER = new RegistrySetBuilder()
             .add(RoomTemplate.REGISTRY_KEY, RoomTemplatesGenerator::addRoomTemplates);
 
-    RoomTemplatesGenerator(PackOutput packOutput, CompletableFuture<HolderLookup.Provider> registries) {
-        super(packOutput, registries, BUILDER, Set.of(CompactMachinesCore.MOD_ID));
-    }
+    private RoomTemplatesGenerator() {}
 
     private static void addRoomTemplates(BootstrapContext<RoomTemplate> ctx) {
         roomTemplate(ctx, "tiny", new RoomTemplate(3, ARGB.color(255, 201, 91, 19)));

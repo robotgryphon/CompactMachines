@@ -114,7 +114,7 @@ public class CompactMachineRenderer implements BlockEntityRenderer<CompactMachin
         // Centre of the block, then bob — the GROUND-context model sits
         // around the origin so this places it dead-centre in the cube.
         poseStack.translate(0.5f, 0.4f, 0.5f);
-        poseStack.mulPose(Axis.YP.rotation(yaw));
+        poseStack.rotate(Axis.YP, yaw);
         poseStack.scale(CORE_ITEM_SCALE, CORE_ITEM_SCALE, CORE_ITEM_SCALE);
 
         state.coreItem.submit(poseStack, collector,

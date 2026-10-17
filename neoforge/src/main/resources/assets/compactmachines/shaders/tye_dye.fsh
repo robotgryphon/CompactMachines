@@ -1,17 +1,19 @@
-#version 330
+#version 450
+
+#extension GL_ARB_separate_shader_objects : require
 
 // tye_dye — domain-warped noise palette gradient. Reads as a slow lava-lamp
 // turbulence with a ROY G BIV default palette.
 
-#moj_import <minecraft:globals.glsl>
+#include <minecraft:globals.glsl>
 
-in vec3 worldPos;   // absolute world coordinates; identical at the seam
-                    // between adjacent machines, so the noise field is
-                    // continuous across the wall.
-in vec3 faceNormal; // outward normal of the pane (kept so future shaders can
-                    // branch on face direction without a vertex format change).
+layout(location = 0) in vec3 worldPos;   // absolute world coordinates; identical at the seam
+                                         // between adjacent machines, so the noise field is
+                                         // continuous across the wall.
+layout(location = 1) in vec3 faceNormal; // outward normal of the pane (kept so future shaders can
+                                         // branch on face direction without a vertex format change).
 
-out vec4 fragColor;
+layout(location = 0) out vec4 fragColor;
 
 const float OPACITY = 0.4; // matches the tinted-glass look the user dialled in.
 

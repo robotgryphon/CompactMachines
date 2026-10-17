@@ -1,9 +1,9 @@
 package dev.compactmods.machines.machine.client.render;
 
-import com.mojang.blaze3d.PrimitiveTopology;
-import com.mojang.blaze3d.buffers.GpuBuffer;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.*;
+import com.mojang.renderpearl.api.pipeline.PrimitiveTopology;
+import com.mojang.renderpearl.api.vertex.VertexFormat;
 import dev.compactmods.machines.machine.Machines;
 import it.unimi.dsi.fastutil.longs.LongList;
 import net.minecraft.client.renderer.culling.Frustum;

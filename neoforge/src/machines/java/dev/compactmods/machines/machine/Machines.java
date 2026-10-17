@@ -13,6 +13,7 @@ import dev.compactmods.machines.room.Rooms;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.GlobalPos;
 import net.minecraft.core.Holder;
+import net.minecraft.core.component.DataComponentPatch;
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
@@ -21,6 +22,7 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.ItemStackTemplate;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.SoundType;
@@ -53,7 +55,7 @@ public interface Machines {
 
     UnaryOperator<BlockBehaviour.Properties> MACHINE_BLOCK_PROPS = props -> props
             .instrument(NoteBlockInstrument.COW_BELL)
-            .pushReaction(PushReaction.IGNORE)
+            .pushReaction(PushReaction.IMMOVEABLE)
             .sound(SoundType.METAL)
             .strength(8.0F, 20.0F)
             .noOcclusion()
@@ -87,12 +89,22 @@ public interface Machines {
         }
 
         static ItemStack forNewRoom(Holder.Reference<RoomTemplate> templateHolder) {
+            return templateForNewRoom(templateHolder).create();
+        }
+
+        /**
+         * Same as {@link #forNewRoom}, but safe to build before item components are bound
+         * (e.g. while datagen bootstraps recipe registries).
+         */
+        static ItemStackTemplate templateForNewRoom(Holder.Reference<RoomTemplate> templateHolder) {
             var template = templateHolder.value();
 
-            final var stack = new ItemStack(net.minecraft.world.item.Items.PAPER);
-            stack.set(Rooms.DataComponents.ROOM_TEMPLATE_ID, templateHolder.key().identifier());
-            stack.set(DataComponents.MACHINE_COLOR, template.defaultMachineColor());
-            return stack;
+            final var components = DataComponentPatch.builder()
+                    .set(Rooms.DataComponents.ROOM_TEMPLATE_ID.get(), templateHolder.key().identifier())
+                    .set(DataComponents.MACHINE_COLOR.get(), template.defaultMachineColor())
+                    .build();
+
+            return new ItemStackTemplate(net.minecraft.world.item.Items.PAPER, components);
         }
     }
 

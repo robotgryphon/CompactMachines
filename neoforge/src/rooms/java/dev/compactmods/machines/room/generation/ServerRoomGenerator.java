@@ -86,7 +86,7 @@ public class ServerRoomGenerator implements RoomGenerator {
     }
 
     public void populateStructure(Identifier template, AABB roomInnerBounds, RoomStructurePlacement placement) {
-        server.getStructureManager().get(template).ifPresent(tem -> {
+        server.getStructureTemplateManager().get(template).ifPresent(tem -> {
 
             Vector3d templateSize = VectorUtils.convert3d(tem.getSize());
 

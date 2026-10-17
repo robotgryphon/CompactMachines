@@ -1,11 +1,11 @@
 package dev.compactmods.machines.room.preview.client;
 
-import com.mojang.blaze3d.PrimitiveTopology;
-import com.mojang.blaze3d.buffers.GpuBuffer;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.BufferBuilder;
 import com.mojang.blaze3d.vertex.ByteBufferBuilder;
 import com.mojang.blaze3d.vertex.MeshData;
+import com.mojang.renderpearl.api.buffers.GpuBuffer;
+import com.mojang.renderpearl.api.pipeline.PrimitiveTopology;
 import dev.compactmods.machines.core.CompactMachinesCore;
 import dev.compactmods.machines.room.preview.RoomPreviewSnapshot;
 import net.minecraft.client.Minecraft;
@@ -24,7 +24,7 @@ import java.util.Map;
  * A baked, textured preview of a room: the room's real block models tessellated (via
  * {@link ModelBlockRenderer}) into GPU vertex buffers, one per {@link ChunkSectionLayer}
  * (SOLID/CUTOUT/TRANSLUCENT), in <em>room-local</em> space (unit cubes at {@code (x,y,z)}). The
- * per-machine placement transform is applied at draw time by {@link RoomPreviewRenderer}, so one
+ * per-machine placement transform is applied at draw time by {@link dev.compactmods.machines.preview.client.RoomPreviewRenderer}, so one
  * baked mesh serves every machine bound to that room.
  *
  * <p>Baking runs on the render thread (it touches the model manager and GPU) and is cached per room

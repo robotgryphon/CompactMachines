@@ -7,9 +7,11 @@ import dev.compactmods.machines.datagen.base.loot.BlockLootGenerator;
 import dev.compactmods.machines.datagen.base.tags.BlockTagGenerator;
 import dev.compactmods.machines.datagen.base.tags.ItemTagGenerator;
 import dev.compactmods.machines.datagen.base.tags.PointOfInterestTagGenerator;
-import dev.compactmods.machines.datagen.basic_room_templates.BasicRoomTemplateRecipeGenerator;
 import net.minecraft.core.HolderLookup;
+import net.minecraft.core.RegistrySetBuilder;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.data.loot.LootTableProvider;
+import net.minecraft.data.recipes.RecipeProvider;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;
 import net.neoforged.neoforge.data.event.GatherDataEvent;
 
@@ -25,26 +27,20 @@ public class BaseDatapack {
     }
 
     public static BaseDatapackGenerationResults generatePack(GatherDataEvent.Client event) {
-        final var generator = event.getGenerator();
-
-        final var basePackOutput = generator.getPackOutput();
-        final var holderLookup = event.getLookupProvider();
-
         // Server
         event.createProvider(ModelAndStateGenerator::new);
 
-        event.createDatapackRegistryObjects(DatapackRegisteredStuff.BUILDER, Set.of(CompactMachinesCore.MOD_ID));
+        event.createWorldRegistryObjects(DatapackRegisteredStuff.BUILDER, Set.of(CompactMachinesCore.MOD_ID));
 
         event.createProvider(PointOfInterestTagGenerator::new);
 
-        event.addProvider(new LootTableProvider(basePackOutput,
-                Collections.emptySet(),
-                List.of(new LootTableProvider.SubProviderEntry(BlockLootGenerator::new, LootContextParamSets.BLOCK)),
-                holderLookup
-        ));
-
-        event.createProvider((output,provider)
-                -> new BasicRoomTemplateRecipeGenerator.Runner(CompactMachinesCore.dotPrefix("base"), output, provider));
+        // Loot tables and recipes are reloadable registries now
+        event.createReloadableRegistryObjects(new RegistrySetBuilder()
+                .add(Registries.LOOT_TABLE, new LootTableProvider(
+                        Collections.emptySet(),
+                        List.of(new LootTableProvider.SubProviderEntry(BlockLootGenerator::new, LootContextParamSets.BLOCK))))
+                .add(RecipeProvider.asBootstrap(RecipeGenerator::new)),
+                Set.of(CompactMachinesCore.MOD_ID));
 
         event.createProvider(BlockTagGenerator::new);
         event.createProvider(ItemTagGenerator::new);
@@ -57,6 +53,6 @@ public class BaseDatapack {
         // Client
         event.createProvider(EnglishLangGenerator::new);
 
-        return new BaseDatapackGenerationResults(holderLookup);
+        return new BaseDatapackGenerationResults(event.getReloadableLookupProvider());
     }
 }

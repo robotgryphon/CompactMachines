@@ -1,13 +1,13 @@
 package dev.compactmods.machines.preview.client;
 
-import com.mojang.blaze3d.GpuFormat;
-import com.mojang.blaze3d.PrimitiveTopology;
-import com.mojang.blaze3d.pipeline.RenderPipeline;
 import com.mojang.blaze3d.pipeline.RenderTarget;
 import com.mojang.blaze3d.pipeline.TextureTarget;
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.textures.FilterMode;
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.renderpearl.api.GpuFormat;
+import com.mojang.renderpearl.api.pipeline.PrimitiveTopology;
+import com.mojang.renderpearl.api.pipeline.RenderPipeline;
+import com.mojang.renderpearl.api.textures.FilterMode;
 import dev.compactmods.machines.core.CompactMachinesCore;
 import dev.compactmods.machines.machine.block.CompactMachineBlockEntity;
 import dev.compactmods.machines.room.preview.RoomEntitySnapshot;
@@ -121,10 +121,10 @@ public final class RoomPreviewRenderer {
 
             for (ChunkSectionLayer layer : LAYERS) {
                 final RenderPipeline pipeline = blockPipeline(layer);
-                pass.setPipeline(pipeline);
+                pass.setPipeline(RenderSystem.getCompiledPipeline(pipeline));
                 RenderSystem.bindDefaultUniforms(pass);
-                pass.bindTexture("Sampler0", atlas, atlasSampler);
-                pass.bindTexture("Sampler2", lightmap, lightmapSampler);
+                pass.setUniform("Sampler0", atlas, atlasSampler);
+                pass.setUniform("Sampler2", lightmap, lightmapSampler);
 
                 for (Entry entry : state.entries) {
                     final RoomPreviewMesh.LayerMesh lm = entry.mesh.layer(layer);
@@ -224,7 +224,7 @@ public final class RoomPreviewRenderer {
 
     private static TextureTarget ensureTarget(int width, int height) {
         if (previewTarget == null) {
-            previewTarget = new TextureTarget("compactmachines:room_preview", width, height, true, GpuFormat.RGBA8_UNORM);
+            previewTarget = new TextureTarget("compactmachines:room_preview", width, height, GpuFormat.RGBA8_UNORM, GpuFormat.D32_FLOAT);
         } else if (previewTarget.width != width || previewTarget.height != height) {
             previewTarget.resize(width, height);
         }

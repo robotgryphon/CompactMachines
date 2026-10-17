@@ -1,6 +1,6 @@
 package dev.compactmods.machines.machine.client.render;
 
-import com.mojang.blaze3d.buffers.GpuBuffer;
+import com.mojang.renderpearl.api.buffers.GpuBuffer;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.MeshData;
 import org.jspecify.annotations.Nullable;

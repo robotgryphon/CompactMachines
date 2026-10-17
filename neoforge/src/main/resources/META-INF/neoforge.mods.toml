@@ -5,8 +5,10 @@ file = "META-INF/accesstransformer.cfg"
 
 # Registered here, not via the MixinConfigs MANIFEST.MF entry — modern NeoForge
 # (FML 11+) discovers mixin configs from this toml. The config file itself
-# lives at the root of core-*.jar, which is on the runtime classpath as a
+# lives at the root of api-*.jar, which is on the runtime classpath as a
 # GAMELIBRARY, so Mixin resolves the resource by name across the classpath.
+# Required: MinecraftServerMixin implements the interface-injected
+# IForwardingAttachmentHolder / IServerCapabilityHolder methods.
 [[mixins]]
 config = "compactmachines.mixins.json"
 
