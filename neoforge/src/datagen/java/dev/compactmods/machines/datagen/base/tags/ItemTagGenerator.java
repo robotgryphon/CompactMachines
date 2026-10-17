@@ -30,7 +30,7 @@ public class ItemTagGenerator extends ItemTagsProvider {
     }
 
     private void curiosTags(ResourceKey<Item> psd) {
-        final var curiosPsdTag = tag(TagKey.create(CMRegistries.ITEMS.getRegistryKey(), Identifier.fromNamespaceAndPath("curios", "psd")));
+        final var curiosPsdTag = tag(TagKey.create(psd.registryKey(), Identifier.fromNamespaceAndPath("curios", "psd")));
         curiosPsdTag.add(psd);
     }
 

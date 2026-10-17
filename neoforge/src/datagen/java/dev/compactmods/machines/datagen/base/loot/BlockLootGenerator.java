@@ -1,6 +1,5 @@
 package dev.compactmods.machines.datagen.base.loot;
 
-import dev.compactmods.machines.CMDataComponents;
 import dev.compactmods.machines.machine.Machines;
 import dev.compactmods.machines.room.Rooms;
 import net.minecraft.core.HolderLookup;

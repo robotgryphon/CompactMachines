@@ -6,7 +6,6 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import dev.compactmods.machines.api.room.capability.RoomCapabilities;
 import dev.compactmods.machines.core.CompactMachinesCore;
-import dev.compactmods.machines.command.CommandTranslations;
 import dev.compactmods.machines.room.RoomTranslations;
 import dev.compactmods.machines.api.room.template.RoomTemplateHelper;
 import dev.compactmods.machines.room.command.argument.Suggestors;

@@ -1,4 +1,4 @@
-package dev.compactmods.machines.command;
+package dev.compactmods.machines.room.command;
 
 import dev.compactmods.machines.core.CompactMachinesCore;
 import net.minecraft.util.Util;

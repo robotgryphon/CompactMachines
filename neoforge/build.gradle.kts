@@ -23,8 +23,7 @@ plugins {
 project.evaluationDependsOn(core.path)
 
 base {
-    archivesName.set(modId)
-    group = "dev.compactmods.compactmachines"
+    group = "dev.compactmods"
     version = envVersion
 }
 
@@ -274,6 +273,7 @@ dependencies {
 
     // Isolated compile deps for the absorbed feature source sets.
     "roomsCompileOnly"(project(":api"))
+    "roomsCompileOnly"(gameruleSrc.get().output)
     "roomsCompileOnly"(compactmods.feather)
     "roomsCompileOnly"(compactmods.spatial)
     "roomsCompileOnly"(libs.jnanoid)
@@ -400,7 +400,7 @@ tasks.withType<ProcessResources>().configureEach {
 val PACKAGES_URL = System.getenv("GH_PKG_URL") ?: "https://maven.pkg.github.com/compactmods/compactmachines"
 publishing {
     publications.register<MavenPublication>("compactmachines") {
-        artifactId = "$modId-neoforge"
+        artifactId = modId
         from(components.getByName("java"))
     }
 

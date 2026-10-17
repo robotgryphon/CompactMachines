@@ -1,4 +1,4 @@
-package dev.compactmods.machines.room.command.rooms;
+package dev.compactmods.machines.room.command;
 
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;

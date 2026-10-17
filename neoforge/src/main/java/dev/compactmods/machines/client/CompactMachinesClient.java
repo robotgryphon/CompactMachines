@@ -1,7 +1,7 @@
 package dev.compactmods.machines.client;
 
 import dev.compactmods.machines.core.CompactMachinesCore;
-import dev.compactmods.machines.client.command.CMClientCommands;
+import dev.compactmods.machines.command.client.CMClientCommands;
 import dev.compactmods.machines.client.config.ClientConfig;
 import dev.compactmods.machines.client.creative.CreativeTabs;
 import dev.compactmods.machines.machine.client.MachinesClient;
@@ -13,7 +13,6 @@ import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.config.ModConfig;
 import net.neoforged.neoforge.client.event.RegisterRenderPipelinesEvent;
-import net.neoforged.neoforge.client.event.RegisterSpecialModelRendererEvent;
 import net.neoforged.neoforge.common.NeoForge;
 
 @Mod(value = CompactMachinesCore.MOD_ID, dist = Dist.CLIENT)

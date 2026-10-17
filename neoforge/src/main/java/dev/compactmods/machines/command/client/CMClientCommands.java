@@ -1,4 +1,4 @@
-package dev.compactmods.machines.client.command;
+package dev.compactmods.machines.command.client;
 
 import net.neoforged.fml.loading.FMLEnvironment;
 import net.neoforged.neoforge.client.event.RegisterClientCommandsEvent;

@@ -1,7 +1,7 @@
 package dev.compactmods.machines.command;
 
 import dev.compactmods.machines.core.CompactMachinesCore;
-import dev.compactmods.machines.command.rooms.CMRoomsSubcommand;
+import dev.compactmods.machines.room.command.CMRoomsSubcommand;
 import dev.compactmods.machines.room.command.CMRoomCoreSubcommand;
 import dev.compactmods.machines.room.command.EnableBasicTemplatesSubcommand;
 import dev.compactmods.machines.room.command.SpawnSubcommand;

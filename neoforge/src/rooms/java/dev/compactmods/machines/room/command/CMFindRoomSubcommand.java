@@ -1,19 +1,15 @@
-package dev.compactmods.machines.command.rooms;
+package dev.compactmods.machines.room.command;
 
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import dev.compactmods.machines.api.room.capability.RoomCapabilities;
 import dev.compactmods.machines.api.dimension.CompactDimension;
-import dev.compactmods.machines.api.machine.MachineConstants;
-import dev.compactmods.machines.machine.i18n.MachineTranslations;
 import dev.compactmods.machines.room.RoomTranslations;
-import dev.compactmods.machines.machine.block.CompactMachineBlockEntity;
 import dev.compactmods.machines.room.Rooms;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.arguments.EntityArgument;
-import net.minecraft.commands.arguments.coordinates.BlockPosArgument;
 import net.minecraft.commands.arguments.coordinates.ColumnPosArgument;
 import net.minecraft.network.chat.ClickEvent;
 import net.minecraft.network.chat.CommonComponents;
@@ -32,13 +28,6 @@ public class CMFindRoomSubcommand {
                 // /cm rooms find chunk [pos]
                 Commands.argument("chunk", ColumnPosArgument.columnPos())
                         .executes(CMFindRoomSubcommand::fetchByChunkPos)
-        ));
-
-        // /cm rooms find connected_to
-        find.then(Commands.literal("connected_to").then(
-                // /cm rooms find connected_to [pos]
-                Commands.argument("pos", BlockPosArgument.blockPos())
-                        .executes(CMFindRoomSubcommand::fetchByMachineBlock)
         ));
 
         // /cm rooms find player
@@ -69,31 +58,6 @@ public class CMFindRoomSubcommand {
                 .orElse(Component.literal("Room not found at chunk: " + chunkPos));
 
         ctx.getSource().sendSuccess(() -> m, false);
-
-        return 0;
-    }
-
-    private static int fetchByMachineBlock(CommandContext<CommandSourceStack> ctx) throws CommandSyntaxException {
-        final var block = BlockPosArgument.getLoadedBlockPos(ctx, "pos");
-        final var level = ctx.getSource().getLevel();
-
-        if (!level.getBlockState(block).is(MachineConstants.MACHINE_BLOCK)) {
-            ctx.getSource().sendFailure(MachineTranslations.NOT_A_MACHINE_BLOCK.apply(block));
-            return -1;
-        }
-
-        final var server = ctx.getSource().getServer();
-        final var registry = server.getCapability(RoomCapabilities.REGISTRY);
-        if (level.getBlockEntity(block) instanceof CompactMachineBlockEntity be) {
-            be.connectedRoom()
-                    .flatMap(registry::get)
-                    .ifPresent(roomInfo -> {
-                        ctx.getSource().sendSuccess(() -> RoomTranslations.MACHINE_ROOM_INFO.apply(block, roomInfo), false);
-                    });
-        } else {
-            // FIXME Translations
-            ctx.getSource().sendFailure(Component.literal("Does not appear to be a bound machine block."));
-        }
 
         return 0;
     }

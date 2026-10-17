@@ -28,8 +28,7 @@ public class CompactMachines {
     @SuppressWarnings("unused")
     public CompactMachines(IEventBus modBus) {
         Commands.prepare();
-
-        CMDataComponents.prepare();
+        
         CMDataAttachments.prepare();
 
         registerEvents(modBus);

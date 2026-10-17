@@ -1,4 +1,4 @@
-package dev.compactmods.machines.client.command;
+package dev.compactmods.machines.command.client;
 
 import com.mojang.brigadier.CommandDispatcher;
 import net.minecraft.client.Minecraft;

@@ -1,10 +1,8 @@
-package dev.compactmods.machines.command.rooms;
+package dev.compactmods.machines.room.command;
 
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import dev.compactmods.machines.api.room.capability.RoomCapabilities;
-import dev.compactmods.machines.command.CommandTranslations;
-import dev.compactmods.machines.room.command.rooms.GenerateRoomCommand;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.network.chat.Component;
