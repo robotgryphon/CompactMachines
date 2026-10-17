@@ -14,9 +14,13 @@ import net.minecraft.core.component.DataComponents;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.ComponentSerialization;
+import net.minecraft.network.protocol.Packet;
+import net.minecraft.network.protocol.game.ClientGamePacketListener;
+import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.util.ProblemReporter;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.TagValueOutput;
@@ -57,7 +61,7 @@ public class CompactMachineBlockEntity extends BlockEntity implements IBoundComp
             @Override
             protected void onContentsChanged(int index, ItemStack previousContents) {
                 super.onContentsChanged(index, previousContents);
-                machine.setChanged();
+                machine.markChangedAndSync();
             }
         };
     }
@@ -106,6 +110,23 @@ public class CompactMachineBlockEntity extends BlockEntity implements IBoundComp
         output.storeNullable(NBT_OWNER, UUIDUtil.CODEC, this.owner);
     }
 
+    /**
+     * Saves and pushes the BE's update tag to watching clients, so the core item
+     * and machine color render changes without waiting for a chunk reload.
+     */
+    private void markChangedAndSync() {
+        this.setChanged();
+        if (level != null && !level.isClientSide()) {
+            final var state = getBlockState();
+            level.sendBlockUpdated(worldPosition, state, state, Block.UPDATE_CLIENTS);
+        }
+    }
+
+    @Override
+    public Packet<ClientGamePacketListener> getUpdatePacket() {
+        return ClientboundBlockEntityDataPacket.create(this);
+    }
+
     @Override
     public CompoundTag getUpdateTag(HolderLookup.Provider provider) {
         CompoundTag data = super.getUpdateTag(provider);
@@ -143,7 +164,7 @@ public class CompactMachineBlockEntity extends BlockEntity implements IBoundComp
     public void setMachineColor(MachineColor machineColor) {
         if (machineColor != null) {
             this.machineColor = machineColor;
-            this.setChanged();
+            this.markChangedAndSync();
         }
     }
 
@@ -152,7 +173,7 @@ public class CompactMachineBlockEntity extends BlockEntity implements IBoundComp
         if (newCore.has(Rooms.DataComponents.BOUND_ROOM_CODE) || newCore.has(Rooms.DataComponents.ROOM_TEMPLATE_ID)) {
             coreItemHandler.set(0, ItemResource.of(newCore), 1);
             newCore.shrink(1);
-            this.setChanged();
+            this.markChangedAndSync();
             return true;
         }
 
@@ -165,7 +186,7 @@ public class CompactMachineBlockEntity extends BlockEntity implements IBoundComp
             final var resource = coreItemHandler.getResource(0);
             if (!resource.isEmpty() && coreItemHandler.extract(resource, 1, tx) == 1) {
                 tx.commit();
-                this.setChanged();
+                this.markChangedAndSync();
                 return resource.toStack(1);
             }
         }

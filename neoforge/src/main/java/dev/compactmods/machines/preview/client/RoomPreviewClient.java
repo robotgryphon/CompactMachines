@@ -51,6 +51,7 @@ public final class RoomPreviewClient {
 
         // Batched in-world preview rendering (manual pass, like the flag shaders).
         NeoForge.EVENT_BUS.addListener(EventPriority.HIGH, RoomPreviewRenderer::extract);
+        NeoForge.EVENT_BUS.addListener(RoomPreviewRenderer::prepareBuffers);
         NeoForge.EVENT_BUS.addListener(RoomPreviewRenderer::afterSolidBlocks);
         NeoForge.EVENT_BUS.addListener(RoomPreviewRenderer::onSubmitCustomGeometry);
     }

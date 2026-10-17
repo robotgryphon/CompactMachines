@@ -1,10 +1,7 @@
 package dev.compactmods.machines.preview.client;
 
-import com.mojang.blaze3d.pipeline.RenderTarget;
-import com.mojang.blaze3d.pipeline.TextureTarget;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.renderpearl.api.GpuFormat;
 import com.mojang.renderpearl.api.pipeline.PrimitiveTopology;
 import com.mojang.renderpearl.api.pipeline.RenderPipeline;
 import com.mojang.renderpearl.api.textures.FilterMode;
@@ -26,30 +23,27 @@ import net.minecraft.util.Mth;
 import net.minecraft.util.context.ContextKey;
 import net.minecraft.world.entity.Entity;
 import net.neoforged.neoforge.client.event.ExtractLevelRenderStateEvent;
+import net.neoforged.neoforge.client.event.PrepareRenderBuffersEvent;
 import net.neoforged.neoforge.client.event.RenderLevelStageEvent;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
-import org.joml.Vector4fc;
-import org.jspecify.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
-import java.util.OptionalDouble;
 
 /**
  * Draws the textured room previews. Each room is baked once into per-layer GPU buffers
  * ({@link RoomPreviewMesh}, in room-local space); this renderer draws that mesh once per visible
  * machine, applying the machine's placement transform via the per-draw model-view matrix.
  *
- * <p>Because the preview is opaque, depth-sorted 3D geometry (and this MC has no true OIT), it needs
- * a real depth buffer. We keep our <em>own</em> {@link TextureTarget}: {@linkplain
- * RenderTarget#copyDepthFrom copy the world's solid depth} into it (so nearer blocks / the machine
- * frame occlude the preview), draw with the vanilla {@code *_BLOCK} pipelines (reversed-Z depth
- * test+write, block atlas + lightmap), then {@linkplain RenderTarget#blitAndBlendToTexture blend it
- * onto the main target}. Runs at {@link RenderLevelStageEvent.AfterOpaqueBlocks} — between the solid
- * pass and the machines' translucent panes, which then composite over the preview.
+ * <p>Draws straight into the level's main pass at {@link RenderLevelStageEvent.AfterOpaqueBlocks}
+ * (NeoForge 26.3 stages hand out the active {@code RenderPass}; opening another one mid-frame is
+ * illegal). That pass already targets the main colour + depth, so the vanilla {@code *_BLOCK}
+ * pipelines (reversed-Z depth test+write, block atlas + lightmap) occlude correctly against the world,
+ * and the machines' translucent panes composite over the preview later in the frame. The shared quad
+ * index buffer can't be resized inside the pass, so its size is requested in
+ * {@link #prepareBuffers(PrepareRenderBuffersEvent)}.
  */
 public final class RoomPreviewRenderer {
 
@@ -67,10 +61,6 @@ public final class RoomPreviewRenderer {
     private static final Vector4f COLOR_MODULATOR = new Vector4f(1, 1, 1, 1);
     private static final Vector3f MODEL_OFFSET = new Vector3f();
     private static final Matrix4f TEXTURE_TRANSFORM = new Matrix4f();
-    private static final Vector4fc CLEAR_TRANSPARENT = new Vector4f(0f, 0f, 0f, 0f);
-
-    private static @Nullable TextureTarget previewTarget;
-
     private RoomPreviewRenderer() {}
 
     // --- extraction: collect visible machines + ensure their room meshes are baked ---
@@ -98,27 +88,31 @@ public final class RoomPreviewRenderer {
 
     // --- drawing ---------------------------------------------------------------------
 
+    /** Reserve the quad index buffer for the largest preview layer before the main pass opens. */
+    public static void prepareBuffers(PrepareRenderBuffersEvent event) {
+        final State state = event.getLevelRenderState().getRenderData(KEY);
+        final int maxIndices = state == null ? 0 : state.maxIndexCount();
+        if (maxIndices > 0)
+            RenderSystem.getSequentialBuffer(PrimitiveTopology.QUADS).requestIndexCount(maxIndices);
+    }
+
     public static void afterSolidBlocks(RenderLevelStageEvent.AfterOpaqueBlocks event) {
         final State state = event.getLevelRenderState().getRenderData(KEY);
         if (state == null || state.entries.isEmpty()) return;
 
-        final Minecraft mc = Minecraft.getInstance();
-        final RenderTarget main = mc.gameRenderer.mainRenderTarget();
-        final TextureTarget target = ensureTarget(main.width, main.height);
-        target.copyDepthFrom(main);
+        final var quadIndices = RenderSystem.getSequentialBuffer(PrimitiveTopology.QUADS);
+        // getBuffer() would resize mid-pass if prepareBuffers didn't reserve enough; skip this frame instead
+        if (!quadIndices.hasStorage(state.maxIndexCount())) return;
 
+        final Minecraft mc = Minecraft.getInstance();
         final Matrix4f view = RenderSystem.getModelViewMatrixCopy();
         final var atlas = mc.getTextureManager().getTexture(TextureAtlas.LOCATION_BLOCKS).getTextureView();
         final var lightmap = mc.gameRenderer.lightmap();
         final var atlasSampler = RenderSystem.getSamplerCache().getClampToEdge(FilterMode.NEAREST);
         final var lightmapSampler = RenderSystem.getSamplerCache().getClampToEdge(FilterMode.LINEAR);
-        final var quadIndices = RenderSystem.getSequentialBuffer(PrimitiveTopology.QUADS);
-
-        try (var pass = RenderSystem.getDevice().createCommandEncoder().createRenderPass(
-                () -> CompactMachinesCore.dotPrefix("room_preview"),
-                target.getColorTextureView(), Optional.of(CLEAR_TRANSPARENT),
-                target.getDepthTextureView(), OptionalDouble.empty())) {
-
+        final var pass = event.getRenderPass();
+        pass.pushDebugGroup(() -> CompactMachinesCore.dotPrefix("room_preview"));
+        try {
             for (ChunkSectionLayer layer : LAYERS) {
                 final RenderPipeline pipeline = blockPipeline(layer);
                 pass.setPipeline(RenderSystem.getCompiledPipeline(pipeline));
@@ -140,12 +134,9 @@ public final class RoomPreviewRenderer {
                     pass.drawIndexed(lm.indexCount(), 1, 0, 0, 0);
                 }
             }
+        } finally {
+            pass.popDebugGroup();
         }
-
-        // Bridge our preview blocks' depth into the main target so the entities we inject into the
-        // level's own submit pass (see onSubmitCustomGeometry) occlude correctly against them.
-        main.copyDepthFrom(target);
-        target.blitAndBlendToTexture(main.getColorTextureView(), main.getDepthTextureView());
     }
 
     /**
@@ -222,20 +213,22 @@ public final class RoomPreviewRenderer {
         };
     }
 
-    private static TextureTarget ensureTarget(int width, int height) {
-        if (previewTarget == null) {
-            previewTarget = new TextureTarget("compactmachines:room_preview", width, height, GpuFormat.RGBA8_UNORM, GpuFormat.D32_FLOAT);
-        } else if (previewTarget.width != width || previewTarget.height != height) {
-            previewTarget.resize(width, height);
-        }
-        return previewTarget;
-    }
-
     private record Entry(BlockPos pos, String roomCode, RoomPreviewMesh mesh) {}
 
     private static final class State {
         static final State INSTANCE = new State();
         final List<Entry> entries = new ArrayList<>();
         double camX, camY, camZ;
+
+        int maxIndexCount() {
+            int max = 0;
+            for (Entry entry : entries) {
+                for (ChunkSectionLayer layer : LAYERS) {
+                    final RoomPreviewMesh.LayerMesh lm = entry.mesh.layer(layer);
+                    if (lm != null) max = Math.max(max, lm.indexCount());
+                }
+            }
+            return max;
+        }
     }
 }

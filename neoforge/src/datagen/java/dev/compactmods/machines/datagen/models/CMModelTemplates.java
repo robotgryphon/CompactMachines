@@ -32,12 +32,12 @@ public class CMModelTemplates {
             // inward face renders unconditionally so the tint reads from inside the
             // cube too. Side faces are intentionally omitted to keep them out of
             // any plane the frame bars occupy.
-//            .element(p -> pane(p, Direction.DOWN,  1, 0, 1,  15, 1, 15))
-//            .element(p -> pane(p, Direction.UP,    1, 15, 1, 15, 16, 15))
-//            .element(p -> pane(p, Direction.NORTH, 1, 1, 0,  15, 15, 1))
-//            .element(p -> pane(p, Direction.SOUTH, 1, 1, 15, 15, 15, 16))
-//            .element(p -> pane(p, Direction.WEST,  0, 1, 1,  1, 15, 15))
-//            .element(p -> pane(p, Direction.EAST,  15, 1, 1, 16, 15, 15))
+            .element(p -> pane(p, Direction.DOWN,  1, 0, 1,  15, 1, 15))
+            .element(p -> pane(p, Direction.UP,    1, 15, 1, 15, 16, 15))
+            .element(p -> pane(p, Direction.NORTH, 1, 1, 0,  15, 15, 1))
+            .element(p -> pane(p, Direction.SOUTH, 1, 1, 15, 15, 15, 16))
+            .element(p -> pane(p, Direction.WEST,  0, 1, 1,  1, 15, 15))
+            .element(p -> pane(p, Direction.EAST,  15, 1, 1, 16, 15, 15))
             // Twelve 1px black edge bars forming the outer frame.
             // Bottom rim (Y = 0..1)
             .element(e -> edge(e, 0, 0, 0, 16, 1, 1))   // bottom-north

@@ -33,14 +33,18 @@ import java.util.List;
  * cell — the same scheme vanilla uses for chunk sections. A 15³ room of mostly air is a 1-bit grid
  * plus a two-entry palette: a few hundred bytes rather than tens of kilobytes.
  *
+ * <p>{@link #biomes} carries the interior's biomes (see {@link RoomPreviewBiomes}) so the client can
+ * biome-tint the preview.
+ *
  * <p>{@link #capture(ServerLevel, AABB)} runs on the server thread (it reads the level); turning a
  * snapshot into a mesh is pure data and may run off-thread on the client.
  */
-public record RoomPreviewSnapshot(int sizeX, int sizeY, int sizeZ, List<BlockState> palette, int[] indices) {
+public record RoomPreviewSnapshot(int sizeX, int sizeY, int sizeZ, List<BlockState> palette, int[] indices,
+                                  RoomPreviewBiomes biomes) {
 
     /** A room that isn't loaded / has no interior yields this; renderers should skip it. */
     public static final RoomPreviewSnapshot EMPTY =
-            new RoomPreviewSnapshot(0, 0, 0, List.of(Blocks.AIR.defaultBlockState()), new int[0]);
+            new RoomPreviewSnapshot(0, 0, 0, List.of(Blocks.AIR.defaultBlockState()), new int[0], RoomPreviewBiomes.EMPTY);
 
     /** Single-block-state codec: encodes a {@link BlockState} as its global block-state registry id. */
     public static final StreamCodec<ByteBuf, BlockState> BLOCK_STATE_STREAM_CODEC =
@@ -60,7 +64,8 @@ public record RoomPreviewSnapshot(int sizeX, int sizeY, int sizeZ, List<BlockSta
 
                     final int cellCount = Math.multiplyExact(Math.multiplyExact(sizeX, sizeY), sizeZ);
                     final int[] indices = unpack(buf, cellCount, bitsFor(palette.size()));
-                    return new RoomPreviewSnapshot(sizeX, sizeY, sizeZ, palette, indices);
+                    final RoomPreviewBiomes biomes = RoomPreviewBiomes.STREAM_CODEC.decode(buf);
+                    return new RoomPreviewSnapshot(sizeX, sizeY, sizeZ, palette, indices, biomes);
                 }
 
                 @Override
@@ -70,6 +75,7 @@ public record RoomPreviewSnapshot(int sizeX, int sizeY, int sizeZ, List<BlockSta
                     ByteBufCodecs.VAR_INT.encode(buf, snapshot.sizeZ);
                     PALETTE_STREAM_CODEC.encode(buf, snapshot.palette);
                     pack(buf, snapshot.indices, bitsFor(snapshot.palette.size()));
+                    RoomPreviewBiomes.STREAM_CODEC.encode(buf, snapshot.biomes);
                 }
             };
 
@@ -117,7 +123,8 @@ public record RoomPreviewSnapshot(int sizeX, int sizeY, int sizeZ, List<BlockSta
             }
         }
 
-        return new RoomPreviewSnapshot(sizeX, sizeY, sizeZ, palette, indices);
+        final RoomPreviewBiomes biomes = RoomPreviewBiomes.capture(level, minX, minY, minZ, sizeX, sizeY, sizeZ);
+        return new RoomPreviewSnapshot(sizeX, sizeY, sizeZ, palette, indices, biomes);
     }
 
     /** {@return the block-local cell index for local coordinates in a grid of the given dimensions} */
@@ -152,20 +159,21 @@ public record RoomPreviewSnapshot(int sizeX, int sizeY, int sizeZ, List<BlockSta
         h = 31 * h + sizeZ;
         h = 31 * h + palette.hashCode();
         h = 31 * h + Arrays.hashCode(indices);
+        h = 31 * h + biomes.contentHash();
         return h;
     }
 
     // --- bit-packing -----------------------------------------------------------------
 
     /** Bits needed to hold any index into a palette of {@code paletteSize} entries (minimum 1). */
-    private static int bitsFor(int paletteSize) {
+    static int bitsFor(int paletteSize) {
         if (paletteSize <= 1)
             return 0;
         return Math.max(1, 32 - Integer.numberOfLeadingZeros(paletteSize - 1));
     }
 
     /** Writes {@code count}-derived index data as a length-prefixed packed {@code long[]}. */
-    private static void pack(ByteBuf buf, int[] indices, int bits) {
+    static void pack(ByteBuf buf, int[] indices, int bits) {
         if (bits == 0) {
             // Palette has a single entry — the grid is entirely that state, no per-cell data needed.
             ByteBufCodecs.VAR_INT.encode(buf, 0);
@@ -195,7 +203,7 @@ public record RoomPreviewSnapshot(int sizeX, int sizeY, int sizeZ, List<BlockSta
     }
 
     /** Reads {@code count} indices from a length-prefixed packed {@code long[]}. */
-    private static int[] unpack(ByteBuf buf, int count, int bits) {
+    static int[] unpack(ByteBuf buf, int count, int bits) {
         final int longCount = ByteBufCodecs.VAR_INT.decode(buf);
         final long[] data = new long[longCount];
         for (int i = 0; i < longCount; i++)
@@ -228,7 +236,8 @@ public record RoomPreviewSnapshot(int sizeX, int sizeY, int sizeZ, List<BlockSta
         if (this == o) return true;
         if (!(o instanceof RoomPreviewSnapshot other)) return false;
         return sizeX == other.sizeX && sizeY == other.sizeY && sizeZ == other.sizeZ
-                && palette.equals(other.palette) && Arrays.equals(indices, other.indices);
+                && palette.equals(other.palette) && Arrays.equals(indices, other.indices)
+                && biomes.equals(other.biomes);
     }
 
     @Override

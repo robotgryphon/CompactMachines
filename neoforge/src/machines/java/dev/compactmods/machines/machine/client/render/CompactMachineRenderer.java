@@ -6,6 +6,7 @@ import com.mojang.math.Axis;
 import dev.compactmods.machines.machine.client.shader.MachineShaders;
 import dev.compactmods.machines.machine.Machines;
 import dev.compactmods.machines.machine.block.CompactMachineBlockEntity;
+import dev.compactmods.machines.room.Rooms;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
@@ -63,19 +64,25 @@ public class CompactMachineRenderer implements BlockEntityRenderer<CompactMachin
         // gameTime stays on the state for future shaders that might want a frame-
         // stamped tick value; the current pride shader reads the Globals UBO directly.
         state.gameTime = be.getLevel() != null ? be.getLevel().getGameTime() + partialTick : 0f;
-//        extractCoreItem(be, state);
+        extractCoreItem(be, state);
     }
 
     /**
      * Pull the core item out of the BE's 1-slot handler and bake an
      * {@link net.minecraft.client.renderer.item.ItemStackRenderState} for it.
-     * When the slot is empty we clear the cached render state so its layers
-     * release any references — same pattern as vanilla's lectern / item-frame
-     * BERs in the deferred pipeline.
+     * Only template cores (room pending creation) are drawn — once a core is
+     * bound to a room, the room preview takes its place. When there's nothing
+     * to draw we clear the cached render state so its layers release any
+     * references — same pattern as vanilla's lectern / item-frame BERs in the
+     * deferred pipeline.
      */
     private void extractCoreItem(CompactMachineBlockEntity be, MachineRenderState state) {
         final var resource = be.coreHandler().getResource(0);
-        if (resource.isEmpty()) {
+        final boolean pendingRoom = !resource.isEmpty()
+                && resource.has(Rooms.DataComponents.ROOM_TEMPLATE_ID)
+                && !resource.has(Rooms.DataComponents.BOUND_ROOM_CODE);
+
+        if (!pendingRoom) {
             state.coreItem.clear();
             state.hasCoreItem = false;
             return;

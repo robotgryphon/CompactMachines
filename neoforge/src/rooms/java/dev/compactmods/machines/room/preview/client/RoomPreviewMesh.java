@@ -6,18 +6,25 @@ import com.mojang.blaze3d.vertex.ByteBufferBuilder;
 import com.mojang.blaze3d.vertex.MeshData;
 import com.mojang.renderpearl.api.buffers.GpuBuffer;
 import com.mojang.renderpearl.api.pipeline.PrimitiveTopology;
+import dev.compactmods.machines.api.dimension.CompactDimension;
 import dev.compactmods.machines.core.CompactMachinesCore;
 import dev.compactmods.machines.room.preview.RoomPreviewSnapshot;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.block.BlockQuadOutput;
+import net.minecraft.client.renderer.block.FluidRenderer;
 import net.minecraft.client.renderer.block.ModelBlockRenderer;
 import net.minecraft.client.renderer.chunk.ChunkSectionLayer;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Holder;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.RenderShape;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jspecify.annotations.Nullable;
 
 import java.util.EnumMap;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -71,8 +78,11 @@ public final class RoomPreviewMesh {
 
         final var mc = Minecraft.getInstance();
         final var modelSet = mc.getModelManager().getBlockStateModelSet();
-        final var level = new SnapshotBlockGetter(snapshot);
+        final var level = new SnapshotBlockGetter(snapshot, resolveBiomes(mc, snapshot), compactBiome(mc),
+                mc.options.biomeBlendRadius().get());
         final var renderer = new ModelBlockRenderer(true /*AO*/, true /*cull internal faces*/, mc.getBlockColors());
+        final var fluidRenderer = new FluidRenderer(mc.getModelManager().getFluidStateModelSet());
+        final var fluidConsumer = new SectionOffsetVertexConsumer();
 
         final Map<ChunkSectionLayer, ByteBufferBuilder> scratch = new EnumMap<>(ChunkSectionLayer.class);
         final Map<ChunkSectionLayer, BufferBuilder> builders = new EnumMap<>(ChunkSectionLayer.class);
@@ -88,8 +98,19 @@ public final class RoomPreviewMesh {
             for (int z = 0; z < sz; z++) {
                 for (int x = 0; x < sx; x++) {
                     final BlockState state = snapshot.blockAt(x, y, z);
-                    if (state.isAir() || state.getRenderShape() != RenderShape.MODEL) continue;
+                    if (state.isAir()) continue;
                     pos.set(x, y, z);
+
+                    // Fluids (water, lava, waterlogged blocks) have no block model; vanilla bakes them separately.
+                    final var fluidState = state.getFluidState();
+                    if (!fluidState.isEmpty()) {
+                        final int fx = x, fy = y, fz = z;
+                        fluidRenderer.tesselate(level, pos,
+                                layer -> fluidConsumer.target(layerBuilder(scratch, builders, layer), fx, fy, fz),
+                                state, fluidState);
+                    }
+
+                    if (state.getRenderShape() != RenderShape.MODEL) continue;
                     renderer.tesselateBlock(
                             ModelBlockRenderer.forceOpaque(false, state) ? forcedSolid : out,
                             x, y, z, level, pos, state, modelSet.get(state), state.getSeed(pos));
@@ -112,6 +133,30 @@ public final class RoomPreviewMesh {
             b.close();
 
         return new RoomPreviewMesh(sx, sy, sz, result);
+    }
+
+    /** {@return the snapshot's biome keys resolved against the client's synced biome registry} */
+    private static Map<ResourceKey<Biome>, Biome> resolveBiomes(Minecraft mc, RoomPreviewSnapshot snapshot) {
+        final Map<ResourceKey<Biome>, Biome> resolved = new HashMap<>();
+        if (mc.level == null)
+            return resolved;
+
+        final var registry = mc.level.registryAccess().lookupOrThrow(Registries.BIOME);
+        for (ResourceKey<Biome> key : snapshot.biomes().palette())
+            registry.get(key).ifPresent(holder -> resolved.put(key, holder.value()));
+        return resolved;
+    }
+
+    /** {@return the compact dimension's biome from the client's synced registry, or null if unavailable} */
+    private static @Nullable Biome compactBiome(Minecraft mc) {
+        if (mc.level == null)
+            return null;
+
+        return mc.level.registryAccess()
+                .lookupOrThrow(Registries.BIOME)
+                .get(CompactDimension.COMPACT_BIOME_KEY)
+                .map(Holder::value)
+                .orElse(null);
     }
 
     private static BufferBuilder layerBuilder(Map<ChunkSectionLayer, ByteBufferBuilder> scratch,

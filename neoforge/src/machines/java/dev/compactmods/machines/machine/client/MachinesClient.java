@@ -20,6 +20,7 @@ public interface MachinesClient {
 	  modBus.addListener(MachinesClient::registerRenderPipelines);
 
        NeoForge.EVENT_BUS.addListener(EventPriority.HIGH, MachineShaderRenderer::extractPrideRenderState);
+       NeoForge.EVENT_BUS.addListener(MachineShaderRenderer::prepareBuffers);
        NeoForge.EVENT_BUS.addListener(MachineShaderRenderer::afterTranslucent);
    }
 

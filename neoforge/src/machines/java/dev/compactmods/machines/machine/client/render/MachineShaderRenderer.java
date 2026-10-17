@@ -16,12 +16,12 @@ import dev.compactmods.machines.machine.block.CompactMachineBlockEntity;
 import it.unimi.dsi.fastutil.longs.LongArrayList;
 import it.unimi.dsi.fastutil.longs.LongList;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.ARGB;
 import net.minecraft.util.context.ContextKey;
 import net.neoforged.neoforge.client.event.ExtractLevelRenderStateEvent;
+import net.neoforged.neoforge.client.event.PrepareRenderBuffersEvent;
 import net.neoforged.neoforge.client.event.RenderLevelStageEvent;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
@@ -83,10 +83,12 @@ public class MachineShaderRenderer {
             .get();
 
     /**
-     * Lazy-allocated palette UBO. Created on first use, then re-uploaded each
-     * frame with the resolved {@link FlagShader} colours.
+     * Palette UBO per flag, lazily allocated and re-uploaded each frame with the
+     * resolved {@link FlagShader} colours. One per flag because every flag drawn
+     * in a frame needs its own contents at draw time — they can't share a buffer
+     * that's rewritten between draws.
      */
-    private static @Nullable GpuBuffer paletteBuffer;
+    private static final Map<Identifier, GpuBuffer> paletteBuffers = new HashMap<>();
 
     public static void extractPrideRenderState(ExtractLevelRenderStateEvent e) {
 
@@ -165,6 +167,27 @@ public class MachineShaderRenderer {
         e.getRenderState().setRenderData(KEY, state);
     }
 
+    /**
+     * Uploads each drawn flag's palette before the level's main pass opens —
+     * buffer writes aren't allowed inside the pass the stage events run in.
+     */
+    public static void prepareBuffers(PrepareRenderBuffersEvent e) {
+        var state = e.getLevelRenderState().getRenderData(KEY);
+        if (state == null || state.meshes.isEmpty())
+            return;
+
+        final var registry = state.clientLevel.registryAccess()
+                .lookupOrThrow(FlagShader.REGISTRY_KEY);
+
+        for (var shaderId : state.meshes.keySet())
+            registry.getOptional(shaderId).ifPresent(flag -> uploadPaletteUbo(shaderId, flag));
+    }
+
+    /**
+     * Only fires with classic transparency; with improved transparency (OIT) enabled,
+     * NeoForge fires {@link RenderLevelStageEvent.OitTranslucent} instead and the overlay
+     * is not drawn.
+     */
     public static void afterTranslucent(RenderLevelStageEvent.AfterTranslucentBlocks e) {
 
         var state = e.getLevelRenderState().getRenderData(KEY);
@@ -174,9 +197,8 @@ public class MachineShaderRenderer {
 
         var transforms = RenderSystem.getDynamicUniforms().writeTransform(RenderSystem.getModelViewMatrixCopy(), colorModulator, worldOffset, textureTransform);
 
-        var renderTarget = Minecraft.getInstance().gameRenderer.mainRenderTarget();
-
         AtomicReference<RenderPipeline> shader = new AtomicReference<>(FlagShaders.PRIDE_STRIPES_PIPELINE);
+        final var pass = e.getRenderPass();
 
         for (var shaderId : state.shaders.keySet()) {
             var mesh = state.meshes.get(shaderId);
@@ -192,33 +214,26 @@ public class MachineShaderRenderer {
             final var prideShader = registry.getOptional(shaderId);
 
             // Whether the pride pipeline is active this frame — gates the palette
-            // UBO upload + bind below. Avoids touching the buffer for the tye-dye
-            // path, which doesn't declare FlagPalette.
+            // UBO bind below. The tye-dye path doesn't declare FlagPalette.
             final boolean[] usePride = {false};
             prideShader.ifPresent(ref -> {
                 shader.set(FlagShaders.PRIDE_STRIPES_PIPELINE);
                 usePride[0] = true;
-                uploadPaletteUbo(ref);
             });
 
-            try (var pass = RenderSystem.getDevice().createCommandEncoder().createRenderPass(
-                    () -> CompactMachinesCore.dotPrefix("machines"),
-                    renderTarget.getColorTextureView(),
-                    Optional.empty(),
-                    renderTarget.getDepthTextureView(),
-                    OptionalDouble.empty())
-            ) {
-                pass.setPipeline(RenderSystem.getCompiledPipeline(shader.get()));
-                RenderSystem.bindDefaultUniforms(pass);
-                pass.setVertexBuffer(0, mesh.VertexBuffer.slice());
-                pass.setIndexBuffer(mesh.IndexBuffer, mesh.MeshState.indexType());
-//            pass.bindTexture("Sampler0", texture.getTextureView(), texture.getSampler());
-                pass.setUniform("DynamicTransforms", transforms);
-                if (usePride[0] && paletteBuffer != null) {
-                    pass.setUniform("FlagPalette", paletteBuffer);
-                }
-                pass.drawIndexed(mesh.MeshState.indexCount(), 1, 0, 0, 0);
-            }
+            final var paletteBuffer = paletteBuffers.get(shaderId);
+            if (usePride[0] && paletteBuffer == null)
+                continue; // not uploaded in prepareBuffers; the pipeline requires it
+
+            pass.pushDebugGroup(() -> CompactMachinesCore.dotPrefix("machines"));
+            pass.setPipeline(RenderSystem.getCompiledPipeline(shader.get()));
+            pass.setVertexBuffer(0, mesh.VertexBuffer.slice());
+            pass.setIndexBuffer(mesh.IndexBuffer, mesh.MeshState.indexType());
+            pass.setUniform("DynamicTransforms", transforms);
+            if (usePride[0])
+                pass.setUniform("FlagPalette", paletteBuffer);
+            pass.drawIndexed(mesh.MeshState.indexCount(), 1, 0, 0, 0);
+            pass.popDebugGroup();
         }
     }
 
@@ -233,13 +248,11 @@ public class MachineShaderRenderer {
      * cheap to re-upload (≈176 bytes), so we just write the whole thing every
      * frame rather than tracking dirty state.</p>
      */
-    private static void uploadPaletteUbo(FlagShader shader) {
-        if (paletteBuffer == null) {
-            paletteBuffer = RenderSystem.getDevice().createBuffer(
-                    () -> CompactMachinesCore.dotPrefix("flag_palette_ubo"),
-                    GpuBuffer.USAGE_UNIFORM | GpuBuffer.USAGE_COPY_DST,
-                    PALETTE_UBO_SIZE);
-        }
+    private static void uploadPaletteUbo(Identifier flagId, FlagShader shader) {
+        final var paletteBuffer = paletteBuffers.computeIfAbsent(flagId, id -> RenderSystem.getDevice().createBuffer(
+                () -> CompactMachinesCore.dotPrefix("flag_palette_ubo"),
+                GpuBuffer.USAGE_UNIFORM | GpuBuffer.USAGE_COPY_DST,
+                PALETTE_UBO_SIZE));
 
         try (MemoryStack stack = MemoryStack.stackPush()) {
             Std140Builder b = Std140Builder.onStack(stack, PALETTE_UBO_SIZE)

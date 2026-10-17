@@ -4,6 +4,7 @@ import dev.compactmods.machines.CMDataAttachments;
 import dev.compactmods.machines.core.CompactMachinesCore;
 import dev.compactmods.machines.core.data.Saveable;
 import dev.compactmods.machines.api.dimension.CompactDimension;
+import dev.compactmods.machines.room.data.CMRoomDataMigration;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.level.Level;
 import net.neoforged.bus.api.EventPriority;
@@ -13,6 +14,7 @@ import net.neoforged.neoforge.attachment.AttachmentType;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.common.world.chunk.RegisterTicketControllersEvent;
 import net.neoforged.neoforge.event.level.LevelEvent;
+import net.neoforged.neoforge.event.server.ServerAboutToStartEvent;
 import net.neoforged.neoforge.event.server.ServerStartedEvent;
 import net.neoforged.neoforge.event.server.ServerStoppingEvent;
 
@@ -29,6 +31,7 @@ public class CompactMachinesServer {
                 .build());
 
     public CompactMachinesServer(IEventBus modBus) {
+        NeoForge.EVENT_BUS.addListener(EventPriority.HIGHEST, CompactMachinesServer::serverAboutToStart);
         NeoForge.EVENT_BUS.addListener(EventPriority.HIGH, CompactMachinesServer::serverStarted);
         NeoForge.EVENT_BUS.addListener(EventPriority.LOW, CompactMachinesServer::serverStopping);
         NeoForge.EVENT_BUS.addListener(EventPriority.LOW, CompactMachinesServer::levelSaved);
@@ -45,6 +48,11 @@ public class CompactMachinesServer {
         final var caps = server.getData(SERVER_CAPABILITIES);
         if(caps instanceof Saveable s)
             s.save();
+    }
+
+    private static void serverAboutToStart(final ServerAboutToStartEvent event) {
+        // Before anything reads room data from disk
+        CMRoomDataMigration.migrateLegacyLayout(event.getServer());
     }
 
     private static void serverStarted(final ServerStartedEvent started) {
