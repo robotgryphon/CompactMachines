@@ -9,25 +9,31 @@ import net.minecraft.server.MinecraftServer;
 
 public final class ServerRoomSpawnManagers implements IRoomSpawnManagers {
 
-    private final MinecraftServer server;
     private final CodecFileManager.Keyed<RoomInstance, SpawnManager> spawnManagers;
 
     public ServerRoomSpawnManagers(MinecraftServer server) {
         this.spawnManagers = CodecFileManager.keyed(RoomInstance::code, SpawnManager.CODEC)
                 .at(CMRoomDataLocations.PLAYER_SPAWNS)
                 .build(server);
-        this.server = server;
     }
 
     public IRoomSpawnManager get(RoomInstance room) {
+        final SpawnManager manager;
         if (this.spawnManagers.hasData(room)) {
-            return this.spawnManagers.data(room);
+            manager = this.spawnManagers.data(room);
         } else {
-            SpawnManager newManager = new SpawnManager(server, room);
-            this.spawnManagers.set(room, newManager);
+            manager = new SpawnManager(room);
+            this.spawnManagers.set(room, manager);
             this.spawnManagers.save();
-            return newManager;
         }
+
+        // Spawn changes mutate the cached manager in place; the keyed file manager only writes
+        // files marked dirty, so mark it and write it now — spawns change rarely.
+        manager.onChanged(() -> {
+            this.spawnManagers.markDirty(room);
+            this.spawnManagers.save();
+        });
+        return manager;
     }
 
     public void save() {

@@ -8,13 +8,9 @@ import dev.compactmods.machines.api.room.spatial.RoomBoundaries;
 import dev.compactmods.machines.api.room.spawn.IRoomSpawnManager;
 import dev.compactmods.machines.api.room.spawn.IRoomSpawns;
 import dev.compactmods.machines.api.room.spawn.RoomSpawn;
-import dev.compactmods.machines.core.data.DataFileUtil;
 import dev.compactmods.machines.core.data.Saveable;
-import dev.compactmods.machines.core.data.manager.CodecFileManager;
-import dev.compactmods.machines.room.data.CMRoomDataLocations;
 import it.unimi.dsi.fastutil.objects.Object2ReferenceLinkedOpenHashMap;
 import net.minecraft.core.UUIDUtil;
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.phys.Vec2;
 import net.minecraft.world.phys.Vec3;
 
@@ -23,6 +19,10 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
+/**
+ * A room's spawn points. Persisted by its owning {@link ServerRoomSpawnManagers}, which binds
+ * {@link #onChanged} when it hands the manager out: every spawn change is written straight away.
+ */
 public class SpawnManager implements IRoomSpawnManager, Saveable {
 
     private static final UnboundedMapCodec<UUID, RoomSpawn> PLAYER_SPAWNS_CODEC = Codec.unboundedMap(UUIDUtil.STRING_CODEC, RoomSpawn.CODEC);
@@ -33,15 +33,15 @@ public class SpawnManager implements IRoomSpawnManager, Saveable {
             RoomBoundaries.MAP_CODEC.fieldOf("room_bounds").forGetter(x -> x.roomBoundaries)
     ).apply(inst, SpawnManager::new));
 
-    private MinecraftServer server;
-
     private final String roomCode;
     private final RoomBoundaries roomBoundaries;
     private RoomSpawn defaultSpawn;
     private final Map<UUID, RoomSpawn> playerSpawns;
 
-    SpawnManager(MinecraftServer server, RoomInstance roomInstance) {
-        this.server = server;
+    /** Persists this manager; bound by the owner (the codec can't carry it). */
+    private Runnable onChanged = () -> {};
+
+    SpawnManager(RoomInstance roomInstance) {
         this.roomCode = roomInstance.code();
         this.roomBoundaries = roomInstance.boundaries();
         this.defaultSpawn = new RoomSpawn(roomBoundaries.defaultSpawn(), Vec2.ZERO);
@@ -55,14 +55,21 @@ public class SpawnManager implements IRoomSpawnManager, Saveable {
         this.roomBoundaries = roomBoundaries;
     }
 
+    /** Called by the owner with how to persist this manager after a change. */
+    void onChanged(Runnable onChanged) {
+        this.onChanged = onChanged;
+    }
+
     @Override
     public void resetPlayerSpawn(UUID player) {
-        playerSpawns.remove(player);
+        if (playerSpawns.remove(player) != null)
+            onChanged.run();
     }
 
     @Override
     public void setDefaultSpawn(Vec3 position, Vec2 rotation) {
         defaultSpawn = new RoomSpawn(position, rotation);
+        onChanged.run();
     }
 
     @Override
@@ -78,15 +85,12 @@ public class SpawnManager implements IRoomSpawnManager, Saveable {
             return;
 
         playerSpawns.put(player, new RoomSpawn(location, rotation));
+        onChanged.run();
     }
 
     @Override
     public void save() {
-        CodecFileManager.Single<SpawnManager> manager = CodecFileManager.single(CODEC)
-                .at(CMRoomDataLocations.PLAYER_SPAWNS)
-                .build(server);
-
-        manager.save();
+        onChanged.run();
     }
 
     private record RoomSpawns(RoomSpawn defaultSpawn,

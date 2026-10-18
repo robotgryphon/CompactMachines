@@ -10,6 +10,7 @@ public final class RoomNetworking {
     public static void register(final PayloadRegistrar reg) {
         reg.playToClient(RoomPreviewSnapshotPacket.TYPE, RoomPreviewSnapshotPacket.STREAM_CODEC, RoomPreviewSnapshotPacket.HANDLER);
         reg.playToClient(RoomEntitiesPacket.TYPE, RoomEntitiesPacket.STREAM_CODEC, RoomEntitiesPacket.HANDLER);
+        reg.playToClient(RoomPreviewSpawnPacket.TYPE, RoomPreviewSpawnPacket.STREAM_CODEC, RoomPreviewSpawnPacket.HANDLER);
 
         reg.playToServer(RoomPreviewSubscribePacket.TYPE, RoomPreviewSubscribePacket.STREAM_CODEC, RoomPreviewSubscribePacket.HANDLER);
         reg.playToServer(PlayerStartedRoomTrackingPacket.TYPE, PlayerStartedRoomTrackingPacket.STREAM_CODEC, PlayerStartedRoomTrackingPacket.HANDLER);

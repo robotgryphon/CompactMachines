@@ -2,44 +2,43 @@ package dev.compactmods.machines.preview.client;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.renderpearl.api.commands.RenderPass;
 import com.mojang.renderpearl.api.pipeline.PrimitiveTopology;
 import com.mojang.renderpearl.api.pipeline.RenderPipeline;
 import com.mojang.renderpearl.api.textures.FilterMode;
 import dev.compactmods.machines.core.CompactMachinesCore;
 import dev.compactmods.machines.machine.block.CompactMachineBlockEntity;
-import dev.compactmods.machines.room.preview.RoomEntitySnapshot;
-import dev.compactmods.machines.room.preview.client.ClientRoomEntities;
 import dev.compactmods.machines.room.preview.client.RoomPreviewEntities;
+import dev.compactmods.machines.room.preview.client.RoomPreviewEntitySubmitter;
 import dev.compactmods.machines.room.preview.client.RoomPreviewMesh;
 import dev.compactmods.machines.room.preview.client.RoomPreviewMeshCache;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.client.renderer.chunk.ChunkSectionLayer;
-import net.minecraft.client.renderer.entity.state.EntityRenderState;
 import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.core.BlockPos;
-import net.minecraft.util.LightCoordsUtil;
-import net.minecraft.util.Mth;
 import net.minecraft.util.context.ContextKey;
-import net.minecraft.world.entity.Entity;
 import net.neoforged.neoforge.client.event.ExtractLevelRenderStateEvent;
 import net.neoforged.neoforge.client.event.PrepareRenderBuffersEvent;
 import net.neoforged.neoforge.client.event.RenderLevelStageEvent;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
+import org.jspecify.annotations.Nullable;
 
 import java.util.ArrayList;
+import java.util.IdentityHashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Draws the textured room previews. Each room is baked once into per-layer GPU buffers
  * ({@link RoomPreviewMesh}, in room-local space); this renderer draws that mesh once per visible
  * machine, applying the machine's placement transform via the per-draw model-view matrix.
  *
- * <p>Draws straight into the level's main pass at {@link RenderLevelStageEvent.AfterOpaqueBlocks}
- * (NeoForge 26.3 stages hand out the active {@code RenderPass}; opening another one mid-frame is
- * illegal). That pass already targets the main colour + depth, so the vanilla {@code *_BLOCK}
+ * <p>Draws straight into the level's main pass — opaque layers at
+ * {@link RenderLevelStageEvent.AfterOpaqueBlocks}, the translucent layer after the level's solid
+ * features (so the room's entities show through its water) — since NeoForge 26.3 stages hand out the
+ * active {@code RenderPass} and opening another one mid-frame is illegal. That pass already targets the main colour + depth, so the vanilla {@code *_BLOCK}
  * pipelines (reversed-Z depth test+write, block atlas + lightmap) occlude correctly against the world,
  * and the machines' translucent panes composite over the preview later in the frame. The shared quad
  * index buffer can't be resized inside the pass, so its size is requested in
@@ -51,10 +50,6 @@ public final class RoomPreviewRenderer {
     private static final float FIT = 14f / 16f;
     /** Block-space Y of the inner window's floor — the room's floor is anchored here. */
     private static final float FLOOR_Y = (1f - FIT) / 2f;
-
-    /** Draw order: opaque, then cutout, then translucent last. */
-    private static final ChunkSectionLayer[] LAYERS =
-            {ChunkSectionLayer.SOLID, ChunkSectionLayer.CUTOUT, ChunkSectionLayer.TRANSLUCENT};
 
     private static final ContextKey<State> KEY = new ContextKey<>(CompactMachinesCore.identifier("room_preview_renderer"));
 
@@ -88,16 +83,63 @@ public final class RoomPreviewRenderer {
 
     // --- drawing ---------------------------------------------------------------------
 
-    /** Reserve the quad index buffer for the largest preview layer before the main pass opens. */
+    /**
+     * Before the main pass opens: reserve the quad index buffer for the largest preview layer, and
+     * re-sort translucent layers back-to-front (both are buffer writes, illegal inside the pass).
+     */
     public static void prepareBuffers(PrepareRenderBuffersEvent event) {
         final State state = event.getLevelRenderState().getRenderData(KEY);
-        final int maxIndices = state == null ? 0 : state.maxIndexCount();
+        if (state == null || state.entries.isEmpty()) return;
+
+        final int maxIndices = state.maxIndexCount();
         if (maxIndices > 0)
             RenderSystem.getSequentialBuffer(PrimitiveTopology.QUADS).requestIndexCount(maxIndices);
+
+        // A mesh is shared by every machine bound to its room, but has one index order: sort for the
+        // nearest of those machines, the one whose layering is most visible.
+        final Map<RoomPreviewMesh, Entry> nearest = new IdentityHashMap<>();
+        for (Entry entry : state.entries) {
+            nearest.merge(entry.mesh, entry, (a, b) ->
+                    distanceSq(a, state) <= distanceSq(b, state) ? a : b);
+        }
+
+        nearest.forEach((mesh, entry) -> {
+            final var translucent = mesh.layer(ChunkSectionLayer.TRANSLUCENT);
+            if (translucent != null && translucent.sort() != null)
+                translucent.sort().sortFor(cameraInMesh(entry, state));
+        });
     }
 
+    private static double distanceSq(Entry entry, State state) {
+        return entry.pos.distToCenterSqr(state.camX, state.camY, state.camZ);
+    }
+
+    /** Inverse of {@link #modelView}'s placement: the camera position in the mesh's room-local space. */
+    private static Vector3f cameraInMesh(Entry entry, State state) {
+        final float scale = FIT / entry.mesh.maxDimension();
+        return new Vector3f(
+                (float) (state.camX - entry.pos.getX() - 0.5) / scale + entry.mesh.sizeX / 2f,
+                (float) (state.camY - entry.pos.getY() - FLOOR_Y) / scale,
+                (float) (state.camZ - entry.pos.getZ() - 0.5) / scale + entry.mesh.sizeZ / 2f);
+    }
+
+    /** Opaque preview layers: drawn before the level's solid features (entities), like solid terrain. */
     public static void afterSolidBlocks(RenderLevelStageEvent.AfterOpaqueBlocks event) {
-        final State state = event.getLevelRenderState().getRenderData(KEY);
+        drawLayers(event.getLevelRenderState().getRenderData(KEY), event.getRenderPass(),
+                ChunkSectionLayer.SOLID, ChunkSectionLayer.CUTOUT);
+    }
+
+    /**
+     * The translucent preview layer: drawn after the level's solid features, like translucent terrain.
+     * Translucent quads write depth, so drawn earlier the preview's water would hide the room's
+     * entities swimming in it. Fires in the main pass with classic and improved transparency alike.
+     */
+    public static void afterOpaqueFeatures(RenderLevelStageEvent.AfterOpaqueFeatures event) {
+        drawLayers(event.getLevelRenderState().getRenderData(KEY), event.getRenderPass(),
+                ChunkSectionLayer.TRANSLUCENT);
+    }
+
+    private static void drawLayers(@Nullable State state, RenderPass pass, ChunkSectionLayer... layers) {
         if (state == null || state.entries.isEmpty()) return;
 
         final var quadIndices = RenderSystem.getSequentialBuffer(PrimitiveTopology.QUADS);
@@ -110,11 +152,10 @@ public final class RoomPreviewRenderer {
         final var lightmap = mc.gameRenderer.lightmap();
         final var atlasSampler = RenderSystem.getSamplerCache().getClampToEdge(FilterMode.NEAREST);
         final var lightmapSampler = RenderSystem.getSamplerCache().getClampToEdge(FilterMode.LINEAR);
-        final var pass = event.getRenderPass();
         pass.pushDebugGroup(() -> CompactMachinesCore.dotPrefix("room_preview"));
         try {
-            for (ChunkSectionLayer layer : LAYERS) {
-                final RenderPipeline pipeline = blockPipeline(layer);
+            for (ChunkSectionLayer layer : layers) {
+                final RenderPipeline pipeline = RoomPreviewMesh.pipeline(layer);
                 pass.setPipeline(RenderSystem.getCompiledPipeline(pipeline));
                 RenderSystem.bindDefaultUniforms(pass);
                 pass.setUniform("Sampler0", atlas, atlasSampler);
@@ -130,7 +171,10 @@ public final class RoomPreviewRenderer {
 
                     pass.setUniform("DynamicTransforms", transforms);
                     pass.setVertexBuffer(0, lm.vertexBuffer().slice());
-                    pass.setIndexBuffer(quadIndices.getBuffer(lm.indexCount()), quadIndices.type());
+                    if (lm.sort() != null)
+                        pass.setIndexBuffer(lm.sort().indexBuffer(), lm.sort().indexType());
+                    else
+                        pass.setIndexBuffer(quadIndices.getBuffer(lm.indexCount()), quadIndices.type());
                     pass.drawIndexed(lm.indexCount(), 1, 0, 0, 0);
                 }
             }
@@ -153,42 +197,23 @@ public final class RoomPreviewRenderer {
         if (mc.level == null) return;
         RoomPreviewEntities.retainCurrent();
 
-        final var dispatcher = mc.getEntityRenderDispatcher();
         final float partialTick = mc.getDeltaTracker().getGameTimeDeltaPartialTick(false);
         final var camera = event.getLevelRenderState().cameraRenderState;
         final var collector = event.getSubmitNodeCollector();
         final PoseStack pose = event.getPoseStack();
 
         for (Entry entry : state.entries) {
-            final var snapshots = ClientRoomEntities.get(entry.roomCode);
-            if (snapshots.isEmpty()) continue;
             final float scale = FIT / entry.mesh.maxDimension();
 
-            for (RoomEntitySnapshot snapshot : snapshots) {
-                final Entity entity = RoomPreviewEntities.get(entry.roomCode, snapshot.entityId());
-                if (entity == null) continue;
-
-                final EntityRenderState rs = dispatcher.extractEntity(entity, partialTick);
-                rs.lightCoords = LightCoordsUtil.FULL_BRIGHT;
-                rs.shadowPieces.clear();
-                rs.shadowRadius = 0f;
-
-                // The entity is ticked at 20 Hz; interpolate its room-local feet by partial tick.
-                final double ex = Mth.lerp((double) partialTick, entity.xOld, entity.getX());
-                final double ey = Mth.lerp((double) partialTick, entity.yOld, entity.getY());
-                final double ez = Mth.lerp((double) partialTick, entity.zOld, entity.getZ());
-
-                // Camera-relative machine transform (camera view is applied by the level), then the
-                // entity's room-local feet — matching the block mesh placement.
-                pose.pushPose();
-                pose.translate(entry.pos.getX() - state.camX, entry.pos.getY() - state.camY, entry.pos.getZ() - state.camZ);
-                pose.translate(0.5f, FLOOR_Y, 0.5f);
-                pose.scale(scale, scale, scale);
-                pose.translate(-entry.mesh.sizeX / 2f, 0f, -entry.mesh.sizeZ / 2f);
-                pose.translate(ex, ey, ez);
-                dispatcher.submit(rs, camera, 0, 0, 0, pose, collector);
-                pose.popPose();
-            }
+            // Camera-relative machine transform (camera view is applied by the level), then
+            // room-local space — matching the block mesh placement.
+            pose.pushPose();
+            pose.translate(entry.pos.getX() - state.camX, entry.pos.getY() - state.camY, entry.pos.getZ() - state.camZ);
+            pose.translate(0.5f, FLOOR_Y, 0.5f);
+            pose.scale(scale, scale, scale);
+            pose.translate(-entry.mesh.sizeX / 2f, 0f, -entry.mesh.sizeZ / 2f);
+            RoomPreviewEntitySubmitter.submit(entry.roomCode, pose, collector, camera, partialTick);
+            pose.popPose();
         }
     }
 
@@ -205,14 +230,6 @@ public final class RoomPreviewRenderer {
                 .translate(-mesh.sizeX / 2f, 0f, -mesh.sizeZ / 2f);
     }
 
-    private static RenderPipeline blockPipeline(ChunkSectionLayer layer) {
-        return switch (layer) {
-            case SOLID -> RenderPipelines.SOLID_BLOCK;
-            case CUTOUT -> RenderPipelines.CUTOUT_BLOCK;
-            case TRANSLUCENT -> RenderPipelines.TRANSLUCENT_BLOCK;
-        };
-    }
-
     private record Entry(BlockPos pos, String roomCode, RoomPreviewMesh mesh) {}
 
     private static final class State {
@@ -222,12 +239,8 @@ public final class RoomPreviewRenderer {
 
         int maxIndexCount() {
             int max = 0;
-            for (Entry entry : entries) {
-                for (ChunkSectionLayer layer : LAYERS) {
-                    final RoomPreviewMesh.LayerMesh lm = entry.mesh.layer(layer);
-                    if (lm != null) max = Math.max(max, lm.indexCount());
-                }
-            }
+            for (Entry entry : entries)
+                max = Math.max(max, entry.mesh.maxIndexCount());
             return max;
         }
     }

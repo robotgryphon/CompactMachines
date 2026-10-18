@@ -7,6 +7,7 @@ import dev.compactmods.machines.api.room.registry.RoomRegistry;
 import dev.compactmods.machines.core.CompactMachinesCore;
 import dev.compactmods.machines.room.network.RoomEntitiesPacket;
 import dev.compactmods.machines.room.network.RoomPreviewSnapshotPacket;
+import dev.compactmods.machines.room.network.RoomPreviewSpawnPacket;
 import dev.compactmods.machines.room.preview.RoomEntitySnapshot;
 import dev.compactmods.machines.room.preview.RoomPreviewSnapshot;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
@@ -23,6 +24,7 @@ import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.event.server.ServerStoppingEvent;
 import net.neoforged.neoforge.event.tick.LevelTickEvent;
 import net.neoforged.neoforge.network.PacketDistributor;
+import org.joml.Vector3f;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -91,12 +93,15 @@ public final class RoomPreviewService {
         state.subscribe(player.getUUID(), requested);
         CompactMachinesCore.modLog().info("[RoomPreview] subscription from {}: {}", player.getName().getString(), requested);
 
-        // Push cached snapshots for the rooms this player just added.
+        // Push cached snapshots (and this player's spawn) for the rooms this player just added.
+        final RoomRegistry rooms = RoomCapabilities.REGISTRY.getCapability(server);
         for (String code : requested) {
             if (previous.contains(code)) continue;
             final CachedSnapshot cached = state.cache.get(code);
             if (cached != null)
                 PacketDistributor.sendToPlayer(player, new RoomPreviewSnapshotPacket(code, cached.snapshot));
+            if (rooms != null)
+                rooms.get(code).ifPresent(room -> sendSpawnIfChanged(player, room, code, state));
         }
     }
 
@@ -130,9 +135,43 @@ public final class RoomPreviewService {
             final RoomInstance room = rooms.get(code).orElse(null);
             if (room == null || !isLoaded(level, room)) continue;
 
-            if (doBlocks) gatherBlocks(server, level, room, code, subscribers, state);
+            if (doBlocks) {
+                gatherBlocks(server, level, room, code, subscribers, state);
+                for (UUID id : subscribers) {
+                    final ServerPlayer player = server.getPlayerList().getPlayer(id);
+                    if (player != null) sendSpawnIfChanged(player, room, code, state);
+                }
+            }
             if (doEntities) gatherEntities(server, level, room, code, subscribers, state);
         }
+    }
+
+    /**
+     * Sends {@code player} their spawn (position and facing) in {@code room} — their own if set, else the room's default,
+     * as the shrinking device resolves it — in the preview's room-local coordinates, if it changed
+     * since last sent.
+     */
+    private static void sendSpawnIfChanged(ServerPlayer player, RoomInstance room, String code, ServerState state) {
+        final var spawnManager = room.getCapability(RoomCapabilities.SPAWN_MANAGER);
+        if (spawnManager == null) return;
+
+        final var spawns = spawnManager.spawns();
+        final var roomSpawn = spawns.forPlayer(player.getUUID()).orElse(spawns.defaultSpawn());
+        final var spawn = roomSpawn.position();
+
+        // Same origin as RoomPreviewSnapshot#capture: the interior's minimum block corner
+        final AABB inner = room.boundaries().innerBounds();
+        final Vector3f local = new Vector3f(
+                (float) (spawn.x - Mth.floor(inner.minX)),
+                (float) (spawn.y - Mth.floor(inner.minY)),
+                (float) (spawn.z - Mth.floor(inner.minZ)));
+
+        // RoomSpawn rotation is (pitch, yaw), as Entity#getRotationVector
+        final var packet = new RoomPreviewSpawnPacket(code, local, roomSpawn.rotation().y, roomSpawn.rotation().x);
+        final var sent = state.lastSpawns.computeIfAbsent(player.getUUID(), u -> new HashMap<>());
+        if (packet.equals(sent.get(code))) return;
+        sent.put(code, packet);
+        PacketDistributor.sendToPlayer(player, packet);
     }
 
     /** Captures the room's blocks and sends a snapshot only when the contents changed. */
@@ -253,6 +292,8 @@ public final class RoomPreviewService {
         private final Set<String> ticketed = new HashSet<>();
         /** Last entity count sent per room, so repeated empties aren't re-sent. */
         private final Map<String, Integer> lastEntityCount = new HashMap<>();
+        /** Last spawn sent per player and room, so unchanged spawns aren't re-sent. */
+        private final Map<UUID, Map<String, RoomPreviewSpawnPacket>> lastSpawns = new HashMap<>();
 
         void subscribe(UUID player, Set<String> rooms) {
             unsubscribe(player);
@@ -263,6 +304,7 @@ public final class RoomPreviewService {
         }
 
         void unsubscribe(UUID player) {
+            lastSpawns.remove(player);
             final Set<String> previous = byPlayer.remove(player);
             if (previous == null) return;
             for (String code : previous) {

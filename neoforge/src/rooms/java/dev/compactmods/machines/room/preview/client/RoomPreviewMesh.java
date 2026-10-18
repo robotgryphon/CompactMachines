@@ -4,12 +4,15 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.BufferBuilder;
 import com.mojang.blaze3d.vertex.ByteBufferBuilder;
 import com.mojang.blaze3d.vertex.MeshData;
+import com.mojang.blaze3d.vertex.VertexSorting;
 import com.mojang.renderpearl.api.buffers.GpuBuffer;
 import com.mojang.renderpearl.api.pipeline.PrimitiveTopology;
+import com.mojang.renderpearl.api.pipeline.RenderPipeline;
 import dev.compactmods.machines.api.dimension.CompactDimension;
 import dev.compactmods.machines.core.CompactMachinesCore;
 import dev.compactmods.machines.room.preview.RoomPreviewSnapshot;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.client.renderer.block.BlockQuadOutput;
 import net.minecraft.client.renderer.block.FluidRenderer;
 import net.minecraft.client.renderer.block.ModelBlockRenderer;
@@ -43,8 +46,11 @@ public final class RoomPreviewMesh {
     public final int sizeX, sizeY, sizeZ;
     private final Map<ChunkSectionLayer, LayerMesh> layers;
 
-    /** One layer's uploaded geometry: a vertex buffer plus the index count for the shared quad indices. */
-    public record LayerMesh(GpuBuffer vertexBuffer, int indexCount) {}
+    /**
+     * One layer's uploaded geometry: a vertex buffer plus its index count. Opaque layers draw with the
+     * shared sequential quad indices; the translucent layer carries its own camera-sorted indices.
+     */
+    public record LayerMesh(GpuBuffer vertexBuffer, int indexCount, @Nullable TranslucentSort sort) {}
 
     private RoomPreviewMesh(int sizeX, int sizeY, int sizeZ, Map<ChunkSectionLayer, LayerMesh> layers) {
         this.sizeX = sizeX;
@@ -61,14 +67,37 @@ public final class RoomPreviewMesh {
         return layers.isEmpty();
     }
 
+    /** Draw order for the layers: opaque, then cutout, then translucent last. */
+    public static final ChunkSectionLayer[] DRAW_ORDER =
+            {ChunkSectionLayer.SOLID, ChunkSectionLayer.CUTOUT, ChunkSectionLayer.TRANSLUCENT};
+
+    /** The vanilla {@code *_BLOCK} pipeline for drawing a layer of this mesh (block atlas + lightmap). */
+    public static RenderPipeline pipeline(ChunkSectionLayer layer) {
+        return switch (layer) {
+            case SOLID -> RenderPipelines.SOLID_BLOCK;
+            case CUTOUT -> RenderPipelines.CUTOUT_BLOCK;
+            case TRANSLUCENT -> RenderPipelines.TRANSLUCENT_BLOCK;
+        };
+    }
+
+    /** {@return the largest index count of any layer} — what the shared quad index buffer must hold. */
+    public int maxIndexCount() {
+        int max = 0;
+        for (LayerMesh mesh : layers.values())
+            max = Math.max(max, mesh.indexCount());
+        return max;
+    }
+
     public @Nullable LayerMesh layer(ChunkSectionLayer layer) {
         return layers.get(layer);
     }
 
     /** Frees the GPU buffers. Call when this mesh is evicted/superseded. */
     public void close() {
-        for (LayerMesh mesh : layers.values())
+        for (LayerMesh mesh : layers.values()) {
             mesh.vertexBuffer().close();
+            if (mesh.sort() != null) mesh.sort().close();
+        }
         layers.clear();
     }
 
@@ -122,11 +151,21 @@ public final class RoomPreviewMesh {
         for (var entry : builders.entrySet()) {
             final MeshData mesh = entry.getValue().build();
             if (mesh == null) continue;
-            try (mesh) {
+            // Resources close in reverse: the mesh (and its sorted index result) before the scratch it lives in
+            try (var indexScratch = new ByteBufferBuilder(mesh.drawState().indexCount() * 4); mesh) {
                 final GpuBuffer vb = RenderSystem.getDevice().createBuffer(
                         () -> CompactMachinesCore.dotPrefix("room_preview_verts"),
                         GpuBuffer.USAGE_COPY_DST | GpuBuffer.USAGE_VERTEX, mesh.vertexBuffer());
-                result.put(entry.getKey(), new LayerMesh(vb, mesh.drawState().indexCount()));
+
+                // Translucent quads need back-to-front order per camera; start from the room's centre
+                TranslucentSort sort = null;
+                if (entry.getKey() == ChunkSectionLayer.TRANSLUCENT) {
+                    final var state = mesh.sortQuads(indexScratch, VertexSorting.byDistance(sx / 2f, sy / 2f, sz / 2f));
+                    if (state != null)
+                        sort = new TranslucentSort(state, mesh.indexBuffer(), mesh.drawState().indexCount());
+                }
+
+                result.put(entry.getKey(), new LayerMesh(vb, mesh.drawState().indexCount(), sort));
             }
         }
         for (ByteBufferBuilder b : scratch.values())

@@ -9,6 +9,7 @@ public class ClientConfig {
     public static ModConfigSpec CONFIG;
 
     public static ModConfigSpec.BooleanValue ENABLE_ROOM_PREVIEWS;
+    public static ModConfigSpec.DoubleValue PREVIEW_SPAWN_GHOST_OPACITY;
 
     /**
      * When {@code true}, Compact Machines that haven't been pinned to a
@@ -29,6 +30,10 @@ public class ClientConfig {
                 .comment("Enable room preview when opening a bound machine UI")
                 .define("enableRoomPreviews", true);
 
+        PREVIEW_SPAWN_GHOST_OPACITY = builder
+                .comment("Opacity of the ghost of yourself drawn at your spawn point in the room preview (0 hides it, 1 is solid).")
+                .defineInRange("previewSpawnGhostOpacity", 0.5, 0.0, 1.0);
+
         ENABLE_PRIDE = builder
                 .comment("Render Compact Machines with Pride shaders.")
                 .define("enablePride", true);
@@ -44,5 +49,6 @@ public class ClientConfig {
         MachineClientConfig.ENABLE_PRIDE = ENABLE_PRIDE;
         MachineClientConfig.DEFAULT_PRIDE_FLAG = DEFAULT_PRIDE_FLAG;
         RoomClientConfig.ENABLE_ROOM_PREVIEWS = ENABLE_ROOM_PREVIEWS;
+        RoomClientConfig.PREVIEW_SPAWN_GHOST_OPACITY = PREVIEW_SPAWN_GHOST_OPACITY;
     }
 }

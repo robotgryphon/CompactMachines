@@ -6,6 +6,7 @@ import dev.compactmods.machines.room.preview.client.ClientRoomEntities;
 import dev.compactmods.machines.room.preview.client.ClientRoomPreviews;
 import dev.compactmods.machines.room.preview.client.RoomPreviewEntities;
 import dev.compactmods.machines.room.preview.client.RoomPreviewMeshCache;
+import dev.compactmods.machines.room.preview.client.gui.RoomPreviewGui;
 import net.neoforged.bus.api.EventPriority;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.client.event.ClientPlayerNetworkEvent;
@@ -49,10 +50,14 @@ public final class RoomPreviewClient {
         NeoForge.EVENT_BUS.addListener(RoomPreviewClient::onClientTick);
         NeoForge.EVENT_BUS.addListener(RoomPreviewClient::onLoggingOut);
 
+        // In-GUI previews (machine screen panel)
+        modBus.addListener(RoomPreviewGui::registerRenderers);
+
         // Batched in-world preview rendering (manual pass, like the flag shaders).
         NeoForge.EVENT_BUS.addListener(EventPriority.HIGH, RoomPreviewRenderer::extract);
         NeoForge.EVENT_BUS.addListener(RoomPreviewRenderer::prepareBuffers);
         NeoForge.EVENT_BUS.addListener(RoomPreviewRenderer::afterSolidBlocks);
+        NeoForge.EVENT_BUS.addListener(RoomPreviewRenderer::afterOpaqueFeatures);
         NeoForge.EVENT_BUS.addListener(RoomPreviewRenderer::onSubmitCustomGeometry);
     }
 
@@ -74,7 +79,8 @@ public final class RoomPreviewClient {
         if (++tickCounter < SUBSCRIBE_INTERVAL_TICKS) return;
         tickCounter = 0;
 
-        final Set<String> current = visibleRooms;
+        final Set<String> current = new HashSet<>(visibleRooms);
+        current.addAll(ClientRoomPreviews.watched());
         if (current.equals(lastSent)) return;
 
         lastSent = current;

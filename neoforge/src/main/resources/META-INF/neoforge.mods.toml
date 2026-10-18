@@ -42,3 +42,11 @@ type = "required"
 versionRange = "${minecraft_version_range}"
 ordering = "NONE"
 side = "BOTH"
+
+# Client-only: the machine screen is built with screenlib's UI
+[[dependencies.compactmachines]]
+modId = "screenlib"
+type = "required"
+versionRange = "[0.1.0,)"
+ordering = "AFTER"
+side = "CLIENT"

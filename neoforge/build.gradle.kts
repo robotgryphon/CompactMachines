@@ -286,6 +286,7 @@ dependencies {
     "roomsCompileOnly"(compactmods.spatial)
     "roomsCompileOnly"(libs.jnanoid)
     "roomsCompileOnly"(i18nSrc.get().output)   // room subcommands use CommandTranslations
+    "roomsCompileOnly"(compactmods.bundles.screenlib) // room preview panel
 
     "shrinkingCompileOnly"(project(":api"))
     "shrinkingCompileOnly"(roomsSrc.get().output)
@@ -295,6 +296,7 @@ dependencies {
     "roomUpgradesCompileOnly"(roomsSrc.get().output)
     "roomUpgradesCompileOnly"(storageSrc.get().output)
     "roomUpgradesCompileOnly"(compactmods.spatial)
+    "roomUpgradesCompileOnly"(compactmods.bundles.screenlib)
 
     "storageCompileOnly"(project(":api"))
     "storageCompileOnly"(roomsSrc.get().output)
@@ -302,6 +304,7 @@ dependencies {
     "machinesCompileOnly"(project(":api"))
     "machinesCompileOnly"(roomsSrc.get().output)
     "machinesCompileOnly"(shrinkingSrc.get().output)
+    "machinesCompileOnly"(compactmods.bundles.screenlib) // machine screen
 
     // Datagen sees the whole mod (main folds every feature source set). It must
     // also inherit main's `implementation` deps (:api, feather, spatial, jnanoid)
@@ -334,6 +337,14 @@ dependencies {
 
     implementation(compactmods.spatial)
     jarJar(compactmods.spatial) { isTransitive = false }
+
+    // ScreenLib node graph + UI APIs (from mavenLocal). Not jar-in-jar'd: the APIs are only
+    // useful alongside the screenlib mod, which provides their implementations at runtime.
+    implementation(compactmods.bundles.screenlib)
+
+    // The machine screen is built through screenlib's UiProvider, so dev runs need the mod itself
+    runtimeOnly(compactmods.screenlibMod)
+    "datagenRuntimeOnly"(compactmods.screenlibMod)
 
     // Gander
 //    implementation(compactmods.bundles.gander)

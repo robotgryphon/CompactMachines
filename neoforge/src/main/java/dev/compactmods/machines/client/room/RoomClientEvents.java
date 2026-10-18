@@ -2,6 +2,7 @@ package dev.compactmods.machines.client.room;
 
 import dev.compactmods.machines.client.keybinds.room.RoomExitKeyMapping;
 import dev.compactmods.machines.machine.client.MachineUI;
+import dev.robotgryphon.screenlib.ui.api.UiScreens;
 import dev.compactmods.machines.machine.Machines;
 import dev.compactmods.machines.room.client.RoomKeyMappings;
 import net.neoforged.neoforge.client.event.ClientTickEvent;
@@ -12,7 +13,7 @@ import net.neoforged.neoforge.client.event.RegisterMenuScreensEvent;
 public class RoomClientEvents {
 
     public static void registerMenuScreens(final RegisterMenuScreensEvent evt) {
-        evt.register(Machines.MACHINE_UI_MENU.get(), MachineUI::new);
+        UiScreens.register(evt, Machines.MACHINE_UI_MENU.get(), MachineUI::create);
     }
 
     public static void onKeybindRegistration(final RegisterKeyMappingsEvent evt) {
